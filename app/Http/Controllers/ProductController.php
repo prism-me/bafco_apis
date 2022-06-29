@@ -23,18 +23,12 @@ class ProductController extends Controller
             }
             return response()->json($products, 200);
         }
-        catch (ModelNotFoundException  $exception) {
-            return response()->json(['ex_message'=>'Product Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
-        }
-        catch (\Error $exception) {
+        catch (\Exception $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
         }
     }
 
-    
+
     /**
      * Store a newly created resource in storage.
      *

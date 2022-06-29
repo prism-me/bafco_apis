@@ -30,13 +30,8 @@ class VariationValueController extends Controller
             
             return response()->json(['data'=> $variation_values] , 200);
         }
-        catch (ModelNotFoundException  $exception) {
-            return response()->json(['ex_message'=>'Variation Values Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
-        }
-        catch (\Error $exception) {
+       
+        catch (\Exception $eexception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
         }
     }

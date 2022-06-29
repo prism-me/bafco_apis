@@ -15,16 +15,6 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
       
-            "short_description" =>"required|min:6",
-            "long_description" => "required|min:6",
-            "shiping_and_return" => "required",
-            "category_id" => "required",
-            "related_categories" => "required",
-            "promotional_images"=> "required",
-            "brand" => "required",
-            "album" => "required",
-            "download" => "required",
-            "variations" => "required",
             $table->id();
             $table->string('name', 255);
             $table->string('featured_image');

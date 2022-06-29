@@ -26,13 +26,7 @@ class VariationController extends Controller
             }
             return response()->json(['data'=> $variation] , 200);
         }
-        catch (ModelNotFoundException  $exception) {
-            return response()->json(['ex_message'=>'Variation Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
-        }
-        catch (\Error $exception) {
+        catch (\Exception $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
         }
     }

@@ -25,26 +25,9 @@ class CategoryController extends Controller
             }
             return response()->json($categories, 200);
         }
-        catch (ModelNotFoundException  $exception) {
-            return response()->json(['ex_message'=>'Category Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
-        }
-        catch (\Error $exception) {
+        catch (\Exception $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
         }
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        abort(404);
-
     }
 
     /**
@@ -59,7 +42,7 @@ class CategoryController extends Controller
 
            if(Category::where('route', $request->route)->exists()){ 
             //update
-                $category = Category::where('route',$request->route)->update($request->except('lang'));
+                $category = Category::where('route',$request->route)->update($request->except('lang','id'));
            }else{
             // create
             $category = Category::create($request->except('lang'));
