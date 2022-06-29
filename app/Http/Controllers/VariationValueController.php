@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Variation;
 use Illuminate\Http\Request;
-use App\Http\Requests\variation\VariationRequest;
+use App\Models\VariationValues;
 use Validator;
-class VariationController extends Controller
+use DB;
+use App\Http\Requests\variant_values\VariationValueRequest;
+class VariationValueController extends Controller
 {   
-    
     /**
      * Display a listing of the resource.
      *
@@ -16,17 +16,22 @@ class VariationController extends Controller
      */
     public function index()
     {
-        
         try{
-            
-            $variation = Variation::with('variantValues:id,variation_id,name,type,type_value')->get();
+            // \DB::enableQueryLog();
 
-            if($variation->isEmpty()){
+            $variation_values = VariationValues::with('variant:id,name')->get();
+
+            // dd(\DB::getQueryLog());
+
+            if($variation_values->isEmpty()){
+
                 return response()->json(['data', 'No Record Found.'] , 404);
             }
-            return response()->json(['data'=> $variation] , 200);
+            
+            return response()->json(['data'=> $variation_values] , 200);
         }
-        catch (\Exception $exception) {
+       
+        catch (\Exception $eexception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
         }
     }
@@ -37,25 +42,27 @@ class VariationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(VariationRequest $request)
+    //form request 
+    public function store(VariationValueRequest $request)
     {
         try{
-
-           $request['name'] = strtolower($request->name);
-
-           if(Variation::where('route', $request->route)->exists()){ 
+            $request['name'] = strtolower($request->name);
+            
+           if(VariationValues::where('route', $request->route)->exists()){ 
             //update
-                $variation = Variation::where('route',$request->route)->update($request->except('id','lang'));
+                $variation_values = VariationValues::where('route',$request->route)->update($request->except('id','lang'));
            }else{
             // create
-            $variation = Variation::create($request->except('lang'));
+            $variation_values = VariationValues::create($request->except('lang'));
            }
-           if($variation){
+           if($variation_values){
+
                 return  response()->json(['data'=> 'Data has been saved.'] , 200);
+
             }
         }
         catch (ModelNotFoundException  $exception) {
-            return response()->json(['ex_message'=>'Variation Not found.' , 'line' =>$exception->getLine() ], 400);
+            return response()->json(['ex_message'=>'Variation Values Not found.' , 'line' =>$exception->getLine() ], 400);
         }
         catch(QueryException $exception){
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
@@ -68,32 +75,33 @@ class VariationController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Variation  $variation
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Variation $variation)
-    {
-        if(!$variation){
+    public function show(VariationValues $variation_value)
+    {   
+        if(!$variation_value){
             return response()->json(['data'=> 'No Record Found.'] , 404);
         }
-        $variation->variantValues;
-        return response()->json(['data'=> $variation] , 200);
+        $variation_value->variation_name = $variation_value->variant->name;
+
+        unset($variation_value->variant);
+        
+        return response()->json(['data'=> $variation_value] , 200);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Variation  $variation
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Variation $variation)
+    public function destroy(VariationValues $variation_value)
     {
-        if($variation->delete()){
-            
-            return response()->json(['data'=> 'Variation has been deleted.'] , 200);
+        if($variation_value->delete()){
+
+            return response()->json(['data'=> 'Variation value has been deleted.'] , 200);
         }
         return response()->json(['data'=> 'Server Error.'] , 400);
     }
-
-
 }

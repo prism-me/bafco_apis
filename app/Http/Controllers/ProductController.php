@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-
+use Validator;
+use App\Http\Requests\product\ProductRequest;
 class ProductController extends Controller
-{
+{   
+    
     /**
      * Display a listing of the resource.
      *
@@ -14,18 +16,18 @@ class ProductController extends Controller
      */
     public function index()
     {
-        
+        try{
+            $products = Product::with('category:name,id')->get();
+            if($products->isEmpty()){
+                return response()->json('No Record Found.' , 404);
+            }
+            return response()->json($products, 200);
+        }
+        catch (\Exception $exception) {
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -33,9 +35,32 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
-        //
+        try{
+
+            if(Product::where('route', $request->route)->exists()){ 
+             //update
+                 $products = Product::where('route',$request->route)->update($request->all());
+            }else{
+             // create
+             $products = Product::create($request->all());
+            }
+            if($products){
+                 return  response()->json('Data has been saved.' , 200);
+             }
+ 
+         }
+         catch (ModelNotFoundException  $exception) {
+             return response()->json(['ex_message'=>'Product Not found.' , 'line' =>$exception->getLine() ], 400);
+         }
+         catch(QueryException $exception){
+             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
+         }
+         catch (\Error $exception) {
+             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+         }   
+
     }
 
     /**
@@ -46,30 +71,11 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Product $product)
-    {
-        //
+        if(!$product){
+            return response()->json('No Record Found.' , 404);
+        }
+        $product->category =  $product->category;
+        return response()->json($product , 200);
     }
 
     /**

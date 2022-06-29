@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+use App\Http\Requests\category\CategoryRequest;
 
 class CategoryController extends Controller
 {
@@ -20,30 +21,13 @@ class CategoryController extends Controller
         try{
             $categories = Category::with('child')->whereNull('parent_id')->get();
             if($categories->isEmpty()){
-                return response()->json(['data', 'No Record Found.'] , 404);
+                return response()->json('No Record Found.' , 404);
             }
-            return response()->json(['data', $categories] , 200);
+            return response()->json($categories, 200);
         }
-        catch (ModelNotFoundException  $exception) {
-            return response()->json(['ex_message'=>'Category Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
-        }
-        catch (\Error $exception) {
+        catch (\Exception $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
         }
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        abort(404);
-
     }
 
     /**
@@ -52,32 +36,19 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|min:3',
-            'featured_image' => 'url',
-            'short_description' => 'required|min:11',
-            'long_description' =>'required|min:11',
-            'route' =>'required',
-            'seo' => 'required'
-        ]);
-        
-        if($validator->fails()){ 
-            return response()->json(['errors'=>$validator->errors()] , 400);
-        }
-
         try{
 
            if(Category::where('route', $request->route)->exists()){ 
             //update
-                $category = Category::where('route',$request->route)->update($request->all());
+                $category = Category::where('route',$request->route)->update($request->except('lang','id'));
            }else{
             // create
-            $category = Category::create($request->all());
+            $category = Category::create($request->except('lang'));
            }
            if($category){
-                return  response()->json(['data'=> 'Data has been saved.'] , 200);
+                return  response()->json('Data has been saved.' , 200);
             }
 
         }
@@ -103,35 +74,13 @@ class CategoryController extends Controller
     { 
 
         if(!$category){
-            return response()->json(['data'=> 'No Record Found.'] , 404);
+            return response()->json('No Record Found.' , 404);
         }
         $category->child =  $category->child;
-        return response()->json(['data'=> $category] , 200);
+        return response()->json($category , 200);
         
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Category  $category
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Category $category)
-    {
-      abort(404);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Category  $category
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Category $category)
-    {
-        abort(404);
-    }
 
     /**
      * Remove the specified resource from storage.
@@ -142,8 +91,33 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         if($category->delete()){
-            return response()->json(['data'=> 'Category has been deleted.'] , 200);
+            return response()->json('Category has been deleted.' , 200);
         }
-        return response()->json(['data'=> 'Server Error.'] , 400);
+        return response()->json('Server Error.' , 400);
     }
+
+
+    public function frontpage_category($category){
+        // dd($category);
+        try{
+            $categories = Category::with('subcategory_products')->whereNull('parent_id')->where('route',$category)->get();
+            if($categories->isEmpty()){
+                return response()->json('No Record Found.' , 404);
+            }
+            return response()->json($categories , 200);
+        }
+        catch (ModelNotFoundException  $exception) {
+            return response()->json(['ex_message'=>'Category Not found.' , 'line' =>$exception->getLine() ], 400);
+        }
+        catch(QueryException $exception){
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
+        }
+        catch (\Error $exception) {
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+        }
+
+    }
+
+
+
 }
