@@ -14,23 +14,33 @@ class CreateProductsTable extends Migration
     public function up()
     {
         Schema::create('products', function (Blueprint $table) {
-
+      
+            "short_description" =>"required|min:6",
+            "long_description" => "required|min:6",
+            "shiping_and_return" => "required",
+            "category_id" => "required",
+            "related_categories" => "required",
+            "promotional_images"=> "required",
+            "brand" => "required",
+            "album" => "required",
+            "download" => "required",
+            "variations" => "required",
             $table->id();
             $table->string('name', 255);
             $table->string('featured_image');
-            $table->json('slider_images');
             $table->text('short_description');
-            $table->longText('long_description')->nullable();   
-            $table->text('dimentions')->nullable();   
-            $table->text('resources')->nullable();   
-            $table->text('colors_materials')->nullable();   
+            $table->text('long_description')->nullable();   
+            $table->text('shiping_and_return')->nullable();   
+            $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('cascade');;
+            $table->bigInteger('related_categories')->nullable();
             $table->string('promotional_images')->nullable();
-            $table->bigInteger('category_id');
-            $table->bigInteger('brand_id');
-            $table->string('album');
+            $table->bigInteger('brand');
+            $table->string('album')->nullable();
+            $table->text('download')->nullable();   
+            $table->text('colors_materials')->nullable();   
             $table->string('type')->nullable();
             $table->string('route');
-            $table->json('seo');
+            $table->json('seo')->nullable();
             $table->timestamps();
 
         });

@@ -16,6 +16,7 @@ class CreateVariationsTable extends Migration
         Schema::create('variations', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('route');
             $table->string('type')->nullable();
             $table->timestamps();
         });

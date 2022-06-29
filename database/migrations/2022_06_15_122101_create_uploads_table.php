@@ -17,6 +17,7 @@ class CreateUploadsTable extends Migration
             $table->id();
             $table->string('post_id')->nullable();
             $table->string('avatar');
+            $table->string('url');
             $table->string('alt_tag')->nullable();
             $table->string('type')->nullable();
             $table->timestamps();

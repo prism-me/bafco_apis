@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Models\Upload;
 use Illuminate\Http\Request;
@@ -8,13 +8,14 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\File;
 use BunnyCDN\Storage\BunnyCDNStorage;
 use App\Http\Controllers\API\BaseController as BaseController;
+use App\Http\Requests\upload\UploadRequest;
 
-
-class UploadController extends BaseController
+class UploadController extends Controller
 {
     public $bunnyCDNStorage ;
     public $storageZone = 'bafco';
     public $directory = '/bafco/images';
+    public $base_URL = 'https://bafco.b-cdn.net/images/';
     public $access_key = '650cdf14-326b-44a7-9b1ef138dd2e-2583-4f15';
                           
     //public $bunny ;
@@ -25,15 +26,8 @@ class UploadController extends BaseController
        $this->bunnyCDNStorage = new BunnyCDNStorage($this->storageZone, $this->access_key, "sg");
     }
 
-    public function upload_media(Request $request)
+    public function upload_media(UploadRequest $request)
     {
-
-
-        $validator = Validator::make($request->all(), [
-            'images' => 'required',
-        ]);
-
-        if( ! $validator->fails()){
 
         $data = $request['data'];
 
@@ -56,13 +50,13 @@ class UploadController extends BaseController
 
                 $name = $without_ext_name .'-'. time().rand(1,100).'.'.$images[$i]->extension();
                 $files[$i]['avatar'] = $name;
-                $files[$i]['url'] = 'bafco.b-cdn.net/images/'. $name ;
+                $files[$i]['url'] = $this->base_URL . $name ;
                 $files[$i]['alt_tag'] = $d['alt_text'];
                 $files[$i]['type'] = $type;
 
                 if($this->bunnyCDNStorage->uploadFile($images[$i]->getPathName() , $this->storageZone."/images/{$name}")){
 
-                $isUploaded = Upload::create(['avatar'=> $name,'url' =>$files[$i]['url'] ,'alt_tag' => $files[$i]['alt_tag'] ,'type' =>'asdf']);
+                $isUploaded = Upload::create(['avatar'=>$files[$i]['url'] , 'url' => $name ,'alt_tag' => $files[$i]['alt_tag'] ,'type' =>$type]);
 
                 echo json_encode(['message' =>'media has uploaded.' , 'status' =>200]);
 
@@ -78,14 +72,9 @@ class UploadController extends BaseController
 
          }
 
-        }
-        else{
-
-            echo json_encode(['message'=>$validator->errors(),'status'=>404]);
-
-        }
-
     }
+
+
 
 
     public function get_all_images(){
@@ -94,7 +83,8 @@ class UploadController extends BaseController
         $data = Upload::orderByDesc('id')->get();
 
         echo json_encode(['data'=>$data ,'status'=>200]);
-     }
+    }
+
 
     public function update_image($file , $id){
 
@@ -105,14 +95,14 @@ class UploadController extends BaseController
 
         $name = $without_ext_name .'-'. time().rand(1,100).'.'.$file->extension();
         $files[$i]['name'] = $name;
-        $files[$i]['url'] = 'https://mic-robotics.b-cdn.net/images/'. $name ;
+        $files[$i]['url'] = $this->base_URL . $name ;
         $files[$i]['alt_tag'] = time().rand(1,100);
 
         if($this->bunnyCDNStorage->uploadFile($file->getPathName() , $this->storageZone."/images/{$name}")){
 
-        $isUpdated = Upload::where('_id' ,$id)->update(['name'=> $name,'url' =>$files[$i]['url']]);
+        $isUpdated = Upload::where('_id' ,$id)->update(['url' =>$name,'avatar'=>$files[$i]['url']]);
 
-        if(! $this->bunnyCDNStorage->deleteObject( '/mic-robotics/images/'.$existing_name))
+        if(! $this->bunnyCDNStorage->deleteObject( '/bafco/images/'.$existing_name))
         {
             echo json_encode(['message' => 'Bucket error' , 'status' => 404]);
         }
@@ -125,14 +115,13 @@ class UploadController extends BaseController
 
     }
 
-    public function delete_images($id){
-
-    $data = Upload::select('avatar')->where('id',$id)->first();
-
-        if(Upload::where('id',$id)->delete()){
+    public function delete_images(Upload $upload){
 
 
-            if(! $this->bunnyCDNStorage->deleteObject( '/mic-robotics/images/'.$data->avatar))
+        if($upload->delete()){
+
+
+            if(! $this->bunnyCDNStorage->deleteObject( '/bafco/images/'.$upload->avatar))
             {
                 echo json_encode(['message' => 'Bucket error' , 'status' => 404]);
             }

@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
-
+use Illuminate\Http\Client\ConnectionException;
 class Handler extends ExceptionHandler
 {
     /**
@@ -39,23 +39,42 @@ class Handler extends ExceptionHandler
     public function register()
     {   
         //not found exception controll
-        $this->renderable(function (NotFoundHttpException $e, $request) {
+       
+        $this->renderable(function (Exception $e, $request) {
+           $class = class_basename($e);
+            dd($class);
             if ($request->is('api/*')) {
                 return response()->json(['ex_message' => 'Record not found.','type' => 'NotFoundHttpException'], 404);
             }
         });
-        //route not found exception controll
+       // route not found exception controll
         $this->renderable(function (MethodNotAllowedHttpException $e, $request) {
             if ($request->is('api/*')) {
                 return response()->json(['ex_message' => 'Invalid Route or method.' ,'type' => 'MethodNotAllowedHttpException'], 404);
             }
         });
+        
+               // route not found exception controll
+        $this->renderable(function (BadMethodCallException $e, $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['ex_message' => 'Bad Request.' ,'type' => 'BadMethodCallException'], 404);
+            }
+        });
+        
+        
 
         $this->renderable(function (ModelNotFoundException $e, $request) {
             if ($request->is('api/*')) {
                 return response()->json(['ex_message' => 'Model not found.' ,'type' => 'ModelNotFoundException' , 'line' =>$e->getLine() ], 404);
             }
         });
+
+        $this->renderable(function (ConnectionException $e, $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['ex_message' => 'Database Connection Error.' ,'type' => 'ConnectionException' , 'line' =>$e->getLine() ], 404);
+            }
+        });
+
 
     }
 
@@ -67,4 +86,46 @@ class Handler extends ExceptionHandler
 
     //     parent::report($exception);
     // }
+
+
+    // public function register(Exception $exception)
+    // {
+    //     switch(class_basename($exception)){
+    //         case 'TokenMismatchException':
+
+    //             return response()->json(['error' => 66, 'errors' => ['forms' => 'Your request was denied. Please try again or reload your page']], 403);
+                
+    //         break;
+    //         case 'ThrottleRequestsException':
+    //             return response()->json(['errors' => ['forms' => 'You have been rate limited, please try again shortly']], 429);
+    //         break;
+    //         case 'MethodNotAllowedHttpException':
+           
+    //                 return response()->json(['errors' => ['forms' => 'Method Not Allowed']],405);
+
+    //         break;
+    //         case 'NotFoundHttpException':
+
+    //                 return response()->json(['errors' => ['forms' => 'We could not locate the data you requested, it may have been lost forever']],404);
+
+    //         break;
+    //         case 'MaintenanceModeException':
+              
+    //                 return response()->json(['errors' => ['forms' => 'The site is currently down for maintenance, please check back with us soon']],503);
+
+    //         break;
+    //         case 'AuthenticationException':
+    //         case 'ValidationException':
+    //             return parent::render($request, $exception);
+    //         break;
+    //     }
+    //     if (app()->isProduction()){
+    //         if ($request->expectsJson()){
+    //             return response()->json('Server Error',500);
+    //         }
+    //         return response()->view('errors.500', [], 500);
+    //     }
+    //     return parent::render($request, $exception);
+    // }
+
 }
