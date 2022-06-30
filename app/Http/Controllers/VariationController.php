@@ -16,7 +16,7 @@ class VariationController extends Controller
      */
     public function index()
     {
-        
+      
         try{
             
             $variation = Variation::with('variantValues:id,variation_id,name,type,type_value')->get();
@@ -39,16 +39,20 @@ class VariationController extends Controller
      */
     public function store(VariationRequest $request)
     {
+        $data['name'] = isset( $request->name ) ? $request->name:'';
+        $data['route'] = isset( $request->route ) ? $request->route:'';
+        $data['type'] = isset( $request->type ) ? $request->type:'';
         try{
 
-           $request['name'] = strtolower($request->name);
+           $data['name'] = strtolower($request->name);
 
            if(Variation::where('route', $request->route)->exists()){ 
-            //update
-                $variation = Variation::where('route',$request->route)->update($request->except('id','lang'));
+                //update
+                $variation = Variation::where('route',$request->route)->update($data);
+
            }else{
-            // create
-            $variation = Variation::create($request->except('lang'));
+                // create
+                $variation = Variation::create($data);
            }
            if($variation){
                 return  response()->json(['data'=> 'Data has been saved.'] , 200);

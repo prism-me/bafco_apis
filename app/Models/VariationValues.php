@@ -10,7 +10,7 @@ class VariationValues extends Model
     use HasFactory;
     
     protected $table = 'variation_values';
-    protected $guarded = [];
+    protected $fillable = ['variation_id','name','route','type','type_value'];
 
 
     public function getRouteKeyName()

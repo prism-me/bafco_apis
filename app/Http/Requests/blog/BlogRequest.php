@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\user;
+namespace App\Http\Requests\blog;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class BlogRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +23,15 @@ class LoginRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'email' => 'required|string|email|max:100',
-            'password' => 'required|string|min:6',
+       return [
+            'name' => 'required|min:3',
+            'featured_image' => 'url',
+            'description' => 'required',
+            'short_description' => 'required',
+            'route' =>'required',
+            'tags' =>'required',
+            'blog_type' =>'required',
+         
         ];
     }
 }

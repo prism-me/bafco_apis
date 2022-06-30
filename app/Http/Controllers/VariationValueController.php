@@ -45,15 +45,20 @@ class VariationValueController extends Controller
     //form request 
     public function store(VariationValueRequest $request)
     {
+        $data['variation_id'] = isset( $request->variation_id ) ? $request->variation_id:null;
+        $data['name'] = isset( $request->name ) ? $request->name:'';
+        $data['route'] = isset( $request->route ) ? $request->route:'';
+        $data['type'] = isset( $request->type ) ? $request->type:'';
+        $data['type_value'] = isset( $request->type_value ) ? $request->type_value:'';
         try{
-            $request['name'] = strtolower($request->name);
+            $data['name'] = strtolower($request->name);
             
            if(VariationValues::where('route', $request->route)->exists()){ 
             //update
-                $variation_values = VariationValues::where('route',$request->route)->update($request->except('id','lang'));
+                $variation_values = VariationValues::where('route',$request->route)->update($data);
            }else{
             // create
-            $variation_values = VariationValues::create($request->except('lang'));
+                $variation_values = VariationValues::create($data);
            }
            if($variation_values){
 

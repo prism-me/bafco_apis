@@ -21,12 +21,12 @@ class UserController extends Controller
 
         $token =  $user->createToken($user->email)->plainTextToken;
 
-        return response()->json($user , 200)->header('x-auth-token',$token)->header('access-control-expose-headers' , 'x-auth-token');
+        return response()->json($user , 200)->header('x_auth_token',$token)->header('access-control-expose-headers' , 'x_auth_token');
 
     }
 
     public function login(LoginRequest $request){
-
+       
         try{
 
            if (!Auth::attempt(['email'=>$request->email, 'password'=>$request->password])) {
@@ -37,7 +37,7 @@ class UserController extends Controller
         
         $token = auth()->user()->createToken('API_Token')->plainTextToken;
         
-        return response()->json('Logged in successfully', 200)->header('x-auth-token', $token)->header('access-control-expose-headers' , 'x-auth-token');
+        return response()->json('Logged in successfully', 200)->header('x_auth_token', $token)->header('access-control-expose-headers' , 'x_auth_token');
 
     } catch(BadMethodCallException $e){
 
