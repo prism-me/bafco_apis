@@ -22,9 +22,9 @@ class VariationController extends Controller
             $variation = Variation::with('variantValues:id,variation_id,name,type,type_value')->get();
 
             if($variation->isEmpty()){
-                return response()->json(['data', 'No Record Found.'] , 404);
+                  return response()->json([] , 200);
             }
-            return response()->json(['data'=> $variation] , 200);
+            return response()->json($variation, 200);
         }
         catch (\Exception $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 

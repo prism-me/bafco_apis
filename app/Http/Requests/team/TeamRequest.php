@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\page;
+namespace App\Http\Requests\team;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PageRequest extends FormRequest
+class TeamRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,7 @@ class PageRequest extends FormRequest
      */
     public function authorize()
     {
-       return true;
+        return true;
     }
 
     /**
@@ -24,10 +24,9 @@ class PageRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|min:3',
-            'route' =>'required'
+            "name" => "required|min:3",
+            "designation" => "required",        
+            "route" => "required|min:6",
         ];
     }
 }
-
-

@@ -56,6 +56,18 @@ Route::post('blogs', 'BlogController@store')->middleware('auth:sanctum');
 Route::get('blogs/{blog}', 'BlogController@show');
 Route::delete('blogs/{blog}', 'BlogController@destroy')->middleware('auth:sanctum');
 
+#Team
+Route::get('teams', 'TeamController@index');
+Route::post('teams', 'TeamController@store')->middleware('auth:sanctum');
+Route::get('teams/{team}', 'TeamController@show');
+Route::delete('teams/{team}', 'TeamController@destroy')->middleware('auth:sanctum');
+
+#Team
+Route::get('partners', 'PartnerController@index');
+Route::post('partners', 'PartnerController@store')->middleware('auth:sanctum');
+Route::get('partners/{partner}', 'PartnerController@show');
+Route::delete('partners/{partner}', 'PartnerController@destroy')->middleware('auth:sanctum');
+
 
 
 #variation values
@@ -75,6 +87,11 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::post('/login', 'UserController@login');
     Route::get('/me','UserController@me')->middleware('auth:sanctum');
     Route::post('/logout', 'UserController@logout')->middleware('auth:sanctum');
+
+    # User Detail
+    Route::post('reset', 'UserController@reset'); 
+    Route::get('user-detail', 'UserController@userDetail'); 
+    Route::post('update-detail', 'UserController@updateUser'); 
 
 });
 

@@ -19,7 +19,7 @@ class PageController extends Controller
         try{
             $pages = Page::all();
             if($pages->isEmpty()){
-                return response()->json('No Record Found.' , 404);
+                return response()->json([] , 200);
             }
             return response()->json($pages, 200);
         }

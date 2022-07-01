@@ -25,10 +25,9 @@ class VariationValueController extends Controller
 
             if($variation_values->isEmpty()){
 
-                return response()->json(['data', 'No Record Found.'] , 404);
+                  return response()->json([] , 200);
             }
-            
-            return response()->json(['data'=> $variation_values] , 200);
+            return response()->json($variation_values, 200);
         }
        
         catch (\Exception $eexception) {

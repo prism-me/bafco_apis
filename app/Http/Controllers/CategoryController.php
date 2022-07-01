@@ -21,7 +21,7 @@ class CategoryController extends Controller
         try{
             $categories = Category::with('child')->get();
             if($categories->isEmpty()){
-                return response()->json('No Record Found.' , 404);
+                return response()->json([] , 200);
             }
             return response()->json($categories, 200);
         }

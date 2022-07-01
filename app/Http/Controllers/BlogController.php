@@ -17,7 +17,7 @@ class BlogController extends Controller
          try{
             $blog = Blog::all();
             if($blog->isEmpty()){
-                return response()->json('No Record Found.' , 404);
+                 return response()->json([] , 200);
             }
             return response()->json($blog, 200);
         }
@@ -66,7 +66,7 @@ class BlogController extends Controller
 
     public function show(Blog $blog)
     {
-         if(!$blog){
+        if(!$blog){
             return response()->json('No Record Found.' , 404);
         }
        
