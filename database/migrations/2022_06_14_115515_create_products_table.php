@@ -17,17 +17,18 @@ class CreateProductsTable extends Migration
       
             $table->id();
             $table->string('name', 255);
-            $table->string('featured_image');
             $table->text('short_description');
             $table->text('long_description')->nullable();   
+            $table->string('featured_image');
             $table->text('shiping_and_return')->nullable();   
-            $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('cascade');;
-            $table->bigInteger('related_categories')->nullable();
-            $table->string('promotional_images')->nullable();
-            $table->bigInteger('brand');
-            $table->string('album')->nullable();
+            $table->foreignId('category_id')->nullable();
+            $table->text('related_categories')->nullable();
+            $table->text('promotional_images')->nullable();
+            $table->string('brand')->nullable();
+            $table->text('album')->nullable();
             $table->text('download')->nullable();   
-            $table->text('colors_materials')->nullable();   
+            $table->text('footrest')->nullable();   
+            $table->text('headrest')->nullable();   
             $table->string('type')->nullable();
             $table->string('route');
             $table->json('seo')->nullable();

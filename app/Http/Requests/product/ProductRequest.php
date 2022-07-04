@@ -30,15 +30,15 @@ class ProductRequest extends FormRequest
             "long_description" => "required|min:6",
             "shiping_and_return" => "required",
             "category_id" => "required",
-            "related_categories" => "required",
-            "promotional_images"=> "required",
+            "related_categories" => "required",//array
+            "promotional_images"=> "required",//array
             "brand" => "required",
-            "album" => "required",
+            "album" => "required", //array
             "download" => "required",
             "variations" => "required",
             // "dimentions" => "required",
             "route" => "required", 
-            "seo" => "required"
+            //"seo" => "required"
         ];
     }
 }

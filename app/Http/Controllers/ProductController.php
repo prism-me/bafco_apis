@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductVariation;
 use Illuminate\Http\Request;
-use Validator;
+use App\Services\ProductService;
 use App\Http\Requests\product\ProductRequest;
+use Illuminate\Support\Facades\DB;
+
 class ProductController extends Controller
 {   
     
@@ -17,11 +20,59 @@ class ProductController extends Controller
     public function index()
     {
         try{
-            $products = Product::with('category:name,id')->get();
-            if($products->isEmpty()){
-                return response()->json('No Record Found.' , 404);
+            DB::enableQueryLog();
+
+            $variations = ProductVariation::with('product_pivot_variation')->get();
+            
+            return $variations;
+            
+            // return DB::getQueryLog();
+            
+            $products = Product::with('product_variations')->get();
+
+            foreach($products as $product){
+            
+                return $products;    
             }
-            return response()->json($products, 200);
+
+            // foreach($products as $product){
+            //     return $product->product_variations->product_variation_values();
+            // }
+
+            //  => function($query) {
+            //    dd($query->product_variation_values());
+            // }])->get();
+            // if($products->isEmpty()){
+            //     return response()->json('No Record Found.' , 404);
+            // }
+            // return response()->json($products, 200);
+        }
+        catch (\Exception $exception) {
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+        }
+    }
+
+    public function website_all(){
+        try{
+            DB::enableQueryLog();
+
+            $variations = ProductVariation::with(['variation_name','variation_values'])->get();
+
+            //return DB::getQueryLog();
+            return $variations;    
+            // $products = Product::with('product_variations')->get();
+
+            // foreach($products as $product){
+            //     return $product->product_variations->product_variation_values();
+            // }
+
+            //  => function($query) {
+            //    dd($query->product_variation_values());
+            // }])->get();
+            // if($products->isEmpty()){
+            //     return response()->json('No Record Found.' , 404);
+            // }
+            // return response()->json($products, 200);
         }
         catch (\Exception $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
@@ -39,23 +90,20 @@ class ProductController extends Controller
     {
         try{
 
-            if(Product::where('route', $request->route)->exists()){ 
+            if(!Product::where('route', $request->route)->exists()){ 
              //update
-                 $products = Product::where('route',$request->route)->update($request->all());
+                 
+             //$product = Product::where('route',$request->route)->update($request->all());
             }else{
+
              // create
-             $products = Product::create($request->all());
+             $product = ProductService::insertProduct($request->all());
             }
-            if($products){
+            if($product){
+
                  return  response()->json('Data has been saved.' , 200);
              }
- 
-         }
-         catch (ModelNotFoundException  $exception) {
-             return response()->json(['ex_message'=>'Product Not found.' , 'line' =>$exception->getLine() ], 400);
-         }
-         catch(QueryException $exception){
-             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
+
          }
          catch (\Error $exception) {
              return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 

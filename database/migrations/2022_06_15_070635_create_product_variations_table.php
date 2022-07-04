@@ -15,9 +15,18 @@ class CreateProductVariationsTable extends Migration
     {
         Schema::create('product_variations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->nullable()->constrained('products')->onDelete('cascade');;
-            $table->bigInteger('variant_id');
-            $table->bigInteger('option_value_id');
+            $table->foreignId('product_id')->nullable();
+            $table->string('code')->nullable();
+            $table->string('lc_code')->nullable();
+            $table->string('cbm')->nullable();
+            $table->boolean('in_stock')->default(1);
+            $table->string('upper_price')->nullable();
+            $table->string('lower_price')->nullable();
+            $table->string('height')->nullable();
+            $table->string('depth')->nullable();
+            $table->string('width')->nullable();
+            $table->text('description')->nullable();
+            $table->text('images')->nullable();
             $table->timestamps();
         });
     }

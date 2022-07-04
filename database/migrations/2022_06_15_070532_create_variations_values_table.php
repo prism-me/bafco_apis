@@ -15,7 +15,7 @@ class CreateVariationsValuesTable extends Migration
     {
         Schema::create('variation_values', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('variation_id')->nullable()->constrained('variations')->onDelete('cascade');
+            $table->foreignId('variation_id')->nullable();
             $table->string('name');
             $table->string('route');
             $table->enum('type' , [ 1 , 2 , 3 ])->comment('1: text, 2: color code, 3: Image ');
