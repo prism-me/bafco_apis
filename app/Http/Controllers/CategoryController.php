@@ -19,9 +19,9 @@ class CategoryController extends Controller
     public function index()
     {
         try{
-            $categories = Category::with('child')->whereNull('parent_id')->get();
+            $categories = Category::with('child')->get();
             if($categories->isEmpty()){
-                return response()->json('No Record Found.' , 404);
+                return response()->json([] , 200);
             }
             return response()->json($categories, 200);
         }
@@ -38,14 +38,23 @@ class CategoryController extends Controller
      */
     public function store(CategoryRequest $request)
     {
+        $data['name'] =  isset( $request->name ) ? $request->name:'';
+        $data['sub_title'] = isset( $request->sub_title )? $request->sub_title:'' ;
+        $data['parent_id'] = isset( $request->parent_id )? $request->parent_id: null ;
+        $data['featured_image'] = isset( $request->featured_image )? $request->featured_image:'' ;
+        $data['banner_image'] = isset( $request->banner_image )? $request->banner_image:'' ;
+        $data['description'] = isset( $request->description )? $request->description:'' ;
+        $data['seo'] = isset( $request->seo )? $request->seo:'' ;
+        $data['route'] = isset( $request->route )? $request->route:'' ;
+    
         try{
 
            if(Category::where('route', $request->route)->exists()){ 
             //update
-                $category = Category::where('route',$request->route)->update($request->except('lang','id'));
+                $category = Category::where('route',$request->route)->update($data);
            }else{
             // create
-            $category = Category::create($request->except('lang'));
+            $category = Category::create($data);
            }
            if($category){
                 return  response()->json('Data has been saved.' , 200);
@@ -98,7 +107,7 @@ class CategoryController extends Controller
 
 
     public function frontpage_category($category){
-        // dd($category);
+        
         try{
             $categories = Category::with('subcategory_products')->whereNull('parent_id')->where('route',$category)->get();
             if($categories->isEmpty()){

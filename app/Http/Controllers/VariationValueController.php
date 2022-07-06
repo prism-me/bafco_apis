@@ -25,10 +25,9 @@ class VariationValueController extends Controller
 
             if($variation_values->isEmpty()){
 
-                return response()->json(['data', 'No Record Found.'] , 404);
+                  return response()->json([] , 200);
             }
-            
-            return response()->json(['data'=> $variation_values] , 200);
+            return response()->json($variation_values, 200);
         }
        
         catch (\Exception $eexception) {
@@ -45,15 +44,20 @@ class VariationValueController extends Controller
     //form request 
     public function store(VariationValueRequest $request)
     {
+        $data['variation_id'] = isset( $request->variation_id ) ? $request->variation_id:null;
+        $data['name'] = isset( $request->name ) ? $request->name:'';
+        $data['route'] = isset( $request->route ) ? $request->route:'';
+        $data['type'] = isset( $request->type ) ? $request->type:'';
+        $data['type_value'] = isset( $request->type_value ) ? $request->type_value:'';
         try{
-            $request['name'] = strtolower($request->name);
+            $data['name'] = strtolower($request->name);
             
            if(VariationValues::where('route', $request->route)->exists()){ 
             //update
-                $variation_values = VariationValues::where('route',$request->route)->update($request->except('id','lang'));
+                $variation_values = VariationValues::where('route',$request->route)->update($data);
            }else{
             // create
-            $variation_values = VariationValues::create($request->except('lang'));
+                $variation_values = VariationValues::create($data);
            }
            if($variation_values){
 
