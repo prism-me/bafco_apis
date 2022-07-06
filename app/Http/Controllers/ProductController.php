@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\ProductVariation;
 use Illuminate\Http\Request;
 use App\Services\ProductService;
+use App\Services\CartService;
 use App\Http\Requests\product\ProductRequest;
 use Illuminate\Support\Facades\DB;
 
@@ -18,34 +19,16 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        try{
-            DB::enableQueryLog();
+    {   
+        //return $req->ip();
 
-            $variations = ProductVariation::with('product_pivot_variation')->get();
+        try{
+            // DB::enableQueryLog();
             
-            return $variations;
+            return Product::with('variations','variations.variation_items')->get();
+
             
             // return DB::getQueryLog();
-            
-            $products = Product::with('product_variations')->get();
-
-            foreach($products as $product){
-            
-                return $products;    
-            }
-
-            // foreach($products as $product){
-            //     return $product->product_variations->product_variation_values();
-            // }
-
-            //  => function($query) {
-            //    dd($query->product_variation_values());
-            // }])->get();
-            // if($products->isEmpty()){
-            //     return response()->json('No Record Found.' , 404);
-            // }
-            // return response()->json($products, 200);
         }
         catch (\Exception $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 

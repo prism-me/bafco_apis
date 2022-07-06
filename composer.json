@@ -12,7 +12,8 @@
         "laravel/sanctum": "^2.15",
         "laravel/tinker": "^2.5",
         "platformcommunity/bunnycdn-storage": "^0.2.0",
-        "sentry/sentry-laravel": "^2.12"
+        "sentry/sentry-laravel": "^2.12",
+        "staudenmeir/eloquent-has-many-deep": "^1.14"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
