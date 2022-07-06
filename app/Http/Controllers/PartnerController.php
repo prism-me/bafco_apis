@@ -32,6 +32,9 @@ class PartnerController extends Controller
         $data['name'] =  isset( $request->name ) ? $request->name:'';
         $data['image'] = isset( $request->image )? $request->image:'' ;
         $data['route'] = isset( $request->route )? $request->route:'' ;
+        $data['description'] = isset( $request->description )? $request->description:'' ;
+        $data['logo'] = isset( $request->logo )? $request->logo:'' ;
+        $data['link'] = isset( $request->link )? $request->link:'' ;
     
         try{
 

@@ -62,11 +62,23 @@ Route::post('teams', 'TeamController@store')->middleware('auth:sanctum');
 Route::get('teams/{team}', 'TeamController@show');
 Route::delete('teams/{team}', 'TeamController@destroy')->middleware('auth:sanctum');
 
-#Team
+#Partner
 Route::get('partners', 'PartnerController@index');
 Route::post('partners', 'PartnerController@store')->middleware('auth:sanctum');
 Route::get('partners/{partner}', 'PartnerController@show');
 Route::delete('partners/{partner}', 'PartnerController@destroy')->middleware('auth:sanctum');
+
+#Contact Us
+Route::get('contact-us', 'ContactUsController@index');
+Route::post('contact-us', 'ContactUsController@store')->middleware('auth:sanctum');
+Route::get('contact-us/{contactUs}', 'ContactUsController@show');
+Route::delete('contact-us/{contactUs}', 'ContactUsController@destroy')->middleware('auth:sanctum');
+
+#Wishlist
+Route::get('wishlists/{wishlist}', 'WishlistsController@index');
+Route::post('wishlists', 'WishlistsController@store')->middleware('auth:sanctum');
+Route::get('wishlists/{wishlist}', 'WishlistsController@show');
+Route::delete('wishlists/{wishlist}', 'WishlistsController@destroy')->middleware('auth:sanctum');
 
 
 

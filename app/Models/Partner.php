@@ -9,7 +9,7 @@ class Partner extends Model
 {
 
     use HasFactory;
-    protected $fillable = ['name','image','route'];
+    protected $fillable = ['name','image','route','description','link','logo'];
     
     public function getRouteKeyName()
     {
