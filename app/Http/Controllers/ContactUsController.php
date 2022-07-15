@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+use App\Http\Requests\contact\ContactUsRequest;
+
 
 class ContactUsController extends Controller
 {
@@ -27,7 +29,7 @@ class ContactUsController extends Controller
 
 
  
-    public function store(Request $request)
+    public function store(ContactUsRequest $request)
     {
         $data['name'] =  isset( $request->name ) ? $request->name:'';
         $data['email'] = isset( $request->email )? $request->email:'' ;
@@ -39,12 +41,12 @@ class ContactUsController extends Controller
             $ContactUs = ContactUs::create($data);
            
            if($ContactUs){
-                return  response()->json('Data has been saved.' , 200);
+                return  response()->json('Query Submitted Successfully.' , 200);
             }
 
         }
         catch (ModelNotFoundException  $exception) {
-            return response()->json(['ex_message'=>'Team Not found.' , 'line' =>$exception->getLine() ], 400);
+            return response()->json(['ex_message'=>'Contact Not found.' , 'line' =>$exception->getLine() ], 400);
         }
         catch(QueryException $exception){
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   

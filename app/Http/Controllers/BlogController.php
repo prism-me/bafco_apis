@@ -28,16 +28,16 @@ class BlogController extends Controller
 
     public function store(BlogRequest $request)
     {
-        $data['name'] =  isset( $request->name ) ? $request->name:'';
-        $data['short_description'] = isset( $request->short_description )? $request->short_description:'' ;
+        $data['title'] =  isset( $request->title ) ? $request->title:'';
+        $data['sub_title'] = isset( $request->sub_title )? $request->sub_title:'' ;
         $data['description'] = isset( $request->description )? $request->description: '' ;
+        $data['short_description'] = isset( $request->short_description )? $request->short_description: '' ;
         $data['tags'] = isset( $request->tags )? $request->tags:'' ;
-        $data['blog_type'] = isset( $request->blog_type )? $request->blog_type:'' ;
         $data['posted_by'] = isset( $request->posted_by )? $request->posted_by:'' ;
-        $data['video'] = isset( $request->video )? $request->video:'' ;
         $data['featured_img'] = isset( $request->featured_img )? $request->featured_img:'' ;
-        $data['additional_img'] = isset( $request->additional_img )? $request->additional_img:'' ;
+        $data['banner_img'] = isset( $request->banner_img )? $request->banner_img:'' ;
         $data['route'] = isset( $request->route )? $request->route:'' ;
+        $data['seo'] = isset( $request->seo )? $request->seo:'' ;
     
         try{
 

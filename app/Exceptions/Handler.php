@@ -43,20 +43,28 @@ class Handler extends ExceptionHandler
         $this->renderable(function (Exception $e, $request) {
            $class = class_basename($e);
             dd($class);
-            if ($request->is('api/*')) {
+            if ($request->is('v1/api/*')) {
+                return response()->json(['ex_message' => 'Record not found.','type' => 'Exception'], 404);
+            }
+        });
+
+        $this->renderable(function (NotFoundHttpException $e, $request) {
+           $class = class_basename($e);
+            if ($request->is('v1/api/*')) {
                 return response()->json(['ex_message' => 'Record not found.','type' => 'NotFoundHttpException'], 404);
             }
         });
+
        // route not found exception controll
         $this->renderable(function (MethodNotAllowedHttpException $e, $request) {
-            if ($request->is('api/*')) {
+            if ($request->is('v1/api/*')) {
                 return response()->json(['ex_message' => 'Invalid Route or method.' ,'type' => 'MethodNotAllowedHttpException'], 404);
             }
         });
         
                // route not found exception controll
         $this->renderable(function (BadMethodCallException $e, $request) {
-            if ($request->is('api/*')) {
+            if ($request->is('v1/api/*')) {
                 return response()->json(['ex_message' => 'Bad Request.' ,'type' => 'BadMethodCallException'], 404);
             }
         });
@@ -64,16 +72,13 @@ class Handler extends ExceptionHandler
         
 
         $this->renderable(function (ModelNotFoundException $e, $request) {
-            if ($request->is('api/*')) {
+            if ($request->is('v1/api/*')) {
                 return response()->json(['ex_message' => 'Model not found.' ,'type' => 'ModelNotFoundException' , 'line' =>$e->getLine() ], 404);
             }
         });
 
-        $this->renderable(function (ConnectionException $e, $request) {
-            if ($request->is('api/*')) {
-                return response()->json(['ex_message' => 'Database Connection Error.' ,'type' => 'ConnectionException' , 'line' =>$e->getLine() ], 404);
-            }
-        });
+      
+        
 
 
     }

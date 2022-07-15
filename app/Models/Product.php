@@ -52,6 +52,11 @@ class Product extends Model
         return $this->hasMany(ProductVariation::class);
     }
 
+    public function getWishlistvariations(){
+
+        return $this->hasMany(ProductVariation::class)->select('id','product_id','in_stock');
+    }
+
 
 
 
@@ -88,7 +93,9 @@ class Product extends Model
         return $this->hasMany(ProductVariation::class , (new ProductVariation())->product_variation_name());
     
     }
+    
     public function product_pivot_table(){
+        
         return $this->hasMany(ProductPivotVariation::class);
         // return $this->hasManyThrough(ProductPivotVariation::class ,ProductVariation::class,'id','product_variation_id','id');
     }   
@@ -98,6 +105,7 @@ class Product extends Model
         return $this->belongsTo(Variation::class);
         
     }
+
     public function product_pivot_variation(){
         
         return $this->hasOneThrough(ProductVariation::class, ProductPivotVariation::class , 'product_id','product_variation_id','id','id');

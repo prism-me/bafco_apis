@@ -8,10 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class Blog extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'short_description', 'description' , 'tags','blog_type','posted_by','video', 'featured_img','additional_img','route'];
+    protected $fillable = ['title', 'sub_title', 'description' , 'short_description','tags','banner_img','posted_by', 'featured_img','route','seo'];
 
     public function getRouteKeyName()
     {
         return 'route';
     }
+
+    protected $casts = [
+       
+        'seo' => 'array',
+        'tags' => 'array'
+        
+    ];
 }

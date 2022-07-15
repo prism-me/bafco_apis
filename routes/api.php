@@ -70,15 +70,23 @@ Route::delete('partners/{partner}', 'PartnerController@destroy')->middleware('au
 
 #Contact Us
 Route::get('contact-us', 'ContactUsController@index');
-Route::post('contact-us', 'ContactUsController@store')->middleware('auth:sanctum');
+Route::post('contact-us', 'ContactUsController@store');
 Route::get('contact-us/{contactUs}', 'ContactUsController@show');
 Route::delete('contact-us/{contactUs}', 'ContactUsController@destroy')->middleware('auth:sanctum');
 
-#Wishlist
-Route::get('wishlists/{wishlist}', 'WishlistsController@index');
-Route::post('wishlists', 'WishlistsController@store')->middleware('auth:sanctum');
-Route::get('wishlists/{wishlist}', 'WishlistsController@show');
-Route::delete('wishlists/{wishlist}', 'WishlistsController@destroy')->middleware('auth:sanctum');
+
+
+#Management
+Route::get('managements', 'ManagementController@index');
+Route::post('managements', 'ManagementController@store')->middleware('auth:sanctum');
+Route::get('managements/{management}', 'ManagementController@show');
+Route::delete('managements/{management}', 'ManagementController@destroy')->middleware('auth:sanctum');
+
+#Testimonial
+Route::get('testimonials', 'TestimonialController@index');
+Route::post('testimonials', 'TestimonialController@store')->middleware('auth:sanctum');
+Route::get('testimonials/{testimonial}', 'TestimonialController@show');
+Route::delete('testimonials/{testimonial}', 'TestimonialController@destroy')->middleware('auth:sanctum');
 
 
 
@@ -93,23 +101,36 @@ Route::post('uploads','UploadController@upload_media');
 Route::get('uploads','UploadController@get_all_images');
 Route::delete('uploads/{upload}','UploadController@delete_images');
 
+
+#Front Controllers
+Route::get('home', 'FrontController@index');
+
+
 Route::group(['prefix' => 'auth'], function ($router) {
 
     Route::post('/register', 'UserController@register');
     Route::post('/login', 'UserController@login');
     Route::get('/me','UserController@me')->middleware('auth:sanctum');
     Route::post('/logout', 'UserController@logout')->middleware('auth:sanctum');
+    Route::post('/reset', 'UserController@reset')->middleware('auth:sanctum'); 
 
     # User Detail
     Route::post('reset', 'UserController@reset'); 
     Route::get('user-detail', 'UserController@userDetail'); 
     Route::post('update-detail', 'UserController@updateUser'); 
 
+    #Wishlist
+    Route::get('wishlists', 'WishlistController@index')->middleware('auth:sanctum');
+    Route::post('wishlists', 'WishlistController@store')->middleware('auth:sanctum');
+    Route::get('wishlists/{id}', 'WishlistController@show')->middleware('auth:sanctum');
+    Route::delete('wishlists/{id}', 'WishlistController@destroy')->middleware('auth:sanctum');
+
 });
 
 Route::fallback(function () {
     return response()->json(['message'=>'Invalid Route'] , 400);
 });
+
 
 
 

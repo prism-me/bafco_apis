@@ -8,6 +8,7 @@ use Hash;
 use Validator;
 use Auth;
 use App\Http\Requests\user\LoginRequest;
+use App\Http\Requests\user\ResetRequest;
 use App\Http\Requests\user\RegisterRequest;
 
 class UserController extends Controller
@@ -85,30 +86,34 @@ class UserController extends Controller
     }
 
 
-    public function reset(Request $request)
+    public function reset(ResetRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'current_password' => 'required',
-            'password' => 'required|string|min:6',
-           
-            
-        ]);
-        if($validator->fails()){
-            
-            echo json_encode(['errors'=>$validator->errors(),'status'=>404]);
+        try{
 
-        }else{
-           
-            $user = User::where('_id',$request->user_id)->first();
-    
-            if (!Hash::check($request->current_password,$user->password)) {
-                echo json_encode(['message','Current password does not match!','status'=>200]);
+            $check = ['email' => $request->email,'password'=>$request->password];
+            
+            if( $token = auth()->attempt($check)){
+                $data = ['password'=> bcrypt($request->changed_password)];
+                $isUserUpdated = User::where('email',$request->email)->update($data);
+
+                if($isUserUpdated){
+
+                    echo json_encode(['message' => 'Password has been changed successfully.']);
+
+                }else{
+                echo json_encode(['message' => 'Password is not changed , server error']);
+                }
+
+
+            }else{
+
+                echo json_encode(['message'=>'Credetials doesnot match.']);
             }
-    
-            $user->password = Hash::make($request->password);
-            $user->save();
-            echo json_encode(['message','Password successfully changed!','status'=>200]);
-      
+
+        } catch(BadMethodCallException $e){
+
+            return response()->json('Email/Password is invalid.', 404);
+
         }
     }
 
