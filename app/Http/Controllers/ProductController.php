@@ -83,6 +83,7 @@ class ProductController extends Controller
              // create
              $product = ProductService::insertProduct($request->all());
             }
+            return $product;
             if($product){
 
                  return  response()->json('Data has been saved.' , 200);

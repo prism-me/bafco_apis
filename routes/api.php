@@ -103,7 +103,12 @@ Route::delete('uploads/{upload}','UploadController@delete_images');
 
 
 #Front Controllers
-Route::get('home', 'FrontController@index');
+Route::get('home', 'FrontController@home');
+Route::get('about', 'FrontController@about');
+Route::get('contact-us', 'FrontController@contactUs');
+Route::get('top-management', 'FrontController@topManagement');
+Route::get('services', 'FrontController@services');
+Route::get('innovations', 'FrontController@innovations');
 
 
 Route::group(['prefix' => 'auth'], function ($router) {

@@ -34,7 +34,7 @@ class ProductRequest extends FormRequest
             "promotional_images"=> "required",//array
             "brand" => "required",
             "album" => "required", //array
-            "download" => "required",
+            // "download" => "required",
             "variations" => "required",
             // "dimentions" => "required",
             "route" => "required", 

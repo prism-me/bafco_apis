@@ -28,29 +28,32 @@ class BlogController extends Controller
 
     public function store(BlogRequest $request)
     {
-        $data['title'] =  isset( $request->title ) ? $request->title:'';
-        $data['sub_title'] = isset( $request->sub_title )? $request->sub_title:'' ;
-        $data['description'] = isset( $request->description )? $request->description: '' ;
-        $data['short_description'] = isset( $request->short_description )? $request->short_description: '' ;
-        $data['tags'] = isset( $request->tags )? $request->tags:'' ;
-        $data['posted_by'] = isset( $request->posted_by )? $request->posted_by:'' ;
-        $data['featured_img'] = isset( $request->featured_img )? $request->featured_img:'' ;
-        $data['banner_img'] = isset( $request->banner_img )? $request->banner_img:'' ;
-        $data['route'] = isset( $request->route )? $request->route:'' ;
-        $data['seo'] = isset( $request->seo )? $request->seo:'' ;
-    
         try{
 
-           if(Blog::where('route', $request->route)->exists()){ 
-            //update
-                $blog = Blog::where('route',$request->route)->update($data);
-           }else{
-            // create
-            $blog = Blog::create($data);
-           }
-           if($blog){
-                return  response()->json('Data has been saved.' , 200);
-            }
+            $data = [ 
+                    'title' =>  $request->title ,
+                    'sub_title' => $request->sub_title ,
+                    'description' =>  $request->description ,
+                    'short_description' =>  $request->short_description ,
+                    'tags' => $request->tags ,
+                    'posted_by' => $request->posted_by ,
+                    'featured_img' => $request->featured_img ,
+                    'banner_img' => $request->banner_img ,
+                    'route' => $request->route ,
+                    'seo' => $request->seo
+            ];
+        
+
+                if(Blog::where('route', $request->route)->exists() AND Blog::where('id', $request->id)->exists()){ 
+                #update
+                    $blog = Blog::where('id', $request->id)->update($data);
+                }else{
+                #create
+                    $blog = Blog::create($data);
+                }
+                if($blog){
+                    return  response()->json('Data has been saved.' , 200);
+                }
 
         }
         catch (ModelNotFoundException  $exception) {

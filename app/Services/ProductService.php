@@ -11,6 +11,7 @@ class ProductService {
 
     public static function insertProduct($data){
 
+        // dd($data['variations'][0]['variationItems']);
         try{
         
             // DB::beginTransaction();
@@ -32,14 +33,14 @@ class ProductService {
             "headrest"=>$data['headrest'],
 
         ]);
-        
+       
         $variations = $data['variations'];
         // dd($variations);
         foreach ($variations as $variation) {
+           
 
           $product_variation = $product->variations()->create([
                 "code"=>  $variation['code'],
-                "product_id"=>2,
                 "code"=> $variation['code'],
                 "lc_code"=> $variation['lc_code'],
                 "cbm"=>$variation['cbm'],
@@ -53,16 +54,24 @@ class ProductService {
                 "images" => $variation['images'],
                 
             ]);
-
-             dd($variations);
-            foreach($variation['variationItems'] as $values){
-
-                $product_variation->product_variatio_values()->create([
-                    "variation_id"=> $values['variation_id'],
-                    "variation_value_id"=> $values['variation_value_id'],
+           //return explode(",","" , $variation['variationItems']);
+           //exit;
+          // throw new Exception("Error Processing Request", 1);
+          $item = $variation['variationItems'];
+          //dd($item);
+         
+        //   dd($item);
+        //   $variationItems = explode("," , $item);
+           
+            foreach($item as $values){
+                
+                
+                $product_variation->product_variation_name()->create([
+                    "variation_id"=> $values,
+                    "variation_value_id"=> $values,
                 ]);
         
-        }
+            }
         
     }
         // DB::commit();

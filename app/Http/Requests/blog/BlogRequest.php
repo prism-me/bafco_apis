@@ -28,7 +28,7 @@ class BlogRequest extends FormRequest
             'sub_title' => 'required|min:3',
             'description' => 'required',
             'short_description' => 'required',
-            'route' =>'required',
+            'route' =>'required|unique:blogs',
             'tags' =>'required',
          
         ];

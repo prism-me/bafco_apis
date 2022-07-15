@@ -77,6 +77,7 @@ class VariationController extends Controller
      */
     public function show(Variation $variation)
     {
+        
         if(!$variation){
             return response()->json(['data'=> 'No Record Found.'] , 404);
         }
