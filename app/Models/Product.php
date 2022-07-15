@@ -93,6 +93,9 @@ class Product extends Model
         return $this->hasMany(ProductVariation::class , (new ProductVariation())->product_variation_name());
     
     }
+
+
+
     
     public function product_pivot_table(){
         

@@ -13,8 +13,7 @@ class ProductService {
 
         try{
         
-            DB::beginTransaction();
-
+            // DB::beginTransaction();
 
         $product = Product::create([
             "name" => $data['name'],
@@ -35,10 +34,10 @@ class ProductService {
         ]);
         
         $variations = $data['variations'];
-        
+        // dd($variations);
         foreach ($variations as $variation) {
 
-          $product_variation = $product->product_variations()->create([
+          $product_variation = $product->variations()->create([
                 "code"=>  $variation['code'],
                 "product_id"=>2,
                 "code"=> $variation['code'],
@@ -55,7 +54,7 @@ class ProductService {
                 
             ]);
 
-
+             dd($variations);
             foreach($variation['variationItems'] as $values){
 
                 $product_variation->product_variatio_values()->create([
@@ -66,12 +65,12 @@ class ProductService {
         }
         
     }
-        DB::commit();
+        // DB::commit();
 
     }
     catch (\Exception $e) {
         
-        DB::rollBack();
+        // DB::rollBack();
         return response()->json(['Product is not added.' , 'stack'=>$e],500);
     }
 
