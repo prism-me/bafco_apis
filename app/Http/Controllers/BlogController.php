@@ -44,7 +44,7 @@ class BlogController extends Controller
             ];
         
 
-                if(Blog::where('route', $request->route)->exists() AND Blog::where('id', $request->id)->exists()){ 
+                if(Blog::where('route', $request->route)->exists()  OR Blog::where('id', $request->id)->exists()){ 
                 #update
                     $blog = Blog::where('id', $request->id)->update($data);
                 }else{

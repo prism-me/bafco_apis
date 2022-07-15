@@ -4,15 +4,32 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Page;
-use App\Helper\Helpers;
+use App\Models\Blog;
+use App\Models\Team;
+use App\Models\Partner;
+use App\Models\Testimonial;
 
 class FrontController extends Controller
 {
 
+    public $blogData;
+    public $teamData;
+    public $partnerData;
+    public $testimonialData;
+
+    public function __construct()
+    {
+        $this->blogData = Blog::get(['id','title','sub_title','short_description','route'])->take(4);
+        $this->teamData = Team::get(['id','name','image','designation','route'])->take(8);
+        $this->partnerData = Partner::get(['id','name','image','description','route','link']);
+        $this->testimonialData = Testimonial::get(['id','designation','img','review']);
+       
+    }
+
     public function home(){
 
         $pages = Page::where('identifier','home')->first(['name','content']);
-        $blog = Helpers::get_blogData();
+        $blog =  $this->blogData;
         $data  = array(
             'pages' => $pages,
             'blogs' => $blog
@@ -25,8 +42,8 @@ class FrontController extends Controller
     public function about(){
 
         $about = Page::where('identifier','about')->first(['name','content']);
-        $team = Helpers::get_teamData();
-        $partner = Helpers::get_partnerData();
+        $team =  $this->teamData;
+        $partner =  $this->partnerData;
 
         $data  = array(
             'about' => $about,
@@ -55,7 +72,7 @@ class FrontController extends Controller
     public function services(){
 
         $services = Page::where('identifier','services')->first(['name','content']);
-        $testimonial = Helpers::get_testimonialData();
+        $testimonial = $this->testimonialData;
 
         $data  = array(
             'services' => $services,
@@ -68,7 +85,7 @@ class FrontController extends Controller
     public function innovations(){
 
         $innovations = Page::where('identifier','innovations')->first(['name','content']);
-        $blog = Helpers::get_blogData();
+        $blog = $this->blogData;
 
         $data  = array(
             'innovations' => $innovations,
