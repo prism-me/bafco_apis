@@ -30,7 +30,7 @@ Route::get('frontpage_category/{route}' , 'CategoryController@frontpage_category
 Route::get('products' , 'ProductController@index');
 Route::post('products' , 'ProductController@store')->middleware('auth:sanctum');
 Route::get('products/{product}' , 'ProductController@show');
-Route::delete('products/{product}' , 'ProductController@destroy')->middleware('auth:sanctum');
+// Route::delete('products/{product}' , 'ProductController@destroy')->middleware('auth:sanctum');
 
 #variations
 Route::get('variations', 'VariationController@index');

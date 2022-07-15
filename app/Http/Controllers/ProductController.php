@@ -20,6 +20,7 @@ class ProductController extends Controller
      */
     public function index()
     {   
+        // return substr(exec('getmac'), 0, 17); 
         //return $req->ip();
 
         try{
@@ -102,6 +103,8 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
+        return Product::with('variations','variations.variation_items')->where('route', $product->route)->get();
+
         if(!$product){
             return response()->json('No Record Found.' , 404);
         }
