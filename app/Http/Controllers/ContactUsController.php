@@ -31,12 +31,15 @@ class ContactUsController extends Controller
  
     public function store(ContactUsRequest $request)
     {
-        $data['name'] =  isset( $request->name ) ? $request->name:'';
-        $data['email'] = isset( $request->email )? $request->email:'' ;
-        $data['phone'] = isset( $request->phone )? $request->phone:'' ;
-        $data['message'] = isset( $request->message )? $request->message:'' ;
-        $data['subject'] = isset( $request->subject )? $request->subject:'' ;
         try{
+       
+            $data = [
+                'name'  => $request->name ,
+                'email' => $request->email,
+                'phone' => $request->phone, 
+                'message' => $request->message,
+                'subject' => $request->subject
+            ]; 
 
             $ContactUs = ContactUs::create($data);
            
@@ -47,9 +50,6 @@ class ContactUsController extends Controller
         }
         catch (ModelNotFoundException  $exception) {
             return response()->json(['ex_message'=>'Contact Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
         }
         catch (\Error $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 

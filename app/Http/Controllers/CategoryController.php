@@ -38,24 +38,29 @@ class CategoryController extends Controller
      */
     public function store(CategoryRequest $request)
     {
-        $data['name'] =  isset( $request->name ) ? $request->name:'';
-        $data['sub_title'] = isset( $request->sub_title )? $request->sub_title:'' ;
-        $data['parent_id'] = isset( $request->parent_id )? $request->parent_id: null ;
-        $data['featured_image'] = isset( $request->featured_image )? $request->featured_image:'' ;
-        $data['banner_image'] = isset( $request->banner_image )? $request->banner_image:'' ;
-        $data['description'] = isset( $request->description )? $request->description:'' ;
-        $data['seo'] = isset( $request->seo )? $request->seo:'' ;
-        $data['route'] = isset( $request->route )? $request->route:'' ;
-    
         try{
+            $data = [
+                'name' =>  $request->name,
+                'sub_title' =>  $request->sub_title ,
+                'parent_id' =>  $request->parent_id ,
+                'featured_image' =>  $request->featured_image ,
+                'banner_image' =>  $request->banner_image ,
+                'description' =>  $request->description ,
+                'seo' =>  $request->seo,
+                'route' =>  $request->route ,
+            ];
 
-           if(Category::where('route', $request->route)->exists()){ 
-            //update
-                $category = Category::where('route',$request->route)->update($data);
-           }else{
-            // create
-            $category = Category::create($data);
-           }
+            if(Category::where('route', $request->route)->exists() OR Category::where('id', $request->id)->exists()){ 
+            
+                #update
+                $category = Category::where('id',$request->id)->update($data);
+
+            }else{
+
+                #create
+                $category = Category::create($data);
+
+            }
            if($category){
                 return  response()->json('Data has been saved.' , 200);
             }
@@ -63,9 +68,6 @@ class CategoryController extends Controller
         }
         catch (ModelNotFoundException  $exception) {
             return response()->json(['ex_message'=>'Category Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
         }
         catch (\Error $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 

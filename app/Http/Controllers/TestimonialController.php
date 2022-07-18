@@ -25,14 +25,17 @@ class TestimonialController extends Controller
 
     public function store(Request $request)
     {
-        $data['name'] =  isset( $request->name ) ? $request->name:'';
-        $data['review'] = isset( $request->review )? $request->review:'' ;
-        $data['designation'] = isset( $request->designation )? $request->designation:'' ;
-        $data['img'] = isset( $request->img )? $request->img:'' ;
-    
         try{
 
-           if(Testimonial::where('id', $request->id)->exists()){ 
+            $data =  [
+                'name' =>  $request->name,
+                'review' =>   $request->review ,
+                'designation' =>   $request->designation,
+                'img' =>   $request->img,
+            ];
+    
+
+           if(Testimonial::where('id', $request->id)->exists() ){ 
             //update
                 $testimonial = Testimonial::where('id',$request->id)->update($data);
            }else{
@@ -46,9 +49,6 @@ class TestimonialController extends Controller
         }
         catch (ModelNotFoundException  $exception) {
             return response()->json(['ex_message'=>'Testimonial Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
         }
         catch (\Error $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 

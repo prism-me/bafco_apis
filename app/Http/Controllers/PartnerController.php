@@ -29,32 +29,35 @@ class PartnerController extends Controller
     
     public function store(PartnerRequest $request)
     {
-        $data['name'] =  isset( $request->name ) ? $request->name:'';
-        $data['image'] = isset( $request->image )? $request->image:'' ;
-        $data['route'] = isset( $request->route )? $request->route:'' ;
-        $data['description'] = isset( $request->description )? $request->description:'' ;
-        $data['logo'] = isset( $request->logo )? $request->logo:'' ;
-        $data['link'] = isset( $request->link )? $request->link:'' ;
-    
         try{
 
-           if(Partner::where('route', $request->route)->exists()){ 
-            //update
+            $data = [  
+                'name' => $request->name,
+                'image' =>  $request->image,
+                'route' =>  $request->route,
+                'description' =>  $request->description,
+                'logo' =>  $request->logo,
+                'link' =>  $request->link
+            ];
+
+            if(Partner::where('route', $request->route)->exists() OR Partner::where('id', $request->id)->exists()){ 
+
+                #update
                 $partner = Partner::where('route',$request->route)->update($data);
-           }else{
-            // create
-            $partner = Partner::create($data);
-           }
-           if($partner){
+
+            }else{
+
+                #create
+                $partner = Partner::create($data);
+
+            }
+            if($partner){
                 return  response()->json('Data has been saved.' , 200);
             }
 
         }
         catch (ModelNotFoundException  $exception) {
             return response()->json(['ex_message'=>'Partner Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
         }
         catch (\Error $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 

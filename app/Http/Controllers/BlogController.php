@@ -45,10 +45,13 @@ class BlogController extends Controller
         
 
                 if(Blog::where('route', $request->route)->exists()  OR Blog::where('id', $request->id)->exists()){ 
-                #update
+
+                    #update
                     $blog = Blog::where('id', $request->id)->update($data);
+
                 }else{
-                #create
+
+                    #create
                     $blog = Blog::create($data);
                 }
                 if($blog){
@@ -58,9 +61,6 @@ class BlogController extends Controller
         }
         catch (ModelNotFoundException  $exception) {
             return response()->json(['ex_message'=>'Blog Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
         }
         catch (\Error $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 

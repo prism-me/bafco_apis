@@ -3,13 +3,23 @@
 namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Session;
-use Hash;
-use Validator;
-use Auth;
 use App\Http\Requests\user\LoginRequest;
 use App\Http\Requests\user\ResetRequest;
 use App\Http\Requests\user\RegisterRequest;
+use App\Http\Requests\user\ForgetRequest;
+use App\Http\Requests;
+use Illuminate\Support\Str;
+use Carbon\Carbon; 
+use App\Models\PasswordReset;
+use App\Mail\ForgetMail;
+use DateTime;
+use Redirect;
+use Validator;
+use Session;
+use Hash;
+use Auth;
+use Mail; 
+use DB; 
 
 class UserController extends Controller
 {   
@@ -69,6 +79,7 @@ class UserController extends Controller
         $user = User::select('name','email','is_social','profile')->where('_id',$request->user_id)->first();
         return $user;
     }
+    
 
     public function updateUser(Request $request)
     {
@@ -113,6 +124,45 @@ class UserController extends Controller
         } catch(BadMethodCallException $e){
 
             return response()->json('Email/Password is invalid.', 404);
+
+        }
+    }
+
+
+    public function forgetPassword(ForgetRequest $request){
+        try{
+
+            $forget = ForgetService::sendToken($request->all());
+            return $forget;
+            if($forget){
+
+                return  response()->json('Data has been saved.' , 200);
+            }
+        }
+        catch (\Error $exception) {
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+        }
+
+
+            
+    }
+
+    public function resetPassword($token)
+    {
+        $updatePassword = PasswordReset::where('token',$token)->first();
+        $error = 'Token Expired!';
+
+        if($updatePassword){
+            $timeLimit = strtotime($updatePassword['created_at']) + 1800;
+            if(time() > $timeLimit){
+                return view('reset-password', ['token' => $token] , compact('error'));
+            }
+            else{
+                return view('reset-password', ['token' => $token]);
+            }
+        }else{
+
+            return view('reset-password', ['token' => $token] , compact('error'));
 
         }
     }

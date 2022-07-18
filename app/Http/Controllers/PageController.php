@@ -30,29 +30,34 @@ class PageController extends Controller
    
     public function store(PageRequest  $request)
     {
-        $data['name'] =  isset( $request->name ) ? $request->name:'';
-        $data['content'] = isset( $request->content )? $request->content:'' ;
-        $data['route'] = isset( $request->	route )? $request->	route:'' ;
         
         try{
+            
+            $data = [
+               'name' => $request->name,
+               'content' => $request->content,
+               'route' => $request->route
+            ];
+        
 
-           if(Page::where('route', $request->route)->exists()){ 
-            //update
-                $page = Page::where('route',$request->route)->update($data);
+            if(Page::where('route', $request->route)->exists() OR Page::where('id', $request->id)->exists() ){ 
+
+                #update
+                $page = Page::where('id',$request->id)->update($data);
+
             }else{
-            // create
+
+                #create
                 $page = Page::create($data);
-           }
-           if($page){
+
+            }
+            if($page){
                 return  response()->json('Data has been saved.' , 200);
             }
 
         }
         catch (ModelNotFoundException  $exception) {
             return response()->json(['ex_message'=>'Page Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
         }
         catch (\Error $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 

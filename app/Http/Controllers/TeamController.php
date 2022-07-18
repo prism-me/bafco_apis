@@ -30,17 +30,19 @@ class TeamController extends Controller
    
     public function store(TeamRequest $request)
     {
-        $data['name'] =  isset( $request->name ) ? $request->name:'';
-        $data['image'] = isset( $request->image )? $request->image:'' ;
-        $data['designation'] = isset( $request->designation )? $request->designation:'' ;
-        $data['gif'] = isset( $request->gif )? $request->gif:'' ;
-        $data['route'] = isset( $request->route )? $request->route:'' ;
-    
+        
         try{
+            $data =  [
+                'name' => $request->name,
+                'image' =>  $request->image ,
+                'designation' =>  $request->designation,
+                'gif' =>  $request->gif,
+                'route' =>  $request->routes
+            ];
 
-           if(Team::where('route', $request->route)->exists()){ 
+           if(Team::where('route', $request->route)->exists() OR Team::where('id', $request->id)->exists()){ 
             //update
-                $team = Team::where('route',$request->route)->update($data);
+                $team = Team::where('id',$request->id)->update($data);
            }else{
             // create
             $team = Team::create($data);
@@ -52,9 +54,6 @@ class TeamController extends Controller
         }
         catch (ModelNotFoundException  $exception) {
             return response()->json(['ex_message'=>'Team Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
         }
         catch (\Error $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 

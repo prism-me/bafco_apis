@@ -30,14 +30,16 @@ class ManagementController extends Controller
  
     public function store(ManagementRequest $request)
     {
-        $data['type'] =  isset( $request->type ) ? $request->type:'';
-        $data['content'] = isset( $request->content )? $request->content:'' ;
-    
+      
         try{
+            $data = [
+                'type' =>  $request->type ,
+                'content' => $request->content
+            ];
 
-           if(Management::where('type', $request->type)->exists()){ 
+           if(Management::where('type', $request->type)->exists() OR Management::where('id', $request->id)->exists() ){ 
             //update
-                $management = Management::where('type',$request->type)->update($data);
+                $management = Management::where('id',$request->id)->update($data);
            }else{
             // create
             $management = Management::create($data);
@@ -49,9 +51,6 @@ class ManagementController extends Controller
         }
         catch (ModelNotFoundException  $exception) {
             return response()->json(['ex_message'=>'Management Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
         }
         catch (\Error $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 

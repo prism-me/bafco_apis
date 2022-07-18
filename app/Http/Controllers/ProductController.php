@@ -64,12 +64,6 @@ class ProductController extends Controller
     }
 
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(ProductRequest $request)
     {
         try{
@@ -89,10 +83,10 @@ class ProductController extends Controller
                  return  response()->json('Data has been saved.' , 200);
              }
 
-         }
+        }
          catch (\Error $exception) {
              return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
-         }   
+        }   
 
     }
 

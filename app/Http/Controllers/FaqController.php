@@ -30,30 +30,28 @@ class FaqController extends Controller
  
    public function store(FaqRequest $request)
     {
-        $data['question'] =  isset( $request->question ) ? $request->question:'';
-        $data['answer'] = isset( $request->answer )? $request->answer:'' ;
-        $data['type'] = isset( $request->type )? $request->type:'' ;
-        $data['route'] = isset( $request->route )? $request->route:'' ;
-    
         try{
+            $data = [
+                'question'=>    $request->question,
+                'answer'=>   $request->answer,
+                'type'=>   $request->type,
+                'route'=>   $request->route
+            ]; 
 
-           if(Faq::where('route', $request->route)->exists()){ 
-            //update
-                $faq = Faq::where('route',$request->route)->update($data);
-           }else{
-            // create
-            $faq = Faq::create($data);
-           }
-           if($faq){
-                return  response()->json('Data has been saved.' , 200);
+            if(Faq::where('route', $request->route)->exists() OR Faq::where('id', $request->id)->exists() ){ 
+                #update
+                    $faq = Faq::where('id',$request->id)->update($data);
+            }else{
+                #create
+                $faq = Faq::create($data);
+            }
+            if($faq){
+                    return  response()->json('Data has been saved.' , 200);
             }
 
         }
         catch (ModelNotFoundException  $exception) {
             return response()->json(['ex_message'=>'Faq Not found.' , 'line' =>$exception->getLine() ], 400);
-        }
-        catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
         }
         catch (\Error $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
