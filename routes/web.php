@@ -17,4 +17,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Route::get('/user', 'UserController@index');
+Route::get('reset-password/{token}', 'ForgetPasswordController@resetPassword');

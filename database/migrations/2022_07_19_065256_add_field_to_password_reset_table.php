@@ -15,7 +15,7 @@ class AddFieldToPasswordResetTable extends Migration
     {
         Schema::table('password_resets', function (Blueprint $table) {
             $table->string('redirect_url')->nullable();
-             $table->timestamp('created_at')->nullable();
+             $table->id();
              $table->timestamp('updated_at')->nullable();
         });
     }

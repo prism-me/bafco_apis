@@ -18,7 +18,7 @@ class NotifyForgetPasswordCreated
   
     public function handle(ForgetPasswordMail $userData)
     {
-        dd($userData);
-        Mail::to($userData['email'])->send('emails.forget'); 
+        $email = $userData['email'];
+        Mail::to($email)->send('emails.forget', $userData); 
     }
 }

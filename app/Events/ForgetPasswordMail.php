@@ -14,14 +14,13 @@ use App\Model\User;
 class ForgetPasswordMail 
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $user;
+    public $userData;
 
   
-    public function __construct($user)
+    public function __construct($userData)
     {
        
-       
-        $this->user = $user;   
+        $this->userData = $userData;   
     }
 
     /**
