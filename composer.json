@@ -13,6 +13,7 @@
         "laravel/tinker": "^2.5",
         "platformcommunity/bunnycdn-storage": "^0.2.0",
         "sentry/sentry-laravel": "^2.12",
+        "spatie/laravel-backup": "^6.16",
         "staudenmeir/eloquent-has-many-deep": "^1.14"
     },
     "require-dev": {

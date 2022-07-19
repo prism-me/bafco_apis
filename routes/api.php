@@ -110,14 +110,19 @@ Route::get('top-management', 'FrontController@topManagement');
 Route::get('services', 'FrontController@services');
 Route::get('innovations', 'FrontController@innovations');
 
-
-Route::group(['prefix' => 'auth'], function ($router) {
-
+#Forget Password
+Route::post('forget-password', 'UserController@forgetPassword');
+   
+   
+   
+   Route::group(['prefix' => 'auth'], function ($router) {
+       
     Route::post('/register', 'UserController@register');
     Route::post('/login', 'UserController@login');
     Route::get('/me','UserController@me')->middleware('auth:sanctum');
     Route::post('/logout', 'UserController@logout')->middleware('auth:sanctum');
     Route::post('/reset', 'UserController@reset')->middleware('auth:sanctum'); 
+ 
 
     # User Detail
     Route::post('reset', 'UserController@reset'); 

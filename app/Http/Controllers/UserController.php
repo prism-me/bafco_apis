@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon; 
 use App\Models\PasswordReset;
 use App\Mail\ForgetMail;
+use App\Services\ForgetService;
 use DateTime;
 use Redirect;
 use Validator;
@@ -130,6 +131,7 @@ class UserController extends Controller
 
 
     public function forgetPassword(ForgetRequest $request){
+       
         try{
 
             $forget = ForgetService::sendToken($request->all());
