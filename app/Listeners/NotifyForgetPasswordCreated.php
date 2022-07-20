@@ -7,6 +7,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use App\Events\ForgetPasswordMail;
 use App\User;
 use Mail;
+use App\Mail\ForgotPasswordMail as ForgotMail;
 
 class NotifyForgetPasswordCreated
 {
@@ -18,7 +19,9 @@ class NotifyForgetPasswordCreated
   
     public function handle(ForgetPasswordMail $userData)
     {
-        $email = $userData['email'];
-        Mail::to($email)->send('emails.forget', $userData); 
+        $email = $userData->userData['email'];
+        Mail::to($email)->send(new ForgotMail($userData->userData)); 
     }
+
+
 }

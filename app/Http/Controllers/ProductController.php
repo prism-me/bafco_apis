@@ -67,16 +67,17 @@ class ProductController extends Controller
     public function store(ProductRequest $request)
     {
         try{
+            
 
-            if(!Product::where('route', $request->route)->exists()){ 
-             //update
-                 
-             //$product = Product::where('route',$request->route)->update($request->all());
-            }else{
+            // if(!Product::where('route', $request->route)->exists()){ 
+            //  //update
+            //  //$product = Product::where('route',$request->route)->update($request->all());
+            // }else{
+              
 
              // create
              $product = ProductService::insertProduct($request->all());
-            }
+            // }
             return $product;
             if($product){
 
@@ -98,7 +99,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return Product::with('variations','variations.variation_items')->where('route', $product->route)->get();
+        return Product::with('variations','variations.variation_items')->where('route', $product->route)->first();
 
         if(!$product){
             return response()->json('No Record Found.' , 404);

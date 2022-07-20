@@ -19,9 +19,9 @@ class FrontController extends Controller
 
     public function __construct()
     {
-        $this->blogData = Blog::get(['id','title','sub_title','short_description','route'])->take(4);
-        $this->teamData = Team::get(['id','name','image','designation','route'])->take(8);
-        $this->partnerData = Partner::get(['id','name','image','description','route','link']);
+        $this->blogData = Blog::get(['id','title','sub_title','short_description','featured_img','route'])->take(4);
+        $this->teamData = Team::get(['id','name','image','designation','gif','route'])->take(8);
+        $this->partnerData = Partner::get(['id','name','image','description','logo','route','link']);
         $this->testimonialData = Testimonial::get(['id','designation','img','review']);
        
     }
@@ -94,4 +94,6 @@ class FrontController extends Controller
         return $data;
 
     }
+
+   
 }

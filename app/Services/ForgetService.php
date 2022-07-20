@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Models\PasswordReset;
 use App\Events\ForgetPasswordMail;
 use Illuminate\Http\Request;
+use App\Models\User;
 use Str;
 
 class ForgetService {
@@ -17,8 +18,9 @@ class ForgetService {
             'token' => $token,
             'redirect_url' => $data['redirect_url'],
         ]); 
+        $user = User::where('email',$data['email'])->first();
 
-        $userData = array(  'name' => $database['name'],
+        $userData = array(  'name' => $user['name'],
                         'email' => $data['email'], 
                         'token' => $token,
                         'redirect_url' => $data['redirect_url'],

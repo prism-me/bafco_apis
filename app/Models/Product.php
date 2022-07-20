@@ -25,9 +25,11 @@ class Product extends Model
         "brand",
         "album",
         "download",
+        'seo',
         "promotional_images"
     
     ];
+   
     
     public function getRouteKeyName()
     {
@@ -37,7 +39,8 @@ class Product extends Model
     protected $casts = [
         'related_categories' => 'array',
         'album' => 'array',
-        'promotional_images' => 'array'
+        'promotional_images' => 'array',
+        'seo' => 'array'
         
     ];
 

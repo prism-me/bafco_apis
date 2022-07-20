@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use App\Models\PasswordReset;
 use App\Mail\ForgetMail;
 use App\Services\ForgetService;
+use App\Services\RegisterService;
 use DateTime;
 use Redirect;
 use Validator;
@@ -24,18 +25,70 @@ use DB;
 
 class UserController extends Controller
 {   
-    
-    public function register(RegisterRequest $request){
-        
-        $request['password'] = bcrypt($request->password);
-        
-        $user = User::create($request->all());
 
-        $token =  $user->createToken($user->email)->plainTextToken;
 
-        return response()->json($user , 200)->header('x_auth_token',$token)->header('access-control-expose-headers' , 'x_auth_token');
+    public function register(RegisterRequest $request) {
+
+        try{
+
+            $data = $request->all();
+            $user = RegisterService::registerUser($data);
+            return $user;
+            if($user){
+                return  response()->json('Data has been saved.' , 200);
+            }
+
+        }
+        catch (\Error $exception) {
+             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+        } 
+        
+        
+        
+    }
+
+
+    public function emailVerify($token)
+    {
+        try{
+
+            $data = $token;
+            $user = RegisterService::tokenVerify($data);
+            return $user;
+            if($user){
+                return  response()->json('Data has been saved.' , 200);
+            }
+
+        }
+        catch (\Error $exception) {
+             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+        }
+        
+        
+        
+    }
+
+    public function verifyEmail(Request $request)
+    {
+        try{
+
+            $data = $request->all();
+            $user = RegisterService::registerVerify($data);
+            return $user;
+            if($user){
+                return  response()->json('Data has been saved.' , 200);
+            }
+
+        }
+        catch (\Error $exception) {
+             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+        }
+
+        
 
     }
+
+
 
     public function login(LoginRequest $request){
        
@@ -47,15 +100,15 @@ class UserController extends Controller
             
             }
         
-        $token = auth()->user()->createToken('API_Token')->plainTextToken;
-        
-        return response()->json('Logged in successfully', 200)->header('x_auth_token', $token)->header('access-control-expose-headers' , 'x_auth_token');
+            $token = auth()->user()->createToken('API_Token')->plainTextToken;
+            
+            return response()->json('Logged in successfully', 200)->header('x_auth_token', $token)->header('access-control-expose-headers' , 'x_auth_token');
 
-    } catch(BadMethodCallException $e){
+        } catch(BadMethodCallException $e){
 
-        return response()->json('Email/Password is invalid.', 404);
+            return response()->json('Email/Password is invalid.', 404);
 
-    }
+        }
 
 
         // $user = User::where('email', $request->email)->first();
@@ -171,38 +224,35 @@ class UserController extends Controller
     }
 
 
-    public function submitResetPassword(Request $request)
+    public function submitResetPassword(ForgetRequest $request)
     {
-        \Validator::validate($request->all(), [
-            'password' => 'required|string|min:6',
-            'password_confirmation' => 'required|same:password'
+      
+        try{
 
-        ],[
-            'password.required'    =>  "Password is required",
-            'password.min'    =>  "Password contains minimum 6 characters",
-            'password_confirmation.required'    =>  "Password Confirmation is required",
-            "password_confirmation.same" =>  "Password Mismatch!"
-        ]);
-
-        $error = 'Token Expired!';
-        $token = $request->token;
-        $updatePassword = PasswordReset::where([
-                            'token' => $request->token
-                          ])
-                          ->first();
+            $error = 'Token Expired!';
+            $token = $request->token;
+            $updatePassword = PasswordReset::where([
+                                'token' => $request->token
+                            ])
+                            ->first();
+                
+            if(!$updatePassword){
+                return view('reset-password', ['token' => $token] , compact('error'));
+            }
             
-        if(!$updatePassword){
-            return view('reset-password', ['token' => $token] , compact('error'));
+            $update = array(
+                'password' => bcrypt($request->password) ,
+                'changed_password' => $request->changed_password
+            );
+            dd('jo');
+            $user = User::where('email', $updatePassword['email'])->update($update);
+            PasswordReset::where('email', $updatePassword['email'])->delete();
+            $url = $updatePassword['redirect_url'];
+            return Redirect::away($url);
         }
-        
-        $update = array(
-            'password' => bcrypt($request->password) ,
-            'password_confirmation'=> $request->password_confirmation
-        );
-        $user = User::where('email', $updatePassword['email'])->update($update);
-        PasswordReset::where('email', $updatePassword['email'])->delete();
-        $url = $updatePassword['redirect_url'];
-        return Redirect::away($url);
+        catch (\Error $exception) {
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+        }
     }
 
 

@@ -27,6 +27,9 @@ class EventServiceProvider extends ServiceProvider
         ForgetPasswordMail::class => [
             NotifyForgetPasswordCreated::class,
         ],
+        RegisterCreate::class => [
+            NotifyRegisterCreated::class,
+        ],
     ];
 
     /**

@@ -17,4 +17,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('reset-password/{token}', 'ForgetPasswordController@resetPassword');
+Route::get('reset-password/{token}', 'UserController@resetPassword');
+Route::get('/email-verification/{token}', 'UserController@emailVerify');
+

@@ -74,23 +74,13 @@ span.psw {
         </div>
     @endif
     @if(!@$error) 
-    <h2>Reset Password</h2>
-    <form action="{{ url('api/submit-reset-password') }}" method="post" style="padding:2rem">
+    <h2>Verify E-Mail</h2>
+    <form action="{{ url('api/email-verify') }}" method="post" style="padding:2rem">
     
         @csrf   
+          <p>Click the link below to Verify Your E-mail!</p>
            <input type="hidden" name="token" value= "{{$token}}">
-            <label for="uname"><b>New Pasword</b></label>
-            <input type="password" placeholder="Enter Password" name="password" required>
-            @error('password')
-                {{ $message }}
-            @enderror
-            <label for="psw"><b>Confirm Password</b></label>
-            <input type="password" placeholder="Confirm Password" name="changed_password" required>
-             @error('changed_password')
-                {{ $message }}
-            @enderror
-            <button type="submit">Reset</button>
-        
+            <button type="submit" style="border-radius: 15px; width: 13%;">Verify</button>
     </form>
     @endif
     
