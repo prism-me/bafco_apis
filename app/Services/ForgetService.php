@@ -34,4 +34,48 @@ class ForgetService {
        
     }
 
+    public function resetPassword($token)
+    {
+        $updatePassword = PasswordReset::where('token',$token)->first();
+        $error = 'Token Expired!';
+
+        if($updatePassword){
+            $timeLimit = strtotime($updatePassword['created_at']) + 1800;
+            if(time() > $timeLimit){
+                return view('emails.reset-password', ['token' => $token] , compact('error'));
+            }
+            else{
+                return view('emails.reset-password', ['token' => $token]);
+            }
+        }else{
+
+            return view('emails.reset-password', ['token' => $token] , compact('error'));
+
+        }
+    }
+
+        public function submitResetPassword($data){
+
+            $error = 'Token Expired!';
+            $token = $data['token'];
+            $updatePassword = PasswordReset::where([
+                                'token' => $data['token']
+                            ])
+                            ->first();
+                
+            if(!$updatePassword){
+                return view('reset-password', ['token' => $token] , compact('error'));
+            }
+            
+            $update = array(
+                'password' => bcrypt($data['password']) ,
+                'changed_password' => $data['changed_password']
+            );
+          
+            $user = User::where('email', $updatePassword['email'])->update($update);
+            PasswordReset::where('email', $updatePassword['email'])->delete();
+            $url = $updatePassword['redirect_url'];
+            return Redirect::away($url);
+        }
+
 }

@@ -205,54 +205,37 @@ class UserController extends Controller
 
     public function resetPassword($token)
     {
-        $updatePassword = PasswordReset::where('token',$token)->first();
-        $error = 'Token Expired!';
+        try{
 
-        if($updatePassword){
-            $timeLimit = strtotime($updatePassword['created_at']) + 1800;
-            if(time() > $timeLimit){
-                return view('emails.reset-password', ['token' => $token] , compact('error'));
+            $forget = ForgetService::resetPassword($token);
+            return $forget;
+            if($forget){
+
+                return  response()->json('Data has been saved.' , 200);
             }
-            else{
-                return view('emails.reset-password', ['token' => $token]);
-            }
-        }else{
-
-            return view('emails.reset-password', ['token' => $token] , compact('error'));
-
+        }
+        catch (\Error $exception) {
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
         }
     }
 
 
     public function submitResetPassword(ForgetRequest $request)
     {
-      
         try{
+            $data = $request->all();
+            $forget = ForgetService::submitResetPassword($data);
+            return $forget;
+            if($forget){
 
-            $error = 'Token Expired!';
-            $token = $request->token;
-            $updatePassword = PasswordReset::where([
-                                'token' => $request->token
-                            ])
-                            ->first();
-                
-            if(!$updatePassword){
-                return view('reset-password', ['token' => $token] , compact('error'));
+                return  response()->json('Data has been saved.' , 200);
             }
-            
-            $update = array(
-                'password' => bcrypt($request->password) ,
-                'changed_password' => $request->changed_password
-            );
-            dd('jo');
-            $user = User::where('email', $updatePassword['email'])->update($update);
-            PasswordReset::where('email', $updatePassword['email'])->delete();
-            $url = $updatePassword['redirect_url'];
-            return Redirect::away($url);
         }
         catch (\Error $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
         }
+      
+        
     }
 
 

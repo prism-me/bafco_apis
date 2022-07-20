@@ -8,6 +8,8 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use Illuminate\Support\Facades\Event;
 use App\Listeners\NotifyForgetPasswordCreated;
 use App\Events\ForgetPasswordMail;
+use App\Listeners\NotifyRegisterCreated;
+use App\Events\RegisterCreate;
 
 
 

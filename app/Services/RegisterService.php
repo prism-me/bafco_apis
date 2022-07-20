@@ -46,14 +46,14 @@ class RegisterService {
         if($user){
             $timeLimit = strtotime($user['created_at']) + 1800;
             if(time() > $timeLimit){
-                return view('verifyEmail', ['token' => $token] , compact('error'));
+                return view('emails.verifyEmail', ['token' => $token] , compact('error'));
             }
             else{
-                return view('verifyEmail', ['token' => $token]);
+                return view('emails.verifyEmail', ['token' => $token]);
             }
         }else{
 
-            return view('verifyEmail', ['token' => $token] , compact('error'));
+            return view('emails.verifyEmail', ['token' => $token] , compact('error'));
 
         }
     }

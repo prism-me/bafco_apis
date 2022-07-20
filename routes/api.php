@@ -96,6 +96,12 @@ Route::post('uploads','UploadController@upload_media');
 Route::get('uploads','UploadController@get_all_images');
 Route::delete('uploads/{upload}','UploadController@delete_images');
 
+#Video
+Route::get('videos', 'VideoController@index');
+Route::post('videos', 'VideoController@store')->middleware('auth:sanctum');
+Route::get('videos/{video}', 'VideoController@show');
+Route::delete('videos/{video}', 'VideoController@destroy')->middleware('auth:sanctum');
+
 
 #Front Controllers
 Route::get('home', 'FrontController@home');
@@ -108,10 +114,11 @@ Route::get('innovations', 'FrontController@innovations');
 #Forget Password
 Route::post('forget-password', 'UserController@forgetPassword');
 Route::post('submit-reset-password', 'UserController@submitResetPassword');
-   
-    Route::group(['prefix' => 'auth'], function ($router) {
-       
+
+Route::group(['prefix' => 'auth'], function ($router) {
+    
         Route::post('/register', 'UserController@register');
+        Route::post('/email-verify', 'UserController@verifyEmail');
         Route::post('/login', 'UserController@login');
         Route::get('/me','UserController@me')->middleware('auth:sanctum');
         Route::post('/logout', 'UserController@logout')->middleware('auth:sanctum');

@@ -17,7 +17,7 @@ class NotifyRegisterCreated
      */
     public function __construct()
     {
-        dd('hello');
+        
     }
 
     /**
@@ -28,7 +28,7 @@ class NotifyRegisterCreated
      */
      public function handle(RegisterCreate $userData)
     {
-        dd($userData);
+       
         $email = $userData->userData['email'];
         Mail::to($email)->send(new Verify($userData->userData)); 
     }
