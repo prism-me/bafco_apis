@@ -39,7 +39,7 @@ class ManagementController extends Controller
 
            if(Management::where('type', $request->type)->exists() OR Management::where('id', $request->id)->exists() ){ 
             //update
-                $management = Management::where('id',$request->id)->update($data);
+                $management = Management::where('type',$request->type)->update($data);
            }else{
             // create
             $management = Management::create($data);

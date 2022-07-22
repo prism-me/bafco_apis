@@ -18,20 +18,20 @@ use Illuminate\Support\Facades\Route;
 #     return $request->user();
 # });
 
-#categories
+#Categories
 Route::get('categories' , 'CategoryController@index');
 Route::post('categories' , 'CategoryController@store')->middleware('auth:sanctum');
 Route::get('categories/{category}' , 'CategoryController@show');
 Route::delete('categories/{category}' , 'CategoryController@destroy')->middleware('auth:sanctum');
 Route::get('frontpage_category/{route}' , 'CategoryController@frontpage_category');
 
-#products
+#Products
 Route::get('products' , 'ProductController@index');
 Route::post('products' , 'ProductController@store')->middleware('auth:sanctum');
 Route::get('products/{product}' , 'ProductController@show');
 // Route::delete('products/{product}' , 'ProductController@destroy')->middleware('auth:sanctum');
 
-#variations
+#Variations
 Route::get('variations', 'VariationController@index');
 Route::post('variations', 'VariationController@store')->middleware('auth:sanctum');
 Route::get('variations/{variation}', 'VariationController@show');
@@ -85,13 +85,13 @@ Route::post('testimonials', 'TestimonialController@store')->middleware('auth:san
 Route::get('testimonials/{testimonial}', 'TestimonialController@show');
 Route::delete('testimonials/{testimonial}', 'TestimonialController@destroy')->middleware('auth:sanctum');
 
-#variation values
+#Variation values
 Route::get('variation_values', 'VariationValueController@index');
 Route::post('variation_values', 'VariationValueController@store')->middleware('auth:sanctum');
 Route::get('variation_values/{variation_value}', 'VariationValueController@show');
 Route::delete('variation_values/{variation_value}', 'VariationValueController@destroy')->middleware('auth:sanctum');
 
-#upload 
+#Upload 
 Route::post('uploads','UploadController@upload_media');
 Route::get('uploads','UploadController@get_all_images');
 Route::delete('uploads/{upload}','UploadController@delete_images');
@@ -102,6 +102,12 @@ Route::post('videos', 'VideoController@store')->middleware('auth:sanctum');
 Route::get('videos/{video}', 'VideoController@show');
 Route::delete('videos/{video}', 'VideoController@destroy')->middleware('auth:sanctum');
 
+#Promo Codes
+Route::get('promo-codes', 'PromoCodeController@index');
+Route::post('promo-codes', 'PromoCodeController@store')->middleware('auth:sanctum');
+Route::get('promo-codes/{promo-code}', 'PromoCodeController@show');
+Route::delete('promo-codes/{promo-code}', 'PromoCodeController@destroy')->middleware('auth:sanctum');
+
 
 #Front Controllers
 Route::get('home', 'FrontController@home');
@@ -110,26 +116,29 @@ Route::get('contact-us', 'FrontController@contactUs');
 Route::get('top-management', 'FrontController@topManagement');
 Route::get('services', 'FrontController@services');
 Route::get('innovations', 'FrontController@innovations');
+Route::get('front-products', 'FrontController@frontProducts');
+
+
+#Dashboard CMS
+Route::get('all-users', 'DashboardController@allUsers');
+
+
 
 #Forget Password
 Route::post('forget-password', 'UserController@forgetPassword');
-Route::post('submit-reset-password', 'UserController@submitResetPassword');
 
-Route::group(['prefix' => 'auth'], function ($router) {
+    Route::group(['prefix' => 'auth'], function ($router) {
     
         Route::post('/register', 'UserController@register');
-        Route::post('/email-verify', 'UserController@verifyEmail');
         Route::post('/login', 'UserController@login');
         Route::get('/me','UserController@me')->middleware('auth:sanctum');
         Route::post('/logout', 'UserController@logout')->middleware('auth:sanctum');
         Route::post('/reset', 'UserController@reset')->middleware('auth:sanctum'); 
     
 
-        # User Detail
+        #User Detail
         Route::post('reset', 'UserController@reset'); 
-        Route::get('user-detail', 'UserController@userDetail'); 
-        Route::post('update-detail', 'UserController@updateUser'); 
-
+ 
         #Wishlist
         Route::get('wishlists', 'WishlistController@index')->middleware('auth:sanctum');
         Route::post('wishlists', 'WishlistController@store')->middleware('auth:sanctum');

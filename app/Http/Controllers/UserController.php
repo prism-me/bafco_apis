@@ -129,28 +129,6 @@ class UserController extends Controller
     }
 
 
-    public function userDetail(Request $request){
-        $user = User::select('name','email','is_social','profile')->where('_id',$request->user_id)->first();
-        return $user;
-    }
-    
-
-    public function updateUser(Request $request)
-    {
-        $user = $request['user_id'];
-        $input = $request->except('_id');
-        if($update){
-            
-            echo json_encode(['message','Profile Updated successfully','status'=>200]);
-            
-        }else{
-            
-            echo json_encode(['message','Server Error While']);
-
-        }
-    }
-
-
     public function reset(ResetRequest $request)
     {
         try{

@@ -17,7 +17,7 @@ class ProductController extends Controller
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
-     */
+    */
     public function index()
     {   
         // return substr(exec('getmac'), 0, 17); 
@@ -38,6 +38,7 @@ class ProductController extends Controller
 
     public function website_all(){
         try{
+            
             DB::enableQueryLog();
 
             $variations = ProductVariation::with(['variation_name','variation_values'])->get();

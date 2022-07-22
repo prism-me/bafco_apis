@@ -14,7 +14,7 @@ class BlogController extends Controller
     
     public function index()
     {
-         try{
+        try{
             $blog = Blog::all();
             if($blog->isEmpty()){
                  return response()->json([] , 200);

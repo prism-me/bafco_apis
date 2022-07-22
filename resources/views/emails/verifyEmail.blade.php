@@ -75,7 +75,7 @@ span.psw {
     @endif
     @if(!@$error) 
     <h2>Verify E-Mail</h2>
-    <form action="{{ url('api/email-verify') }}" method="post" style="padding:2rem">
+    <form action="{{ url('email-verify') }}" method="post" style="padding:2rem">
     
         @csrf   
           <p>Click the link below to Verify Your E-mail!</p>

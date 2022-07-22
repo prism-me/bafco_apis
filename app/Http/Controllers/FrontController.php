@@ -95,5 +95,12 @@ class FrontController extends Controller
 
     }
 
+
+    public function frontProducts(){
+
+        $products = Page::paginate(12);
+        return response()->json($products);
+    }
+
    
 }

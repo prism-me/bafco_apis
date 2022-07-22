@@ -54,28 +54,29 @@ class ForgetService {
         }
     }
 
-        public function submitResetPassword($data){
+    public function submitResetPassword($data){
+        dd('hi');
 
-            $error = 'Token Expired!';
-            $token = $data['token'];
-            $updatePassword = PasswordReset::where([
-                                'token' => $data['token']
-                            ])
-                            ->first();
-                
-            if(!$updatePassword){
-                return view('reset-password', ['token' => $token] , compact('error'));
-            }
+        $error = 'Token Expired!';
+        $token = $data['token'];
+        $updatePassword = PasswordReset::where([
+                            'token' => $data['token']
+                        ])
+                        ->first();
             
-            $update = array(
-                'password' => bcrypt($data['password']) ,
-                'changed_password' => $data['changed_password']
-            );
-          
-            $user = User::where('email', $updatePassword['email'])->update($update);
-            PasswordReset::where('email', $updatePassword['email'])->delete();
-            $url = $updatePassword['redirect_url'];
-            return Redirect::away($url);
+        if(!$updatePassword){
+            return view('reset-password', ['token' => $token] , compact('error'));
         }
+        
+        $update = array(
+            'password' => bcrypt($data['password']) ,
+            'changed_password' => $data['changed_password']
+        );
+        
+        $user = User::where('email', $updatePassword['email'])->update($update);
+        PasswordReset::where('email', $updatePassword['email'])->delete();
+        $url = $updatePassword['redirect_url'];
+        return Redirect::away($url);
+    }
 
 }

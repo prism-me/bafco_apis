@@ -7,6 +7,7 @@ use App\Models\TempUser;
 use App\Models\User;
 use Str;
 use DB;
+use Redirect;
 
 
 class RegisterService {
@@ -60,31 +61,16 @@ class RegisterService {
 
     public function registerVerify($data){
 
-        $user = TempUser::where('token', $data->token )->first();
+        $user = TempUser::where('token', $data['token'] )->first();
         $error = 'Token Expired!';
         
         if(!$user){
             return view('loading', ['token' =>  $data->token ] , compact('error'));
         }
-            $user['isActive'] =  1 ;
-            $user['token'] =  "" ;
-            
-            $tempUser = $user->update(['token'=> "" , "isActive" => 1]);
             $create = array(
                 "name" => $user['name'],
-                "firstName" => $user['firstName'],
-                "lastName" => $user['lastName'],
-                "mobile" => $user['mobile'],
-                "address" => $user['address'],
-                "area" => $user['area'],
-                "emirates" => $user['emirates'],
                 "email" => $user['email'],
                 "password" => $user['password'],
-                "password_confirmation" => $user['password_confirmation'],
-                "isActive" => $user['isActive'],
-                "user_type" => $user['user_type'],
-                "kid_age" => $user['kid_age'],
-                "pregnent" => $user['pregnent']
             );
             
             $userCreate =  User::create($create);

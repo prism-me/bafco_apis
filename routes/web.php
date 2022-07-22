@@ -18,5 +18,9 @@ Route::get('/', function () {
 });
 
 Route::get('reset-password/{token}', 'UserController@resetPassword');
+Route::post('submit-reset-password', 'UserController@submitResetPassword');
+
 Route::get('/email-verification/{token}', 'UserController@emailVerify');
+Route::post('/email-verify', 'UserController@verifyEmail');
+
 
