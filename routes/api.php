@@ -91,7 +91,7 @@ Route::post('variation_values', 'VariationValueController@store')->middleware('a
 Route::get('variation_values/{variation_value}', 'VariationValueController@show');
 Route::delete('variation_values/{variation_value}', 'VariationValueController@destroy')->middleware('auth:sanctum');
 
-#Upload 
+#Upload
 Route::post('uploads','UploadController@upload_media');
 Route::get('uploads','UploadController@get_all_images');
 Route::delete('uploads/{upload}','UploadController@delete_images');
@@ -130,27 +130,29 @@ Route::get('services', 'FrontController@services');
 Route::get('innovations', 'FrontController@innovations');
 Route::get('front-products', 'FrontController@frontProducts');
 
+#Form Submit
+Route::post('form-submit','EnquiryController@store');
+
 
 #Dashboard CMS
 Route::get('all-users', 'DashboardController@allUsers');
-
-
 
 #Forget Password
 Route::post('forget-password', 'UserController@forgetPassword');
 
     Route::group(['prefix' => 'auth'], function ($router) {
-    
+
         Route::post('/register', 'UserController@register');
+        Route::post('/email-verification', 'UserController@emailVerify');
+
         Route::post('/login', 'UserController@login');
         Route::get('/me','UserController@me')->middleware('auth:sanctum');
         Route::post('/logout', 'UserController@logout')->middleware('auth:sanctum');
-        Route::post('/reset', 'UserController@reset')->middleware('auth:sanctum'); 
-    
+        Route::post('/reset', 'UserController@reset')->middleware('auth:sanctum');
 
         #User Detail
-        Route::post('reset', 'UserController@reset'); 
- 
+        Route::post('reset', 'UserController@reset');
+
         #Wishlist
         Route::get('wishlists', 'WishlistController@index')->middleware('auth:sanctum');
         Route::post('wishlists', 'WishlistController@store')->middleware('auth:sanctum');

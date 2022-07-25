@@ -29,27 +29,14 @@ class AddressController extends Controller
     public function store(Request $request)
     {
         try{
-            $user =  auth()->user()->id;
 
-            $data = [ 
-                    'user_id' =>  $user,
-                    'address' => $request->address
-            ];
-        
-
-            if(Address::where('id', $request->id)->exists()){ 
-
-                #update
-                $address = Address::where('id', $request->id)->update($data);
-
-            }else{
-
-                #create
-                $address = Address::create($data);
-            }
+            $address = AddressService::addAddress($request->all());
+            
+            return $address;
             if($address){
-                return  response()->json('Data has been saved.' , 200);
-            }
+
+                 return  response()->json('Data has been saved.' , 200);
+            } 
         }
         catch (ModelNotFoundException  $exception) {
             return response()->json(['ex_message'=>'Address Not found.' , 'line' =>$exception->getLine() ], 400);
@@ -57,9 +44,6 @@ class AddressController extends Controller
         catch (\Error $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
         } 
-
-
-        
     }
    
    
@@ -78,19 +62,14 @@ class AddressController extends Controller
 
         try{
             
-            $setDefault = [
-                'default' => 1
-            ];
-
-            $unsetPreviousDefaultValue = [
-                'default' => 0
-            ];
-            $previousDafaultAddress = Address::where('default',1)->first();
-            $updatePrevious = Address::where('id',$previousDafaultAddress['id'])->update($unsetPreviousDefaultValue);
-            $address = Address::where('id',$id)->update($setDefault);
+            $address = AddressService::setDefaultAddress($request->all());
+            
+            return $address;
             if($address){
-                return  response()->json('Data has been updated.' , 200);
-            }
+
+                 return  response()->json('Data has been saved.' , 200);
+            } 
+            
         }
         catch (ModelNotFoundException  $exception) {
             return response()->json(['ex_message'=>'Address Not found.' , 'line' =>$exception->getLine() ], 400);

@@ -18,9 +18,8 @@ class CreateTempUsersTable extends Migration
             $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('password')->nullable();
-            $table->string('token')->nullable();
             $table->string('isActive')->nullable();
-            $table->string('redirect_url')->nullable();
+            $table->string('code')->nullable();
             $table->timestamps();
         });
     }
