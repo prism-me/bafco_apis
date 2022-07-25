@@ -109,6 +109,18 @@ Route::get('promo-codes/{promo-code}', 'PromoCodeController@show');
 Route::delete('promo-codes/{promo-code}', 'PromoCodeController@destroy')->middleware('auth:sanctum');
 
 
+#Cart
+Route::get('cart', 'CartController@index')->middleware('auth:sanctum');
+Route::post('cart', 'CartController@store')->middleware('auth:sanctum');
+Route::delete('remove-cart/{id}', 'CartController@removeCart')->middleware('auth:sanctum');
+Route::delete('clear-all-cart/{id}', 'CartController@clearAllCart')->middleware('auth:sanctum');
+
+#Cart
+Route::get('addresses', 'AddressController@index')->middleware('auth:sanctum');
+Route::post('addresses', 'AddressController@store')->middleware('auth:sanctum');
+Route::delete('addresses/{address}', 'AddressController@destroy')->middleware('auth:sanctum');
+Route::put('set-default/{id}', 'AddressController@setDefault')->middleware('auth:sanctum');
+
 #Front Controllers
 Route::get('home', 'FrontController@home');
 Route::get('about', 'FrontController@about');
@@ -144,6 +156,9 @@ Route::post('forget-password', 'UserController@forgetPassword');
         Route::post('wishlists', 'WishlistController@store')->middleware('auth:sanctum');
         Route::get('wishlists/{id}', 'WishlistController@show')->middleware('auth:sanctum');
         Route::delete('wishlists/{id}', 'WishlistController@destroy')->middleware('auth:sanctum');
+
+        #Promo Check
+        Route::post('promo-check','PromoUserController@promoCheck')->middleware('auth:sanctum');
 
     });
 

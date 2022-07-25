@@ -19,6 +19,8 @@ class PromoCodeController extends Controller
                 $item->code_count = $item->code()->count();
                 return $item;
             });
+        
+       return json_encode(['data'=>$promo,'status'=>'Data Retrieved Successfully']);
          
         }
         catch (\Exception $exception) {
@@ -27,12 +29,10 @@ class PromoCodeController extends Controller
        
     }
 
-    public function store(PromoCodeRequest $request)
+    public function store(Request $request)
     {
-       
-        try{
-         
 
+        try{
             $data = [ 
                     'name' =>  $request->name ,
                     'value' => $request->value ,
