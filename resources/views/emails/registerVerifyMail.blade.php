@@ -1,25 +1,27 @@
-<table class="table table-bordered" style="width:605px !important;">
+<table class="table table-bordered" style="width:605px;">
     <thead>
         <tr>
-        <th colspan="3" style="border-bottom:0px !important; position:relative;">
-            <img src="https://bafco.b-cdn.net/images/Rectangle%2032.png" alt="logo" with="auto"/>
-            <img src="https://bafco.b-cdn.net/images/bafco-logo.png" alt="logo" >
+        <th colspan="3" style="border-bottom:0px !important;position: relative;">
+            <img src="https://bafco.b-cdn.net/images/Rectangle%2032.png" alt="logo" >
+            <img src="https://bafco.b-cdn.net/images/bafco-logo.png" alt="logo" style="position:absolute; top:10px; left:0; right:0; margin:0 auto; width:200px; background:white;">
         <br />
         </th>
         </tr>
     </thead>
     <tbody>
-      <td colspan="2" style="text-align:center; line-height:24px;">
-          <h2>Confirm Verification Code</h2>
-        <p>Hi {{  $user['name'] }}</p>
-          <p><strong>This is your verification Code:</strong></p>
-
-          <h2>Your Confirmation Code {{  $user['code'] }}</h2>
-        <h2><strong>Email Verification!</strong></h2>
-        <p style="color:#a39f9f;"><strong>Click the Link below to Verify Email</strong></p><br />
-        <p style="color:#e65550;"><strong>*This Link is Valid only For 30 minutes only</strong></p><br />
+      <td colspan="2">
+          <p>Hi {{  $user['name'] }},</p>
+          <p>Welcome to the Bafco</p>
+          <p>This is your Verification code:
+              <input type="text" value="{{  $user['code'] }}"></p>
+          <p>Thanks,</p>
+          <p>Bafco Team</p>
+          <p style="color:red">*This Link is Valid only For 30 minutes only</p>
 
       </td>
+    <td>
+
+    </td>
 
 </tbody>
 </table>

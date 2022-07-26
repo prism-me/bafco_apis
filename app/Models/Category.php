@@ -14,7 +14,7 @@ class Category extends Model
     protected $casts = [
         'seo' => 'array',
     ];
-    
+
     public function getRouteKeyName()
     {
         return 'route';
@@ -27,14 +27,15 @@ class Category extends Model
     public function parent(){
         return $this->hasOne(Category::class , 'parent_id','id');
     }
-    
+
     public function subcategory_products(){
 
         return $this->hasMany(Category::class , 'parent_id','id')->with('products');
     }
 
     public function products(){
-        return $this->hasMany(Product::class , 'category_id','id');
+        return $this->hasMany(Product::class , 'category_id','id')->select('id','name','short_description','featured_image','promotional_images','route',  'category_id');;
     }
+
 
 }

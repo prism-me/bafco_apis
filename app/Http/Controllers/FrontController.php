@@ -6,8 +6,12 @@ use Illuminate\Http\Request;
 use App\Models\Page;
 use App\Models\Blog;
 use App\Models\Team;
+use App\Models\Product;
 use App\Models\Partner;
+use App\Models\Category;
+
 use App\Models\Testimonial;
+use DB;
 
 class FrontController extends Controller
 {
@@ -23,7 +27,7 @@ class FrontController extends Controller
         $this->teamData = Team::get(['id','name','image','designation','gif','route'])->take(8);
         $this->partnerData = Partner::get(['id','name','image','description','logo','route','link']);
         $this->testimonialData = Testimonial::get(['id','designation','img','review']);
-       
+
     }
 
     public function home(){
@@ -95,12 +99,12 @@ class FrontController extends Controller
 
     }
 
-
-    public function frontProducts(){
-
-        $products = Page::paginate(12);
+    public function frontProducts($route)
+    {
+        $products = Category::with('products.variations')->where('route',$route)->paginate(12);
         return response()->json($products);
     }
 
-   
+
+
 }

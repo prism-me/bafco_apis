@@ -26,7 +26,7 @@ class CategoryController extends Controller
             return response()->json($categories, 200);
         }
         catch (\Exception $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
     }
 
@@ -50,8 +50,8 @@ class CategoryController extends Controller
                 'route' =>  $request->route ,
             ];
 
-            if(Category::where('route', $request->route)->exists() OR Category::where('id', $request->id)->exists()){ 
-            
+            if(Category::where('route', $request->route)->exists() OR Category::where('id', $request->id)->exists()){
+
                 #update
                 $category = Category::where('id',$request->id)->update($data);
 
@@ -70,9 +70,9 @@ class CategoryController extends Controller
             return response()->json(['ex_message'=>'Category Not found.' , 'line' =>$exception->getLine() ], 400);
         }
         catch (\Error $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
-        }   
-        
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
+
     }
 
     /**
@@ -82,14 +82,14 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Category $category)
-    { 
+    {
 
         if(!$category){
             return response()->json('No Record Found.' , 404);
         }
         $category->child =  $category->child;
         return response()->json($category , 200);
-        
+
     }
 
 
@@ -101,7 +101,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-      
+
         if($category->delete()){
             return response()->json('Category has been deleted.' , 200);
         }
@@ -110,7 +110,7 @@ class CategoryController extends Controller
 
 
     public function frontpage_category($category){
-        
+
         try{
             $categories = Category::with('subcategory_products')->whereNull('parent_id')->where('route',$category)->get();
             if($categories->isEmpty()){
@@ -122,12 +122,26 @@ class CategoryController extends Controller
             return response()->json(['ex_message'=>'Category Not found.' , 'line' =>$exception->getLine() ], 400);
         }
         catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);
         }
         catch (\Error $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
 
+    }
+
+    public function subCategory()
+    {
+        try{
+            $categories = Category::where('parent_id' , '!=', 'null')->get();
+            if($categories->isEmpty()){
+                return response()->json([] , 200);
+            }
+            return response()->json($categories, 200);
+        }
+        catch (\Exception $exception) {
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
     }
 
 

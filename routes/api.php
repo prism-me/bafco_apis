@@ -24,6 +24,8 @@ Route::post('categories' , 'CategoryController@store')->middleware('auth:sanctum
 Route::get('categories/{category}' , 'CategoryController@show');
 Route::delete('categories/{category}' , 'CategoryController@destroy')->middleware('auth:sanctum');
 Route::get('frontpage_category/{route}' , 'CategoryController@frontpage_category');
+Route::get('sub-category' , 'CategoryController@subCategory');
+
 
 #Products
 Route::get('products' , 'ProductController@index');
@@ -128,7 +130,7 @@ Route::get('contact-us', 'FrontController@contactUs');
 Route::get('top-management', 'FrontController@topManagement');
 Route::get('services', 'FrontController@services');
 Route::get('innovations', 'FrontController@innovations');
-Route::get('front-products', 'FrontController@frontProducts');
+Route::get('front-products/{route}', 'FrontController@frontProducts');
 
 #Form Submit
 Route::post('form-submit','EnquiryController@store');
@@ -139,6 +141,7 @@ Route::get('all-users', 'DashboardController@allUsers');
 
 #Forget Password
 Route::post('forget-password', 'UserController@forgetPassword');
+Route::post('submit-reset-password', 'UserController@submitResetPassword');
 
     Route::group(['prefix' => 'auth'], function ($router) {
 

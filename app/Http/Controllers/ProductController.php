@@ -11,40 +11,40 @@ use App\Http\Requests\product\ProductRequest;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
-{   
-    
+{
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
     */
     public function index()
-    {   
-        // return substr(exec('getmac'), 0, 17); 
+    {
+        // return substr(exec('getmac'), 0, 17);
         //return $req->ip();
 
         try{
             // DB::enableQueryLog();
-            
-            return Product::with('variations','variations.variation_items')->get();
 
-            
+            return Product::with('variations','category','variations.variation_items')->get();
+
+
             // return DB::getQueryLog();
         }
         catch (\Exception $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
     }
 
     public function website_all(){
         try{
-            
+
             DB::enableQueryLog();
 
             $variations = ProductVariation::with(['variation_name','variation_values'])->get();
 
             //return DB::getQueryLog();
-            return $variations;    
+            return $variations;
             // $products = Product::with('product_variations')->get();
 
             // foreach($products as $product){
@@ -60,7 +60,7 @@ class ProductController extends Controller
             // return response()->json($products, 200);
         }
         catch (\Exception $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
     }
 
@@ -68,13 +68,13 @@ class ProductController extends Controller
     public function store(ProductRequest $request)
     {
         try{
-            
 
-            // if(!Product::where('route', $request->route)->exists()){ 
+
+            // if(!Product::where('route', $request->route)->exists()){
             //  //update
             //  //$product = Product::where('route',$request->route)->update($request->all());
             // }else{
-              
+
 
              // create
              $product = ProductService::insertProduct($request->all());
@@ -87,8 +87,8 @@ class ProductController extends Controller
 
         }
          catch (\Error $exception) {
-             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
-        }   
+             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
 
     }
 

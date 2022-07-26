@@ -26,7 +26,7 @@ use DB;
 class UserController extends Controller
 {
 
-
+    ####Register#####
     public function register(RegisterRequest $request) {
 
         try{
@@ -47,7 +47,6 @@ class UserController extends Controller
 
     }
 
-
     public function emailVerify(Request $request)
     {
         try{
@@ -65,11 +64,7 @@ class UserController extends Controller
 
 
     }
-
-
-
-
-
+    ####End Register#####
     public function login(LoginRequest $request){
 
         try{
@@ -102,13 +97,12 @@ class UserController extends Controller
 
     }
 
-
     public function me(){
 
         return auth()->user();
     }
 
-
+    ###Reset Password After Login####
     public function reset(ResetRequest $request)
     {
         try{
@@ -140,9 +134,9 @@ class UserController extends Controller
 
         }
     }
+    ###End Reset Password####
 
-
-    #Forget Password
+    #####Forget Password#####
     public function forgetPassword(ForgetRequest $request){
 
         try{
@@ -178,7 +172,6 @@ class UserController extends Controller
         }
     }
 
-
     public function submitResetPassword(ForgetRequest $request)
     {
         try{
@@ -196,6 +189,7 @@ class UserController extends Controller
 
 
     }
+    #####End Forgot Password######
 
 
     public function logout()
