@@ -17,13 +17,13 @@ class UploadController extends Controller
     public $directory = '/bafco/images';
     public $base_URL = 'https://bafco.b-cdn.net/images/';
     public $access_key = '650cdf14-326b-44a7-9b1ef138dd2e-2583-4f15';
-                          
+
     //public $bunny ;
 
     public function __construct()
     {
 
-       $this->bunnyCDNStorage = new BunnyCDNStorage($this->storageZone, $this->access_key, "sg");
+        $this->bunnyCDNStorage = new BunnyCDNStorage($this->storageZone, $this->access_key, "sg");
     }
 
     public function upload_media(UploadRequest $request)
@@ -37,9 +37,9 @@ class UploadController extends Controller
         $files = [];
 
         if($data && $images)
-         {
+        {
 
-             $i =0 ;
+            $i =0 ;
             foreach($data as $d)
             {
                 $d = json_decode($d , true);
@@ -53,24 +53,25 @@ class UploadController extends Controller
                 $files[$i]['url'] = $this->base_URL . $name ;
                 $files[$i]['alt_tag'] = $d['alt_text'];
                 $files[$i]['type'] = $type;
+                $files[$i]['isImg'] = isset($d['isImg']) ? ($d['isImg']) : 1;
 
                 if($this->bunnyCDNStorage->uploadFile($images[$i]->getPathName() , $this->storageZone."/images/{$name}")){
 
-                $isUploaded = Upload::create(['avatar'=>$files[$i]['url'] , 'url' => $name ,'alt_tag' => $files[$i]['alt_tag'] ,'type' =>$type]);
+                    $isUploaded = Upload::create(['avatar'=>$files[$i]['url'] , 'url' => $name ,'alt_tag' => $files[$i]['alt_tag'] ,'type' =>$type , 'isImg' => $files[$i]['isImg']  ]);
 
-                echo json_encode(['message' =>'media has uploaded.' , 'status' =>200]);
+                    echo json_encode(['message' =>'media has uploaded.' , 'data' => $isUploaded,  'status' =>200]);
 
                 }else{
 
-                   return $errors = ['message'=>'server issue','status'=>404 ,'image_name'=>$file->getClientOrignalName()];
+                    return $errors = ['message'=>'server issue','status'=>404 ,'image_name'=>$file->getClientOrignalName()];
                 }
 
                 $i ++;
             }
-         }else{
-              echo json_encode(['message' =>'files are not uploaded' , 'status' =>404]);
+        }else{
+            echo json_encode(['message' =>'files are not uploaded' , 'status' =>404]);
 
-         }
+        }
 
     }
 
@@ -79,16 +80,16 @@ class UploadController extends Controller
 
     public function get_all_images(){
 
+        $data = Upload::orderByDesc('id')->where('isImg' ,'=',1 )->get();
 
-        $data = Upload::orderByDesc('id')->get();
+        echo response()->json(['data'=>$data ,'status'=>200]);
 
-        echo json_encode(['data'=>$data ,'status'=>200]);
     }
 
 
     public function update_image($file , $id){
 
-        $existing_data = Upload::select('name')->where('_id',$id)->first();
+        $existing_data = Upload::select('name')->where('id',$id)->first();
         $existing_name = $existing_data->name;
 
         $without_ext_name= $this->slugify(preg_replace('/\..+$/', '', $file->getClientOriginalName()));
@@ -100,12 +101,12 @@ class UploadController extends Controller
 
         if($this->bunnyCDNStorage->uploadFile($file->getPathName() , $this->storageZone."/images/{$name}")){
 
-        $isUpdated = Upload::where('_id' ,$id)->update(['url' =>$name,'avatar'=>$files[$i]['url']]);
+            $isUpdated = Upload::where('_id' ,$id)->update(['url' =>$name,'avatar'=>$files[$i]['url']]);
 
-        if(! $this->bunnyCDNStorage->deleteObject( '/bafco/images/'.$existing_name))
-        {
-            echo json_encode(['message' => 'Bucket error' , 'status' => 404]);
-        }
+            if(! $this->bunnyCDNStorage->deleteObject( '/bafco/images/'.$existing_name))
+            {
+                echo json_encode(['message' => 'Bucket error' , 'status' => 404]);
+            }
 
         }else{
 
@@ -140,7 +141,7 @@ class UploadController extends Controller
         $text = preg_replace('~[^\pL\d]+~u', '-', $text);
 
         // transliterate
-       // $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        // $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
 
         // remove unwanted characters
         $text = preg_replace('~[^-\w]+~', '', $text);

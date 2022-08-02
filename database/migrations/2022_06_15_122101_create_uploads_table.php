@@ -20,6 +20,8 @@ class CreateUploadsTable extends Migration
             $table->string('url');
             $table->string('alt_tag')->nullable();
             $table->string('type')->nullable();
+            $table->string('boolean')->default(1);
+
             $table->timestamps();
         });
     }

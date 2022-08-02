@@ -3,61 +3,54 @@
 namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\User;
+use App\Models\Product;
+use App\Services\CartService;
 use Auth;
 
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    public function index()
+    public function index($id)
     {
         try{
-            $user =  auth()->user()->id;
-            $cart = Cart::where('user_id',$user)->get();
+
+            $cart = Cart::where('user_id',$id)->with('cartProduct')->get();
+
             if($cart->isEmpty()){
                  return response()->json([] , 200);
             }
             return response()->json($cart, 200);
         }
         catch (\Exception $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
     }
 
 
-     public function store(Request $request)
+    public function store(Request $request)
     {
         try{
-            $user =  auth()->user()->id;
 
-            $data = [ 
-                    'user_id' =>  $user,
-                    'ip' => $request->ip ,
-                    'mac' =>  $request->mac ,
-            ];
-        
+            $data = $request->all();
+            $cart = CartService::addToCart($data);
 
-            if(Cart::where('id', $request->id)->exists()){ 
-
-                #update
-                $cart = Cart::where('id', $request->id)->update($data);
-
-            }else{
-
-                #create
-                $cart = Cart::create($data);
-            }
+            return $cart;
             if($cart){
+
                 return  response()->json('Data has been saved.' , 200);
             }
+
+
+
 
         }
         catch (ModelNotFoundException  $exception) {
             return response()->json(['ex_message'=>'Cart Value Not found.' , 'line' =>$exception->getLine() ], 400);
         }
         catch (\Error $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
-        } 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
     }
 
 

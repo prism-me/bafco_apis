@@ -14,6 +14,7 @@ use App\Models\PasswordReset;
 use App\Mail\ForgetMail;
 use App\Services\ForgetService;
 use App\Services\RegisterService;
+use App\Services\UserService;
 use DateTime;
 use Redirect;
 use Validator;
@@ -102,31 +103,17 @@ class UserController extends Controller
         return auth()->user();
     }
 
-    ###Reset Password After Login####
-    public function reset(ResetRequest $request)
-    {
+
+    public function updateProfile(ResetRequest $request){
         try{
 
-            $check = ['email' => $request->email,'password'=>$request->password];
-
-            if( $token = auth()->attempt($check)){
-                $data = ['password'=> bcrypt($request->changed_password)];
-                $isUserUpdated = User::where('email',$request->email)->update($data);
-
-                if($isUserUpdated){
-
-                    echo json_encode(['message' => 'Password has been changed successfully.']);
-
-                }else{
-
-                    echo json_encode(['message' => 'Password is not changed , server error']);
-                }
-
-
-            }else{
-
-                echo json_encode(['message'=>'Credetials doesnot match.']);
+            $data = $request->all();
+            $user = UserService::update($data);
+            return $user;
+            if($user){
+                return response()->json('Updated Successfully',200);
             }
+
 
         } catch(BadMethodCallException $e){
 
@@ -134,7 +121,7 @@ class UserController extends Controller
 
         }
     }
-    ###End Reset Password####
+
 
     #####Forget Password#####
     public function forgetPassword(ForgetRequest $request){

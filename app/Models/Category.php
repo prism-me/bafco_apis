@@ -9,6 +9,7 @@ class Category extends Model
 {
     use HasFactory;
 
+
     protected $fillable = ['name','sub_title','parent_id','featured_image','banner_image','description','route','seo'];
 
     protected $casts = [
@@ -36,6 +37,11 @@ class Category extends Model
     public function products(){
         return $this->hasMany(Product::class , 'category_id','id')->select('id','name','short_description','featured_image','promotional_images','route',  'category_id');;
     }
+
+
+
+
+
 
 
 }

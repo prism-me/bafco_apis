@@ -9,6 +9,12 @@ use App\Models\Team;
 use App\Models\Product;
 use App\Models\Partner;
 use App\Models\Category;
+use App\Models\Variation;
+use App\Models\ProductVariation;
+use App\Models\VariationValues;
+
+
+
 
 use App\Models\Testimonial;
 use DB;
@@ -30,11 +36,16 @@ class FrontController extends Controller
 
     }
 
+    ###Home Section#######
+
+    /* Home Page Data*/
     public function home(){
 
         $pages = Page::where('identifier','home')->first(['name','content']);
         $blog =  $this->blogData;
+        $category = Category::where('parent_id' , '!=' , null)->get()->take( 4);
         $data  = array(
+            'category' => $category,
             'pages' => $pages,
             'blogs' => $blog
         );
@@ -42,6 +53,28 @@ class FrontController extends Controller
 
 
     }
+
+    /* Product Filter on the basis of Category*/
+    public function homeProductCategoryFilter($route)
+    {
+        if($route == 'all' ){
+
+            $product = Product::with('variations.variation_items.variation_values')->get()->take(4);
+
+            $data = $product;
+        }
+        else{
+            //$productFilter = Category::with('products')->where('route',$route)->get()->take(4);
+
+            $productFilter = Category::with('products.variations.variation_items.variation_values')->where('route',$route)->get()->take(4);
+            $data =  $productFilter;
+
+        }
+
+        return response()->json($data);
+    }
+
+    #####End Home Section########
 
     public function about(){
 
@@ -99,12 +132,46 @@ class FrontController extends Controller
 
     }
 
+
+
+    /* Products Page*/
+
     public function frontProducts($route)
     {
-        $products = Category::with('products.variations')->where('route',$route)->paginate(12);
+        $products = Category::with('products.variations.variation_items.variation_values')->where('route',$route)->paginate(12);
         return response()->json($products);
     }
 
 
+    public function filterListing($route){
+
+        return VariationValues::with('variationNameValue')->where('route',$route)->get();
+//        $category= Category::where('route',$route)->first();
+//        $brandValue = Product::distinct()->where('category_id',$category['id'])->get(['brand']);
+//        $productValue = Product::where('category_id',$category['id'])->pluck('id');
+//
+//        //$variation = ProductVariation::whereIn('product_id',$productValue)->with('variation_items.variation_name.variantValues')->get();
+//
+//        $variation = VariationValues::with('variationNameValue')->whereIn('product_id',$productValue)->get();
+//
+//        $data  = array(
+//            'brand' => $brandValue,
+//             'variation' => $variation
+//        );
+//        return $data;
+
+    }
+
+
+
 
 }
+
+
+
+
+
+
+
+
+

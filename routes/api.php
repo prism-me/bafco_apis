@@ -70,8 +70,8 @@ Route::get('partners/{partner}', 'PartnerController@show');
 Route::delete('partners/{partner}', 'PartnerController@destroy')->middleware('auth:sanctum');
 
 #Contact Us
+Route::post('form-submit','ContactUsController@store');
 Route::get('contact-us', 'ContactUsController@index');
-Route::post('contact-us', 'ContactUsController@store');
 Route::get('contact-us/{contactUs}', 'ContactUsController@show');
 Route::delete('contact-us/{contactUs}', 'ContactUsController@destroy')->middleware('auth:sanctum');
 
@@ -107,12 +107,12 @@ Route::delete('videos/{video}', 'VideoController@destroy')->middleware('auth:san
 #Promo Codes
 Route::get('promo-codes', 'PromoCodeController@index');
 Route::post('promo-codes', 'PromoCodeController@store')->middleware('auth:sanctum');
-Route::get('promo-codes/{promo-code}', 'PromoCodeController@show');
-Route::delete('promo-codes/{promo-code}', 'PromoCodeController@destroy')->middleware('auth:sanctum');
+Route::get('promo-codes/{id}', 'PromoCodeController@show');
+Route::delete('promo-codes/{id}', 'PromoCodeController@destroy')->middleware('auth:sanctum');
 
 
 #Cart
-Route::get('cart', 'CartController@index')->middleware('auth:sanctum');
+Route::get('cart/{id}', 'CartController@index')->middleware('auth:sanctum');
 Route::post('cart', 'CartController@store')->middleware('auth:sanctum');
 Route::delete('remove-cart/{id}', 'CartController@removeCart')->middleware('auth:sanctum');
 Route::delete('clear-all-cart/{id}', 'CartController@clearAllCart')->middleware('auth:sanctum');
@@ -125,6 +125,15 @@ Route::put('set-default/{id}', 'AddressController@setDefault')->middleware('auth
 
 #Front Controllers
 Route::get('home', 'FrontController@home');
+Route::get('home-product-category-filter/{route}', 'FrontController@homeProductCategoryFilter');
+Route::get('filters-listing/{route}', 'FrontController@filterListing');
+Route::get('product-filter-data', 'FrontController@filterProductData');
+
+
+
+
+
+
 Route::get('about', 'FrontController@about');
 Route::get('contact-us', 'FrontController@contactUs');
 Route::get('top-management', 'FrontController@topManagement');
@@ -132,8 +141,7 @@ Route::get('services', 'FrontController@services');
 Route::get('innovations', 'FrontController@innovations');
 Route::get('front-products/{route}', 'FrontController@frontProducts');
 
-#Form Submit
-Route::post('form-submit','EnquiryController@store');
+
 
 
 #Dashboard CMS
@@ -151,10 +159,9 @@ Route::post('submit-reset-password', 'UserController@submitResetPassword');
         Route::post('/login', 'UserController@login');
         Route::get('/me','UserController@me')->middleware('auth:sanctum');
         Route::post('/logout', 'UserController@logout')->middleware('auth:sanctum');
-        Route::post('/reset', 'UserController@reset')->middleware('auth:sanctum');
+        Route::post('/update-profile', 'UserController@updateProfile')->middleware('auth:sanctum');
 
-        #User Detail
-        Route::post('reset', 'UserController@reset');
+
 
         #Wishlist
         Route::get('wishlists', 'WishlistController@index')->middleware('auth:sanctum');

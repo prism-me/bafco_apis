@@ -7,17 +7,14 @@ use App\Models\ProductVariation;
 use Illuminate\Http\Request;
 use App\Services\ProductService;
 use App\Services\CartService;
+use App\Models\ProductPivotVariation;
 use App\Http\Requests\product\ProductRequest;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-    */
+
     public function index()
     {
         // return substr(exec('getmac'), 0, 17);
@@ -92,31 +89,32 @@ class ProductController extends Controller
 
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
+
     public function show(Product $product)
     {
-        return Product::with('variations','variations.variation_items')->where('route', $product->route)->first();
 
-        if(!$product){
-            return response()->json('No Record Found.' , 404);
+        $productData =  Product::with('variations')->where('route', $product->route)->first();
+        foreach ($productData['variations'] as $variant){
+            $data = ProductPivotVariation::where('product_variation_id', $variant->id)->pluck('variation_value_id');
+            $variant['variationItems'] = $data;
         }
-        $product->category =  $product->category;
-        return response()->json($product , 200);
+        return response()->json($productData , 200);
+
+
+//        if(!$product){
+//            return response()->json('No Record Found.' , 404);
+//        }
+//        $product->category =  $product->category;
+//        return response()->json($product , 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy(Product $product)
     {
-        //
+
     }
+
+
+
+
 }

@@ -26,7 +26,9 @@ class Product extends Model
         "album",
         "download",
         'seo',
-        "promotional_images"
+        "promotional_images",
+        "footrest",
+        "headrest"
 
     ];
 
@@ -40,7 +42,9 @@ class Product extends Model
         'related_categories' => 'array',
         'album' => 'array',
         'promotional_images' => 'array',
-        'seo' => 'array'
+        'seo' => 'array',
+        'footrest' => 'array',
+        'headrest' => 'array',
 
     ];
 
@@ -124,6 +128,15 @@ class Product extends Model
     // public function product_variation_values(){
     //     return $this->hasMany(ProductVariation::class);
     // }
+
+
+    public function cmsProductVariation(){
+
+        return $this->hasManyThrough(ProductPivotVariation::class, ProductVariation::class , 'product_id','product_variation_id','id','id');
+    }
+
+
+
 
 
 }

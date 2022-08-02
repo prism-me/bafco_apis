@@ -19,31 +19,31 @@ class PromoCodeController extends Controller
                 $item->code_count = $item->code()->count();
                 return $item;
             });
-        
+
        return json_encode(['data'=>$promo,'status'=>'Data Retrieved Successfully']);
-         
+
         }
         catch (\Exception $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
-       
+
     }
 
     public function store(Request $request)
     {
 
         try{
-            $data = [ 
+            $data = [
                     'name' =>  $request->name ,
                     'value' => $request->value ,
                     'usage' =>  $request->usage ,
                     'usage_per_person' =>  $request->usage_per_person ,
                     'start_date' => $request->start_date ,
-                    'end_date' => $request->end_date 
+                    'end_date' => $request->end_date
             ];
-        
 
-            if(PromoCode::where('id', $request->id)->exists()){ 
+
+            if(PromoCode::where('id', $request->id)->exists()){
 
                 #update
                 $PromoCode = PromoCode::where('id', $request->id)->update($data);
@@ -56,36 +56,39 @@ class PromoCodeController extends Controller
             if($PromoCode){
                 return  response()->json('Data has been saved.' , 200);
             }
-        
+
         }
         catch (ModelNotFoundException  $exception) {
             return response()->json(['ex_message'=>'PromoCode Not found.' , 'line' =>$exception->getLine() ], 400);
         }
         catch (\Error $exception) {
-             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
-        } 
-       
-     
+             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
 
-       
+
+
+
     }
 
-  
-    public function show(PromoCode $promoCode)
+
+    public function show($id)
     {
-       if(!$promoCode){
+
+        $promoCode = PromoCode::where('id',$id)->first();
+        if(!$promoCode){
             return response()->json('No Record Found.' , 404);
         }
-       
+
         return response()->json($promoCode , 200);
     }
 
 
 
-    
-    public function destroy(PromoCode $promoCode)
+
+    public function destroy($id)
     {
-        if($promoCode->delete()){
+        $promoCode = PromoCode::where('id',$id)->delete();
+        if($promoCode){
 
             return json_encode(['status' => 'Data Deleted Successfully']);
         }else{
