@@ -163,12 +163,19 @@ class FrontController extends Controller
 
         ];
 
-
-        $relatedProducts = Product::with('variations')->paginate(4);
-        $randomProducts = Product::with('variations')->inRandomOrder()
+        $relatedProducts = Product::with('variations','productDetailCategory.parentCategory')->paginate(4);
+        $randomProducts = Product::with('variations','productDetailCategory.parentCategory')->inRandomOrder()
         ->limit(4)
         ->paginate(4);
-        if (isset($productDetails) && !empty($productDetails)) {
+
+        $dimensions = ProductVariation::where('product_id',$productDetails->id)->get(['product_id', 'id','code','lc_code','height','depth','width' ,'images']);
+        $i=0;
+        foreach($dimensions as $value){
+            $dimensionsData[$i]['images'] =     $value['images'][0];
+            $i++;
+        }
+
+         if (isset($productDetails) && !empty($productDetails)) {
             $productVariationIdArr = $productDetails->variations()->pluck('id');
 
             #First Variation
@@ -189,7 +196,8 @@ class FrontController extends Controller
             'product_all_varitaions' => $productAllVariations,
             'related_products' => $relatedProducts,
             'random_purchase' => $relatedProducts,
-        ]); 
+            'dimensions' => $dimensions
+        ]);
     }
 
     public function filterListing($route){
@@ -212,6 +220,18 @@ class FrontController extends Controller
     }
 
 
+
+//    public function test(){
+//        \DB::enableQueryLog();
+//        return DB::select('CALL GetAllProducts("duncan-fry")');
+//         \DB::getQueryLog();
+//    }
+//
+//    public function test1(){
+//        \DB::enableQueryLog();
+//        return Product::where('route', '=' , 'duncan-fry')->first();
+//         \DB::getQueryLog();
+//    }
 
 
 

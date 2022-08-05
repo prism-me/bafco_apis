@@ -18,19 +18,16 @@ class CartController extends Controller
     public function index($id)
     {
         try{
-            $cart = Cart::where('user_id',$id)->get();
-            $product_ids = $cart->pluck('product_id');
-            $variation_ids = $cart->pluck('variation_id');
 
-            $productData =  Product::with(['product_variations.variation_items' => function($q) use($variation_ids) {
-                $q->whereIn('variation_id', '=', $variation_ids );
-            }])->
-            whereIn('id', $product_ids)->get();
-            return $productData;
-            foreach ($productData['variations'] as $variant){
-                $data = ProductPivotVariation::where('product_variation_id', $variant->id)->pluck('variation_value_id');
-                $variant['variationItems'] = $data;
-            }
+            $cart = Cart::where('user_id',$id)->get();
+          foreach($cart as $cartValue){
+              $product = Product::whereIn('id',$cart['product_id'])->get();
+              return $product;
+
+          }
+
+
+
 
             if($cart->isEmpty()){
                  return response()->json([] , 200);

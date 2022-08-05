@@ -161,7 +161,14 @@ class Product extends Model
 
     }
 
-    /*   End Product Detail Relationship */
+
+    public function productDetailCategory(){
+
+        return $this->hasOne(Category::class,'id','category_id')->select('id','route','parent_id');
+
+    }
+
+     /*   End Product Detail Relationship */
 
 }
 

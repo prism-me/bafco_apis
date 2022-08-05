@@ -111,12 +111,7 @@ Route::get('promo-codes/{id}', 'PromoCodeController@show');
 Route::delete('promo-codes/{id}', 'PromoCodeController@destroy')->middleware('auth:sanctum');
 
 
-#Cart
-Route::get('cart/{id}', 'CartController@index')->middleware('auth:sanctum');
-Route::post('cart', 'CartController@store')->middleware('auth:sanctum');
-Route::delete('remove-cart/{id}', 'CartController@removeCart')->middleware('auth:sanctum');
-Route::delete('clear-all-cart/{id}', 'CartController@clearAllCart')->middleware('auth:sanctum');
-Route::post('cart-qty', 'CartController@incrementQty')->middleware('auth:sanctum');
+
 
 #Cart
 Route::get('addresses', 'AddressController@index')->middleware('auth:sanctum');
@@ -141,6 +136,8 @@ Route::get('contact-us', 'FrontController@contactUs');
 Route::get('top-management', 'FrontController@topManagement');
 Route::get('services', 'FrontController@services');
 Route::get('innovations', 'FrontController@innovations');
+
+
 
 
 
@@ -172,6 +169,13 @@ Route::post('submit-reset-password', 'UserController@submitResetPassword');
 
         #Promo Check
         Route::post('promo-check','PromoUserController@promoCheck')->middleware('auth:sanctum');
+
+        #Cart
+        Route::get('cart/{id}', 'CartController@index')->middleware('auth:sanctum');
+        Route::post('cart', 'CartController@store')->middleware('auth:sanctum');
+        Route::delete('remove-cart/{id}', 'CartController@removeCart')->middleware('auth:sanctum');
+        Route::delete('clear-all-cart/{id}', 'CartController@clearAllCart')->middleware('auth:sanctum');
+        Route::post('cart-qty', 'CartController@incrementQty')->middleware('auth:sanctum');
 
     });
 
