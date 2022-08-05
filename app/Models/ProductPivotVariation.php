@@ -35,4 +35,20 @@ class ProductPivotVariation extends Model
         return $this->belongsTo(Variation::class,'variation_id','id');
 
     }
+    
+    public function variation_pivot_belongs_to(){
+        return $this->belongsToThrough(ProductVariation::class, Product::class );
+    }
+
+    public function variationNameValue()
+    {
+        return $this->belongsToThrough(
+            Category::class,
+            [Product::class ,ProductVariation::class],
+            //'',
+            //'',
+            // [Product::class =>'id', ProductVariation::class => 'id' , ProductPivotVariation::class => 'variation_value_id'],
+            // [Product::class =>'product_id', ProductVariation::class => 'product_variation_id' , ProductPivotVariation::class => 'id'],
+        );
+    }
 }

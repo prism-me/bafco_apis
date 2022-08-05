@@ -126,7 +126,7 @@ Route::put('set-default/{id}', 'AddressController@setDefault')->middleware('auth
 #Front Controllers
 Route::get('home', 'FrontController@home');
 Route::get('home-product-category-filter/{route}', 'FrontController@homeProductCategoryFilter');
-Route::get('filters-listing/{route}', 'FrontController@filterListing');
+Route::get('filters-listing/{category}', 'FrontController@filterListing');
 Route::get('product-filter-data', 'FrontController@filterProductData');
 
 

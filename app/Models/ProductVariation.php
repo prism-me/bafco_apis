@@ -34,7 +34,11 @@ class ProductVariation extends Model
     // {
     //     return 'route';
     // }
-
+     
+    
+    public function bridge(){
+        return $this->belongsToMany(Variation::class , 'product_variation_pivot_variation_values','product_variation_id','variation_id');
+    }
 
     public function variation_items(){
 
@@ -59,6 +63,10 @@ class ProductVariation extends Model
         return $this->hasManyThrough(ProductPivotVariation::class, ProductVariation::class , 'product_id','product_variation_id','id','id');
     }
 
+    public function hasthroughTest2(){
 
+        return $this->hasManyThrough(Variation::class , ProductPivotVariation::class ,'product_variation_id' , 'id' , 'id','variation_id');
+    
+    }
 
 }

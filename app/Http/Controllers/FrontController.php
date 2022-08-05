@@ -12,6 +12,7 @@ use App\Models\Category;
 use App\Models\Variation;
 use App\Models\ProductVariation;
 use App\Models\VariationValues;
+use App\Models\ProductPivotVariation;
 
 
 
@@ -143,9 +144,59 @@ class FrontController extends Controller
     }
 
 
-    public function filterListing($route){
+    public function filterListing($category){
+        
+        //category
+        //product
+        //product variation
+        //product variation pivot
+        //variation items & variation values
+        
 
-        return VariationValues::with('variationNameValue')->where('route',$route)->get();
+//hasthroughTest
+       return  Product::with(['variations.bridge'])->get();
+
+
+
+
+
+
+
+
+
+        \DB::enableQueryLog();
+        return $category;
+        $brandValue = Product::distinct()->where('category_id',$category->id)->get(['brand']);
+        $product = Category::select('id')->with('deep_deep.variantValues')->get();
+        $product = $product->collect();
+
+        $product = $product->pluck('deep_deep');
+        $processed = [];
+        $i=0;
+        foreach($product as $pro){
+            
+            foreach($pro as $p){
+                $processed[$i] = $p;
+                
+                $i++;
+            }
+        }
+        return response()->jsonn([$processed , $brandValue] , 200);
+
+
+        //     if( && !empty($pro)){
+        //         foreach($pro as $p){
+        //             $processed[$i] = $p;
+        //         }
+        //     }else{
+        //         // $processed[$i] = $pro;
+        //     }
+        //     $i++;
+        // }
+        //return $processed;
+        // return $product->unique('name');
+        //return \DB::getQueryLog();
+
 //        $category= Category::where('route',$route)->first();
 //        $brandValue = Product::distinct()->where('category_id',$category['id'])->get(['brand']);
 //        $productValue = Product::where('category_id',$category['id'])->pluck('id');

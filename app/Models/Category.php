@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     use HasFactory;
+    use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 
     protected $fillable = ['name','sub_title','parent_id','featured_image','banner_image','description','route','seo'];
@@ -39,9 +40,24 @@ class Category extends Model
     }
 
 
+    //testing
+
+    public function hasthroughTest(){
+
+        return $this->hasManyThrough(ProductVariation::class , Product::class);
+    
+    }
+
+    //get all variations inside
+    public function deep_deep(){
+
+    return $this->hasManyDeep(
+        Variation::class,
+        [ Product::class , ProductVariation::class , ProductPivotVariation::class ],
+        [ 'category_id', 'product_id' , 'product_variation_id' , 'id'],
+        [ 'id', 'id' , 'id','variation_id'],
+    );
 
 
-
-
-
+    }
 }
