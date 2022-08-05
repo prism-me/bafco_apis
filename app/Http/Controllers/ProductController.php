@@ -67,20 +67,17 @@ class ProductController extends Controller
         try{
 
 
-            // if(!Product::where('route', $request->route)->exists()){
-            //  //update
-            //  //$product = Product::where('route',$request->route)->update($request->all());
-            // }else{
+             if(!Product::where('route', $request->route)->exists()){
+              //update
+                $product = Product::where('route',$request->route)->update($request->all());
+             }else {
 
 
-             // create
-             $product = ProductService::insertProduct($request->all());
-            // }
-            return $product;
-            if($product){
-
-                 return  response()->json('Data has been saved.' , 200);
+                 // create
+                 $product = ProductService::insertProduct($request->all());
              }
+
+            return $product;
 
         }
          catch (\Error $exception) {

@@ -2,6 +2,8 @@
 
 namespace App\Services;
 use App\Models\Cart;
+use App\Models\Product;
+
 
 
 class CartService {
@@ -21,20 +23,22 @@ class CartService {
 
         if( $cartValue){
 
-            $create['qty'] = $cartValue['qty']  + 1;
-             #update
-            $cart = $cartValue->update($create);
+            $create['qty'] = $cartValue['qty'] + 1;
+
+            $cartUpdate = $cartValue->update($create);
+            return  $cartValue->refresh();
+
 
         }else{
 
             #create
             $cart = Cart::create($create);
+            return $cart;
+
+
         }
 
-        if($cart){
 
-            return  response()->json('Data has been saved.' , 200);
-        }
 
     }
 }

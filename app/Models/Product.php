@@ -54,52 +54,24 @@ class Product extends Model
 
     }
 
+    public function cartCategory(){
+
+        return $this->hasOne(Category::class,'id','category_id')->select('id','route');
+
+    }
+
     public function variations(){
 
         return $this->hasMany(ProductVariation::class);
     }
 
-    public function getWishlistvariations(){
-
-        return $this->hasMany(ProductVariation::class)->select('id','product_id','in_stock');
-    }
-
-
-
-
-    public function test(){
-        //return $this->hasManyDeep(Permission::class, ['role_user', Role::class, 'permission_role']);
-
-
-        return $this->hasManyDeepFromRelations($this->products() , (new ProductVariation())->product_variation_name());
-
-
-
-        //return $this->hasManyThrough(ProductPivotVariation::class,ProductVariation::class)->withPivot(['id','product_id','code']);
-    }
-
-
-    public function front_list_of_variations(){
-        //return $this->hasManyDeep(Permission::class, ['role_user', Role::class, 'permission_role']);
-
-
-        return $this->hasManyDeep(
-            ProductVariation::class,
-             [ProductPivotVariation::class],
-             ['product_variation_id' ,'id','product_id']
-             ,['id','variation_id','product_variation_id']
-            )->withIntermediate(ProductPivotVariation::class);
-
-
-
-        //return $this->hasManyThrough(ProductPivotVariation::class,ProductVariation::class)->withPivot(['id','product_id','code']);
-    }
 
     public function product_variations(){
 
         return $this->hasMany(ProductVariation::class , (new ProductVariation())->product_variation_name());
 
     }
+
 
 
 
@@ -136,20 +108,62 @@ class Product extends Model
     }
 
 
+    public function getWishlistvariations(){
+
+        return $this->hasMany(ProductVariation::class)->select('id','product_id','in_stock');
+    }
+
+    public function test(){
+        //return $this->hasManyDeep(Permission::class, ['role_user', Role::class, 'permission_role']);
 
 
+        return $this->hasManyDeepFromRelations($this->products() , (new ProductVariation())->product_variation_name());
+
+
+
+        //return $this->hasManyThrough(ProductPivotVariation::class,ProductVariation::class)->withPivot(['id','product_id','code']);
+    }
+
+
+    public function front_list_of_variations(){
+
+
+        return $this->hasManyDeep(
+            ProductVariation::class,
+            [ProductPivotVariation::class],
+            ['product_variation_id' ,'id','product_id']
+            ,['id','variation_id','product_variation_id']
+        )->withIntermediate(ProductPivotVariation::class);
+
+
+
+    }
+
+
+
+    /* Product Detail Relationship */
+
+    public function getProductDetail($fields){
+
+        return [
+            'product_variation_details' => ProductVariation::find($fields['product_variation_id']),
+            'variation_details' => Variation::find($fields['variation_id']),
+            'variation_value_details' => VariationValues::find($fields['variation_value_id'])
+        ];
+
+    }
+    public function getProductVariation($fields){
+
+        return [
+            'variation_details' => Variation::find($fields['variation_id']),
+            'variation_value_details' => VariationValues::find($fields['variation_value_id'])
+        ];
+
+    }
+
+    /*   End Product Detail Relationship */
 
 }
 
 
 
-// product
-// +
-// product_variation
-// +
-// product pivot variation (variations  ,variation values)
-
-
-
-
-// product_id , product_variation_name + product_variation_value +

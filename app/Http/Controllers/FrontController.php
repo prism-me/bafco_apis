@@ -12,7 +12,7 @@ use App\Models\Category;
 use App\Models\Variation;
 use App\Models\ProductVariation;
 use App\Models\VariationValues;
-
+use App\Models\ProductPivotVariation;
 
 
 
@@ -133,6 +133,14 @@ class FrontController extends Controller
     }
 
 
+    /* Category Page */
+
+    public function category($route){
+
+         $category = Category::where('route' , $route)->with('subcategory_products')->get();
+         return response()->json($category);
+    }
+
 
     /* Products Page*/
 
@@ -142,6 +150,47 @@ class FrontController extends Controller
         return response()->json($products);
     }
 
+    public function productDetail($route)
+    {
+        //\DB::enableQueryLog();
+        $productDetails =  Product::where('route', $route)->first();
+        $headRest = VariationValues::whereIn('id',$productDetails->headrest )->get();
+        $footRest = VariationValues::whereIn('id',$productDetails->footrest )->get();
+        $product = [
+            'product' => $productDetails,
+            'headrest' => $headRest,
+            'footrest' => $footRest,
+
+        ];
+
+
+        $relatedProducts = Product::with('variations')->paginate(4);
+        $randomProducts = Product::with('variations')->inRandomOrder()
+        ->limit(4)
+        ->paginate(4);
+        if (isset($productDetails) && !empty($productDetails)) {
+            $productVariationIdArr = $productDetails->variations()->pluck('id');
+
+            #First Variation
+            $productPivotListingSingle = ProductPivotVariation::whereIn('product_variation_id',$productVariationIdArr)->first();
+            $productSingleVariation = Product::getProductDetail($productPivotListingSingle);
+
+
+            $productPivotListings = ProductPivotVariation::whereIn('product_variation_id',$productVariationIdArr)->get();
+            $productAllVariations  = $productPivotListings->transform(function($item){
+                $item->product_details = Product::getProductVariation($item);
+                return $item;
+            })->all();
+
+        }
+        return response()->json([
+            'single_product_details' => $product,
+            'product_single_variation' => $productSingleVariation,
+            'product_all_varitaions' => $productAllVariations,
+            'related_products' => $relatedProducts,
+            'random_purchase' => $relatedProducts,
+        ]); 
+    }
 
     public function filterListing($route){
 
@@ -165,7 +214,11 @@ class FrontController extends Controller
 
 
 
+
+
+
 }
+
 
 
 

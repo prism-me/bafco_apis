@@ -80,9 +80,9 @@ class UploadController extends Controller
 
     public function get_all_images(){
 
-        $data = Upload::orderByDesc('id')->where('isImg' ,'=',1 )->get();
+        $data = Upload::orderBy('id','DESC')->where('isImg' ,'=', 1 )->get();
 
-        echo response()->json(['data'=>$data ,'status'=>200]);
+        echo json_encode(['data'=>$data ,'status'=>200]);
 
     }
 

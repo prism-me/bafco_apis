@@ -27,7 +27,6 @@ class VariationValueRequest extends FormRequest
             'variation_id' => 'required',
             'name' =>'required',
             'type' => 'required|integer',
-            'type_value' => 'required',
         ];
     }
 }

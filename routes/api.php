@@ -116,6 +116,7 @@ Route::get('cart/{id}', 'CartController@index')->middleware('auth:sanctum');
 Route::post('cart', 'CartController@store')->middleware('auth:sanctum');
 Route::delete('remove-cart/{id}', 'CartController@removeCart')->middleware('auth:sanctum');
 Route::delete('clear-all-cart/{id}', 'CartController@clearAllCart')->middleware('auth:sanctum');
+Route::post('cart-qty', 'CartController@incrementQty')->middleware('auth:sanctum');
 
 #Cart
 Route::get('addresses', 'AddressController@index')->middleware('auth:sanctum');
@@ -124,22 +125,22 @@ Route::delete('addresses/{address}', 'AddressController@destroy')->middleware('a
 Route::put('set-default/{id}', 'AddressController@setDefault')->middleware('auth:sanctum');
 
 #Front Controllers
-Route::get('home', 'FrontController@home');
+Route::get('front-products/{route}', 'FrontController@frontProducts');
+Route::get('product-detail/{route}', 'FrontController@productDetail');
+
 Route::get('home-product-category-filter/{route}', 'FrontController@homeProductCategoryFilter');
 Route::get('filters-listing/{route}', 'FrontController@filterListing');
 Route::get('product-filter-data', 'FrontController@filterProductData');
 
+Route::get('front-category/{route}', 'FrontController@category');
 
 
-
-
-
+Route::get('home', 'FrontController@home');
 Route::get('about', 'FrontController@about');
 Route::get('contact-us', 'FrontController@contactUs');
 Route::get('top-management', 'FrontController@topManagement');
 Route::get('services', 'FrontController@services');
 Route::get('innovations', 'FrontController@innovations');
-Route::get('front-products/{route}', 'FrontController@frontProducts');
 
 
 

@@ -18,10 +18,7 @@ class ProductPivotVariation extends Model
 
     ];
 
-    // public function getRouteKeyName()
-    // {
-    //     return 'route';
-    // }
+
 
 
     public function variation_values(){
@@ -29,7 +26,6 @@ class ProductPivotVariation extends Model
         return $this->belongsTo(VariationValues::class,'variation_value_id' ,'id');
 
     }
-
     public function variation_name(){
 
         return $this->belongsTo(Variation::class,'variation_id','id');

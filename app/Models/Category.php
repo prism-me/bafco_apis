@@ -29,13 +29,18 @@ class Category extends Model
         return $this->hasOne(Category::class , 'parent_id','id');
     }
 
+    public function subcategory(){
+
+        return $this->hasMany(Category::class , 'parent_id','id');
+    }
+
     public function subcategory_products(){
 
         return $this->hasMany(Category::class , 'parent_id','id')->with('products');
     }
 
     public function products(){
-        return $this->hasMany(Product::class , 'category_id','id')->select('id','name','short_description','featured_image','promotional_images','route',  'category_id');;
+        return $this->hasMany(Product::class , 'category_id','id')->select('id','name','short_description','featured_image','promotional_images','route',  'category_id');
     }
 
 

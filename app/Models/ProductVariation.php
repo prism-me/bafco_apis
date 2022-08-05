@@ -35,7 +35,16 @@ class ProductVariation extends Model
     //     return 'route';
     // }
 
+    /* Product Detail */
+    public function hasOnePivot(){
+        return $this->hasOne(ProductPivotVariation::class);
+    }
 
+    public function hasManyPivot(){
+        return $this->hasMany(ProductPivotVariation::class);
+    }
+
+    /* End Product Detail */
     public function variation_items(){
 
         return $this->hasMany(ProductPivotVariation::class , 'product_variation_id','id');
