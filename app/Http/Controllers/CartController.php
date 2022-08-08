@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 use App\Models\Cart;
+use App\Models\CartCalculation;
 use App\Models\ProductVariation;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Variation;
+use App\Models\Category;
 use App\Models\VariationValues;
 use App\Services\CartService;
 use Auth;
@@ -19,17 +21,21 @@ class CartController extends Controller
     {
         try{
 
-            $cart = Cart::where('user_id',$id)->get();
+          $cart = Cart::where('user_id',$id)->get();
+          $i=0;
           foreach($cart as $cartValue){
-              $product = Product::whereIn('id',$cart['product_id'])->get();
-              return $product;
-
+                $data[$i]['productData'] = Product::where('id',$cartValue->product_id)->get(['name','id', 'route' ,'category_id']);
+                $data[$i]['variation'] = ProductVariation::where('product_id',$cartValue->product_id)->get(['product_id' , 'images']);
+                $data[$i]['category'] = Category::where('id',$data[$i]['productData'][0]['category_id'])->with('parentCategory')->get('id' ,'name', 'parent_id','route','images');
+                $data[$i]['qty'] = $cartValue->qty;
+                $data[$i]['total'] = $cartValue->total;
+                $i++;
           }
 
+        return $data;
 
 
-
-            if($cart->isEmpty()){
+            if($cartData->isEmpty()){
                  return response()->json([] , 200);
             }
             return response()->json($cart, 200);
@@ -104,22 +110,46 @@ class CartController extends Controller
     }
 
     public function cartData($cart){
+
         $productDetail = Product::where('id',$cart->product_id)->with('cartCategory')->first(['name','featured_image','route','category_id']);
         $productVariant = ProductVariation::where('id',$cart->product_variation_id)->first('upper_price');
         $variationValue = VariationValues::where('id',$cart->variation_value_id)->first('name');
         $quantity =  $cart->qty;
         $price = $productVariant['upper_price'];
         $finalPrice = $quantity * $price;
+        $cartPrice = Cart::where('id',$cart->id)->update(['total' => $finalPrice]);
+
+        $cartCalculation =   [
+            'user_id' => $cart->user_id ,
+            'total' => $finalPrice,
+            'sub_total' => $finalPrice
+        ];
+
+        if($cartcal = CartCalculation::where('user_id',$cart->user_id)->exists()){
+
+            CartCalculation::where('user_id',$cart->user_id)->update($cartCalculation);
+
+        }else{
+
+            $cartCalculation = CartCalculation::create($cartCalculation);
+
+        }
+
         $data = [
             'quantity' => $quantity,
             'productDetail'=> $productDetail ,
             'variationValue' => $variationValue,
-            'price' => $finalPrice
+            'total' => $finalPrice,
         ];
         return $data;
 
 
     }
 
+
+    public function cartCalculation(Request $request){
+            $data = $request->all();
+
+    }
 
 }

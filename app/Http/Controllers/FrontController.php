@@ -171,7 +171,7 @@ class FrontController extends Controller
         $dimensions = ProductVariation::where('product_id',$productDetails->id)->get(['product_id', 'id','code','lc_code','height','depth','width' ,'images']);
         $i=0;
         foreach($dimensions as $value){
-            $dimensionsData[$i]['images'] =     $value['images'][0];
+            $dimensions[$i]['images'] =     $value['images'][0];
             $i++;
         }
 

@@ -36,7 +36,7 @@ class Category extends Model
     }
     public function parentCategory(){
 
-        return $this->belongsTo(Category::class , 'parent_id','id');
+        return $this->belongsTo(Category::class , 'parent_id','id' ,'route');
     }
     public function subcategory_products(){
 
