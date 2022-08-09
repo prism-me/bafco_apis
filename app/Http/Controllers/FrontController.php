@@ -200,36 +200,47 @@ class FrontController extends Controller
         ]);
     }
 
-    public function productDetailFilter(Request $request){
+    public function productDetailVariationFilter(Request $request){
+
+        $IDs = $request->all();
+        $data = ProductPivotVariation::where('product_id',$IDs['product_id'])
+            ->where('product_variation_id',$IDs['product_variation_id'])
+            ->where('variation_value_id',$IDs['variation_value_id'])
+            ->get();
+        dd($data);
+        $productVariation  = ProductPivotVariation::where('product_variation_id',$IDs['product_variation_id'])->get('variation_value_id');
+//        $value  = Variation
+//        return response()->json([
+//            'product_single_variation' => $productVariation,
+//
+//        ]);
+
 
     }
 
     public function filterListing($route){
 
-        return VariationValues::with('variationNameValue')->where('route',$route)->get();
-//        $category= Category::where('route',$route)->first();
-//        $brandValue = Product::distinct()->where('category_id',$category['id'])->get(['brand']);
-//        $productValue = Product::where('category_id',$category['id'])->pluck('id');
-//
-//        //$variation = ProductVariation::whereIn('product_id',$productValue)->with('variation_items.variation_name.variantValues')->get();
-//
-//        $variation = VariationValues::with('variationNameValue')->whereIn('product_id',$productValue)->get();
-//
-//        $data  = array(
-//            'brand' => $brandValue,
-//             'variation' => $variation
-//        );
-//        return $data;
+
+        $category= Category::where('route',$route)->first();
+        $brandValue = Product::distinct()->where('category_id',$category['id'])->get(['brand']);
+        //$variation = DB::selectRaw('CALL VariationNamesOnly(" . $route . ")');
+        $query =  DB::select('CALL VariationNamesOnly(". $route .")');
+
+        return DB::statement($query);
+
+
 
     }
 
 
 
-//    public function test(){
-//        \DB::enableQueryLog();
-//        return DB::select('CALL GetAllProducts("duncan-fry")');
-//         \DB::getQueryLog();
-//    }
+    public function test(){
+
+         $data = DB::select('CALL VariationNamesOnly("executive-chairs")');
+//          $data->collection();
+          //$data->groupBy('variation_name');
+          return $data;
+    }
 //
 //    public function test1(){
 //        \DB::enableQueryLog();
@@ -242,7 +253,6 @@ class FrontController extends Controller
 
 
 }
-
 
 
 

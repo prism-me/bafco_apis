@@ -121,14 +121,19 @@ Route::delete('addresses/{address}', 'AddressController@destroy')->middleware('a
 Route::put('set-default/{id}', 'AddressController@setDefault')->middleware('auth:sanctum');
 
 #Front Controllers
+/*Product Inner page*/
 Route::get('front-products/{route}', 'FrontController@frontProducts');
 Route::get('product-detail/{route}', 'FrontController@productDetail');
 
 Route::get('home-product-category-filter/{route}', 'FrontController@homeProductCategoryFilter');
 Route::get('filters-listing/{route}', 'FrontController@filterListing');
 Route::get('product-filter-data', 'FrontController@filterProductData');
+Route::post('product-detail-variation-filter', 'FrontController@productDetailVariationFilter');
+
 
 Route::get('front-category/{route}', 'FrontController@category');
+Route::get('test', 'FrontController@test');
+
 
 
 Route::get('home', 'FrontController@home');
@@ -163,10 +168,9 @@ Route::post('submit-reset-password', 'UserController@submitResetPassword');
 
 
         #Wishlist
-        Route::get('wishlists', 'WishlistController@index')->middleware('auth:sanctum');
+        Route::get('wishlists/{id}', 'WishlistController@index')->middleware('auth:sanctum');
         Route::post('wishlists', 'WishlistController@store')->middleware('auth:sanctum');
-        Route::get('wishlists/{id}', 'WishlistController@show')->middleware('auth:sanctum');
-        Route::delete('wishlists/{id}', 'WishlistController@destroy')->middleware('auth:sanctum');
+        Route::get('wishlists/{id}', 'WishlistController@removeWishlist')->middleware('auth:sanctum');
 
         #Promo Check
         Route::post('promo-check','PromoUserController@promoCheck')->middleware('auth:sanctum');
