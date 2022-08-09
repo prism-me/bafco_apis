@@ -62,22 +62,23 @@ class ProductController extends Controller
     }
 
 
-    public function store(ProductRequest $request)
+    public function store(Request $request)
     {
         try{
 
-
-             if(!Product::where('route', $request->route)->exists()){
-              //update
-                $product = Product::where('route',$request->route)->update($request->all());
-             }else {
+            if(Product::where('id',$request->id)->exists() && Product::where('route',$request->route)->exists()){
 
 
-                 // create
-                 $product = ProductService::insertProduct($request->all());
-             }
+                $product = ProductService::updateProduct($request->all());
 
-            return $product;
+            }else{
+
+                #create
+                $product = ProductService::insertProduct($request->all());
+            }
+
+
+
 
         }
          catch (\Error $exception) {
@@ -92,7 +93,7 @@ class ProductController extends Controller
 
         $productData =  Product::with('variations')->where('route', $product->route)->first();
         foreach ($productData['variations'] as $variant){
-            $data = ProductPivotVariation::where('product_variation_id', $variant->id)->pluck('variation_value_id');
+            $data = ProductPivotVariation::where('product_variation_id', $variant->id)->get(['id','variation_value_id']);
             $variant['variationItems'] = $data;
         }
         return response()->json($productData , 200);
@@ -104,6 +105,9 @@ class ProductController extends Controller
 //        $product->category =  $product->category;
 //        return response()->json($product , 200);
     }
+
+
+
 
 
     public function destroy(Product $product)

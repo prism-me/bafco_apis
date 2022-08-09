@@ -200,6 +200,10 @@ class FrontController extends Controller
         ]);
     }
 
+    public function productDetailFilter(Request $request){
+
+    }
+
     public function filterListing($route){
 
         return VariationValues::with('variationNameValue')->where('route',$route)->get();

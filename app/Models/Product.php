@@ -12,25 +12,26 @@ class Product extends Model
     //use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
     use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
-
-    protected $fillable = [
-        "name",
-        "short_description",
-        "featured_image",
-        "route",
-        "long_description",
-        "shiping_and_return",
-        "category_id",
-        "related_categories",
-        "brand",
-        "album",
-        "download",
-        'seo',
-        "promotional_images",
-        "footrest",
-        "headrest"
-
-    ];
+        protected $guarded = [];
+//    protected $fillable = array(
+//        "name",
+//        "short_description",
+//        "featured_image",
+//        "route",
+//        "long_description",
+//        "shiping_and_return",
+//        "category_id",
+//        "related_categories",
+//        "brand",
+//        "album",
+//        "download",
+//        'seo',
+//        "promotional_images",
+//        "footrest",
+//        "headrest",
+//        "type"
+//
+//    );
 
 
     public function getRouteKeyName()

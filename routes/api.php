@@ -31,6 +31,7 @@ Route::get('sub-category' , 'CategoryController@subCategory');
 Route::get('products' , 'ProductController@index');
 Route::post('products' , 'ProductController@store')->middleware('auth:sanctum');
 Route::get('products/{product}' , 'ProductController@show');
+
 // Route::delete('products/{product}' , 'ProductController@destroy')->middleware('auth:sanctum');
 
 #Variations

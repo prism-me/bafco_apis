@@ -12,6 +12,7 @@ class ProductPivotVariation extends Model
     protected $table ='product_variation_pivot_variation_values';
 
     protected $fillable = [
+        "product_id",
         "product_variation_id",
         "variation_id",
         "variation_value_id",
