@@ -170,7 +170,7 @@ Route::post('submit-reset-password', 'UserController@submitResetPassword');
         #Wishlist
         Route::get('wishlists/{id}', 'WishlistController@index')->middleware('auth:sanctum');
         Route::post('wishlists', 'WishlistController@store')->middleware('auth:sanctum');
-        Route::get('wishlists/{id}', 'WishlistController@removeWishlist')->middleware('auth:sanctum');
+        Route::delete('wishlists/{wishlist}', 'WishlistController@removeWishlist')->middleware('auth:sanctum');
 
         #Promo Check
         Route::post('promo-check','PromoUserController@promoCheck')->middleware('auth:sanctum');
