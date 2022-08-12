@@ -135,12 +135,16 @@ class CartController extends Controller
 
         }
 
-        $data = [
-            'quantity' => $quantity,
-            'productDetail'=> $productDetail ,
-            'variationValue' => $variationValue,
-            'total' => $finalPrice,
-        ];
+        $data = $productDetail;
+        $data['variation_values'] = $variationValue;
+        $data['quantity'] = $quantity;
+        $data['total'] = $finalPrice;
+//        $data = [
+//            'quantity' => $quantity,
+//            'productDetail'=> $productDetail ,
+//            'variationValue' => $variationValue,
+//            'total' => $finalPrice,
+//        ];
         return $data;
 
 

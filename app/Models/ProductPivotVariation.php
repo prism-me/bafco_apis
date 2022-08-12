@@ -32,4 +32,10 @@ class ProductPivotVariation extends Model
         return $this->belongsTo(Variation::class,'variation_id','id');
 
     }
+
+    public function productVariationValues(){
+
+        return $this->belongsTo(VariationValues::class,'variation_value_id' ,'id')->select('id','variation_id','name');
+
+    }
 }

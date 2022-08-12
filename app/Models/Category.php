@@ -36,7 +36,7 @@ class Category extends Model
     }
     public function parentCategory(){
 
-        return $this->belongsTo(Category::class , 'parent_id','id' ,'route');
+        return $this->belongsTo(Category::class , 'parent_id','id' ,'route')->select('name','id','route');
     }
     public function subcategory_products(){
 
@@ -44,7 +44,8 @@ class Category extends Model
     }
 
     public function products(){
-        return $this->hasMany(Product::class , 'category_id','id')->select('id','name','short_description','featured_image','promotional_images','route',  'category_id');
+        return $this->hasMany(Product::class , 'category_id','id')->select('id','name','route',  'category_id');
+
     }
 
 

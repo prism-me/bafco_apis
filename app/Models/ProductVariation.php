@@ -30,10 +30,7 @@ class ProductVariation extends Model
         'images' => 'array'
     ];
 
-    // public function getRouteKeyName()
-    // {
-    //     return 'route';
-    // }
+
 
     /* Product Detail */
     public function hasOnePivot(){
@@ -59,6 +56,11 @@ class ProductVariation extends Model
     public function product_variation_name(){
 
         return $this->hasMany(ProductPivotVariation::class);
+
+    }
+    public function productVariationName(){
+
+        return $this->hasOne(ProductPivotVariation::class)->select('id','product_variation_id','variation_id','variation_value_id');
 
     }
 

@@ -14,7 +14,8 @@ class ProductService
 
         try {
 
-            DB::beginTransaction();
+            \DB::beginTransaction();
+
             $product = Product::create([
                 "name" => $data['name'],
                 "short_description" => $data['short_description'],
@@ -30,7 +31,7 @@ class ProductService
                 "promotional_images" => $data['promotional_images'],
                 "footrest" => $data['footrest'],
                 "headrest" => $data['headrest'],
-                "seo" => $data['seo'],
+                "seo" => $data['seo']
 
             ]);
 
@@ -59,7 +60,6 @@ class ProductService
                 foreach ($item as $values) {
 
                     $productVariationId = VariationValues::select('id','variation_id')->where('id', $values)->first();
-                    //  dd($productVariationId->variation_id);
                     $product_variation->product_variation_name()->create([
                         "product_id" => 1,
                         "variation_id" => $productVariationId->variation_id,
@@ -69,14 +69,14 @@ class ProductService
                 }
 
             }
-            DB::commit();
+            \DB::commit();
             return response()->json('Data has been saved.', 200);
 
         }
 
         catch (\Exception $e) {
           
-            DB::rollBack();
+            \DB::rollBack();
             return response(['Product is not added.', 'stack' => $e->getMessage() , 'line' => $e->getLine()], 500);
         }
 

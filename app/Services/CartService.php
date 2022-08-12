@@ -14,6 +14,7 @@ class CartService {
         $create = [
             'user_id' =>  $data['user_id'],
             'product_id' => $data['product_id'] ,
+            'product_variation_id' => $data['product_variation_id'] ,
             'qty' =>  $data['qty'] ,
             'variation_id' =>  $data['variation_id'] ,
             'variation_value_id' =>  $data['variation_value_id']
