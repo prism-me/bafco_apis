@@ -5,15 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductPivotVariation;
+use App\Models\ProductVaraition;
 use App\Models\ProductVariation;
 use App\Models\VariationValues;
-use App\Models\ProductVaraition;
 use Illuminate\Http\Request;
 
 class FrontProductController extends Controller
 {
 
-    public function homeProductCategoryFilter($route)
+
+    /* Home Page Top Selling Product */
+        public function homeProductCategoryFilter($route)
     {
         if($route == 'all' ){
 
@@ -31,9 +33,12 @@ class FrontProductController extends Controller
 
         return response()->json($data);
     }
+    /* ENd Home Page Top Selling Product*/
 
-    /* Products Page*/
+    /* Products Inner Page*/
 
+
+    #Product Inner Category Listing
     public function frontProducts($route)
     {
 
@@ -41,6 +46,7 @@ class FrontProductController extends Controller
         return response()->json($products);
     }
 
+    #Product Detail Page
     public function productDetail($route)
     {
         //\DB::enableQueryLog();
@@ -72,8 +78,6 @@ class FrontProductController extends Controller
             #First Variation
             $productPivotListingSingle = ProductPivotVariation::whereIn('product_variation_id',$productVariationIdArr)->first();
             $productSingleVariation = Product::getProductDetail($productPivotListingSingle);
-
-
             $productPivotListings = ProductPivotVariation::whereIn('product_variation_id',$productVariationIdArr)->get();
             $productAllVariations  = $productPivotListings->transform(function($item){
                 $item->product_details = Product::getProductVariation($item);
@@ -90,6 +94,7 @@ class FrontProductController extends Controller
             'dimensions' => $dimensions
         ]);
     }
+
 
     public function productDetailVariationFilter(Request $request){
 
@@ -123,7 +128,7 @@ class FrontProductController extends Controller
 
     }
 
-    /* Category Page */
+    /* Category Product Inner  Page */
 
     public function category($route){
 

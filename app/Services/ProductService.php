@@ -2,9 +2,10 @@
 
 namespace App\Services;
 use App\Models\Product;
-use App\Models\ProductVariation;
 use App\Models\ProductPivotVariation;
+use App\Models\ProductVariation;
 use App\Models\VariationValues;
+
 class ProductService
 {
 
@@ -63,7 +64,7 @@ class ProductService
 
                     $productVariationId = VariationValues::select('id','variation_id')->where('id', $values)->first();
                     $product_variation->product_variation_name()->create([
-                        "product_id" => 1,
+                        "product_id" => $product->id,
                         "variation_id" => $productVariationId->variation_id,
                         "variation_value_id" => $values,
                     ]);

@@ -3,16 +3,12 @@
 namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\CartCalculation;
-use App\Models\ProductVariation;
-use App\Models\User;
 use App\Models\Product;
-use App\Models\Variation;
-use App\Models\Category;
+use App\Models\ProductVariation;
 use App\Models\VariationValues;
 use App\Services\CartService;
 use Auth;
 use DB;
-
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -29,7 +25,8 @@ class CartController extends Controller
                 $i=0;
                 foreach($cart as $cartValue){
                     $data[$i]['productData'] = Product::where('id',$cartValue->product_id)->with('productCategory.parentCategory')->get(['name','id', 'route' ,'category_id']);
-                    $data[$i]['variation'] = ProductVariation::where('product_id',$cartValue->product_id)->get(['product_id' , 'images']);
+                    $data[$i]['variation'] = ProductVariation::where('id',$cartValue->product_variation_id)->get(['product_id' , 'images']);
+                    $data[$i]['variation_value'] = VariationValues::where('id',$cartValue->variation_value_id)->get(['id' , 'variation_id','name','type_value']);
                     $data[$i]['qty'] = $cartValue->qty;
                     $data[$i]['total'] = $cartValue->total;
                     $i++;
@@ -123,7 +120,7 @@ class CartController extends Controller
             DB::beginTransaction();
                 $productDetail = Product::where('id',$cart->product_id)->with('cartCategory.parentCategory' )->first(['name','featured_image','route','category_id']);
                 $productVariant = ProductVariation::where('id',$cart->product_variation_id)->first(['id','code','upper_price']);
-                $variationValue = VariationValues::where('id',$cart->variation_value_id)->first('name');
+                $variationValue = VariationValues::where('id',$cart->variation_value_id)->first(['id','variation_id','name']);
                 $quantity =  $cart->qty;
                 $price = $productVariant['upper_price'];
                 $finalPrice = $quantity * $price;

@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\VariationValues;
 use App\Models\Wishlist;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\User;
-use Illuminate\Http\Request;
 use App\Services\WishlistService;
-
+use DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
-
+use Illuminate\Http\Request;
 
 
 class WishlistController extends Controller
@@ -22,29 +18,25 @@ class WishlistController extends Controller
 
     public function index($id)
     {
+        $wishlist = Wishlist::where('user_id',$id)->get();
 
-        try{
+        if(!blank($wishlist)) {
 
-            $wishlist = Wishlist::where('user_id',$id)->get();
-            $i=0;
-            foreach($wishlist as $wishlistValue){
-                $data[$i]['productData'] = Product::where('id',$wishlistValue->product_id)->get(['name','id', 'route' ,'category_id']);
-                $data[$i]['variation'] = ProductVariation::where('product_id',$wishlistValue->product_id)->get(['id' , 'product_id' , 'images' , ]);
-                $data[$i]['category'] = Category::where('id',$data[$i]['productData'][0]['category_id'])->with('parentCategory')->get('id' ,'name', 'parent_id','route','images');
+            $i = 0;
+            foreach ($wishlist as $wishlistValue) {
+                $data[$i]['productData'] = Product::where('id', $wishlistValue->product_id)->with('productCategory.parentCategory')->get(['name', 'id', 'route', 'category_id']);
+                $data[$i]['variation'] = ProductVariation::where('id',$wishlistValue->product_variation_id)->get(['product_id' , 'images']);
+                $data[$i]['variation_value'] = VariationValues::where('id',$wishlistValue->variation_value_id)->get(['id' , 'variation_id','name','type_value']);
+
                 $i++;
             }
 
             return $data;
 
 
-            if($cartData->isEmpty()){
-                return response()->json([] , 200);
-            }
-            return response()->json($cart, 200);
         }
-        catch (\Exception $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
-        }
+
+
 
     }
 
@@ -87,16 +79,26 @@ class WishlistController extends Controller
 
     public function WishlistData($wishlist){
 
-        $productDetail = Product::where('id',$wishlist->product_id)->with('cartCategory')->first(['name','featured_image','route','category_id']);
-        $productVariant = ProductVariation::where('id',$wishlist->product_variation_id)->first('upper_price');
-        $variationValue = VariationValues::where('id',$wishlist->variation_value_id)->first('name');
+        try {
 
-        $data = [
-            'productDetail'=> $productDetail ,
-            'variationValue' => $variationValue,
-        ];
-        return $data;
+            DB::beginTransaction();
+                $productDetail = Product::where('id',$wishlist->product_id)->with('cartCategory.parentCategory')->first(['name','featured_image','route','category_id']);
+                $productVariant = ProductVariation::where('id',$wishlist->product_variation_id)->first(['id','code','upper_price']);
+                $variationValue = VariationValues::where('id',$wishlist->variation_value_id)->first('name');
+                $data = $productDetail;
+                $data['variation'] = $productVariant;
+                $data['variationValue'] = $variationValue;
 
+            DB::commit();
+
+            return $data;
+
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+            return response()->json(['Product is not added.', 'stack' => $e], 500);
+        }
 
     }
 
