@@ -51,10 +51,7 @@ class FrontController extends Controller
         );
         return $data;
 
-
     }
-
-
 
     #####End Home Section########
 

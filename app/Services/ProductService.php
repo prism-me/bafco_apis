@@ -5,8 +5,6 @@ use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\ProductPivotVariation;
 use App\Models\VariationValues;
-use Illuminate\Support\Facades\DB;
-
 class ProductService
 {
 
@@ -16,8 +14,7 @@ class ProductService
 
         try {
 
-            //DB::beginTransaction();
-
+            \DB::beginTransaction();
 
             $product = Product::create([
                 "name" => $data['name'],
@@ -39,6 +36,8 @@ class ProductService
             ]);
 
 
+
+            // dd($product);
             $variations = $data['variations'];
 
             foreach ($variations as $variation) {
@@ -60,27 +59,27 @@ class ProductService
                 ]);
                 $item = $variation['variationItems'];
 
-
                 foreach ($item as $values) {
 
-                    $productVariationId = VariationValues::where('id', $values['variation_value_id'])->first('variation_id');
-
+                    $productVariationId = VariationValues::select('id','variation_id')->where('id', $values)->first();
                     $product_variation->product_variation_name()->create([
-                        "product_id" => $product->id,
+                        "product_id" => 1,
                         "variation_id" => $productVariationId->variation_id,
-                        "variation_value_id" => $values['variation_value_id'],
+                        "variation_value_id" => $values,
                     ]);
 
                 }
 
             }
-            //DB::commit();
+            \DB::commit();
             return response()->json('Data has been saved.', 200);
 
-        } catch (\Exception $e) {
+        }
 
-            // DB::rollBack();
-            return response()->json(['Product is not added.', 'stack' => $e], 500);
+        catch (\Exception $e) {
+
+            \DB::rollBack();
+            return response(['Product is not added.', 'stack' => $e->getMessage() , 'line' => $e->getLine()], 500);
         }
 
     }
