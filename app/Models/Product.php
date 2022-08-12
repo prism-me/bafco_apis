@@ -61,7 +61,7 @@ class Product extends Model
 
     public function cartCategory(){
 
-        return $this->hasOne(Category::class,'id','category_id')->select('id','route');
+        return $this->hasOne(Category::class,'id','category_id')->select('id','route','parent_id');
 
     }
 
@@ -98,13 +98,7 @@ class Product extends Model
         return $this->hasOneThrough(ProductVariation::class, ProductPivotVariation::class , 'product_id','product_variation_id','id','id');
     }
 
-    // public function product_pivot_variation(){
 
-    //     return $this->hasOneThrough(ProductVariation::class, ProductPivotVariation::class , 'product_id','product_variation_id','id','id')->as('variations');
-    // }
-    // public function product_variation_values(){
-    //     return $this->hasMany(ProductVariation::class);
-    // }
 
 
     public function cmsProductVariation(){
@@ -118,16 +112,7 @@ class Product extends Model
         return $this->hasMany(ProductVariation::class)->select('id','product_id','in_stock');
     }
 
-    public function test(){
-        //return $this->hasManyDeep(Permission::class, ['role_user', Role::class, 'permission_role']);
 
-
-        return $this->hasManyDeepFromRelations($this->products() , (new ProductVariation())->product_variation_name());
-
-
-
-        //return $this->hasManyThrough(ProductPivotVariation::class,ProductVariation::class)->withPivot(['id','product_id','code']);
-    }
 
 
     public function front_list_of_variations(){
@@ -176,9 +161,15 @@ class Product extends Model
 
     public function productvariations(){
 
-        return $this->hasOne(ProductVariation::class)->select('id','product_id','code','upper_price','in_stock','images');
+        return $this->hasOne(ProductVariation::class)->select('id','product_id','code','upper_price','lower_price','in_stock','images');
     }
 
+
+    public function productCategory(){
+
+        return $this->hasOne(Category::class,'id','category_id')->select('id','parent_id','name','route');
+
+    }
      /*   End Product Detail Relationship */
 
 }
