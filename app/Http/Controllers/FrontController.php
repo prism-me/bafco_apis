@@ -13,11 +13,10 @@ use App\Models\Variation;
 use App\Models\ProductVariation;
 use App\Models\VariationValues;
 use App\Models\ProductPivotVariation;
-
-
-
 use App\Models\Testimonial;
 use DB;
+
+use Illuminate\Support\Facades\Redis;
 
 class FrontController extends Controller
 {
@@ -242,23 +241,30 @@ class FrontController extends Controller
           return $data;
     }
 //
-//    public function test1(){
-//        \DB::enableQueryLog();
-//        return Product::where('route', '=' , 'duncan-fry')->first();
-//         \DB::getQueryLog();
-//    }
+   public function test1(){
 
+    $redis = Redis::connection();
+    //$redis->del('product');
+    
+    if(!$redis->get('product')){
+            
+            $product =  Product::where('route', '=' , 'duncan-fry')->first();
+        
+            $redis->set('product', $product);
 
+            return response()->json(["before-cache" , $product]);
 
+    }else{
+    
+        return response()->json(["after-cache" , $redis->get('product')]);
 
+    
+    }
 
 }
 
 
 
 
-
-
-
-
+}
 

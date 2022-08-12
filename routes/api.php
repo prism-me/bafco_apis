@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 #     return $request->user();
 # });
 
+
+Route::get('test1','FrontController@test1');
 #Categories
 Route::get('categories' , 'CategoryController@index');
 Route::post('categories' , 'CategoryController@store')->middleware('auth:sanctum');
