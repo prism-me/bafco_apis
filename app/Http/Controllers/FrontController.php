@@ -241,16 +241,6 @@ class FrontController extends Controller
           //$data->groupBy('variation_name');
           return $data;
     }
-//
-//    public function test1(){
-//        \DB::enableQueryLog();
-//        return Product::where('route', '=' , 'duncan-fry')->first();
-//         \DB::getQueryLog();
-//    }
-
-
-
-
 
 }
 

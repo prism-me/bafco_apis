@@ -9,7 +9,10 @@ use App\Services\ProductService;
 use App\Services\CartService;
 use App\Models\ProductPivotVariation;
 use App\Http\Requests\product\ProductRequest;
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
@@ -62,7 +65,7 @@ class ProductController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(ProductRequest $request) 
     {
         try{
 
@@ -75,10 +78,9 @@ class ProductController extends Controller
 
                 #create
                 $product = ProductService::insertProduct($request->all());
+
+               return $product;
             }
-
-
-
 
         }
          catch (\Error $exception) {

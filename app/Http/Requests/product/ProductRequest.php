@@ -41,4 +41,5 @@ class ProductRequest extends FormRequest
             //"seo" => "required"
         ];
     }
+
 }
