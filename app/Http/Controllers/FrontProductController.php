@@ -9,7 +9,7 @@ use App\Models\ProductVariation;
 use App\Models\VariationValues;
 use App\Models\ProductVaraition;
 use Illuminate\Http\Request;
-
+use DB;
 class FrontProductController extends Controller
 {
 
@@ -109,16 +109,12 @@ class FrontProductController extends Controller
 
     }
 
-    public function filterListing($route){
+    public function filterListing(Category $category){
 
+        $brands = Product::distinct()->where('category_id',$category->id)->get(['brand']);
+        $variations =  DB::select("CALL VariationNamesOnly('". $category->route ."')");
 
-        $category= Category::where('route',$route)->first();
-        $brandValue = Product::distinct()->where('category_id',$category['id'])->get(['brand']);
-        //$variation = DB::selectRaw('CALL VariationNamesOnly(" . $route . ")');
-        $query =  DB::select('CALL VariationNamesOnly(". $route .")');
-
-        return DB::statement($query);
-
+        return response()->json(['brands' => $brands , 'variations' => $variations] , 200);
 
 
     }
