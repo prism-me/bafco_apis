@@ -20,23 +20,25 @@ class ProductService
 
 
             $product = Product::create([
-                "name" => $data['name'],
-                "short_description" => $data['short_description'],
-                "featured_image" => $data['featured_image'],
-                "route" => $data['route'],
-                "long_description" => $data['long_description'],
-                "shiping_and_return" => $data['shiping_and_return'],
-                "category_id" => $data['category_id'],
-                "related_categories" => $data['related_categories'],
-                "brand" => $data['brand'],
-                "album" => $data['album'],
-                "download" => $data['download'],
-                "promotional_images" => $data['promotional_images'],
-                "footrest" => $data['footrest'],
-                "headrest" => $data['headrest'],
-                "seo" => $data['seo'],
+                "name" => $data['name']
+//                "short_description" => $data['short_description'],
+//                "featured_image" => $data['featured_image'],
+//                "route" => $data['route'],
+//                "long_description" => $data['long_description'],
+//                "shiping_and_return" => $data['shiping_and_return'],
+//                "category_id" => $data['category_id'],
+//                "related_categories" => $data['related_categories'],
+//                "brand" => $data['brand'],
+//                "album" => $data['album'],
+//                "download" => $data['download'],
+//                "promotional_images" => $data['promotional_images'],
+//                "footrest" => $data['footrest'],
+//                "headrest" => $data['headrest'],
+//                "seo" => $data['seo'],
 
             ]);
+            dd('h');
+
             $variations = $data['variations'];
 
             foreach ($variations as $variation) {

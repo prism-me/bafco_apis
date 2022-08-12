@@ -115,23 +115,25 @@ Route::delete('promo-codes/{id}', 'PromoCodeController@destroy')->middleware('au
 
 
 #Cart
-Route::get('addresses', 'AddressController@index')->middleware('auth:sanctum');
+Route::get('addresses/{id}', 'AddressController@index')->middleware('auth:sanctum');
 Route::post('addresses', 'AddressController@store')->middleware('auth:sanctum');
 Route::delete('addresses/{address}', 'AddressController@destroy')->middleware('auth:sanctum');
 Route::put('set-default/{id}', 'AddressController@setDefault')->middleware('auth:sanctum');
 
 #Front Controllers
+
 /*Product Inner page*/
-Route::get('front-products/{route}', 'FrontController@frontProducts');
-Route::get('product-detail/{route}', 'FrontController@productDetail');
+Route::get('front-products/{route}', 'FrontProductController@frontProducts');
+Route::get('product-detail/{route}', 'FrontProductController@productDetail');
 
-Route::get('home-product-category-filter/{route}', 'FrontController@homeProductCategoryFilter');
-Route::get('filters-listing/{route}', 'FrontController@filterListing');
-Route::get('product-filter-data', 'FrontController@filterProductData');
-Route::post('product-detail-variation-filter', 'FrontController@productDetailVariationFilter');
+Route::get('home-product-category-filter/{route}', 'FrontProductController@homeProductCategoryFilter');
+Route::get('filters-listing/{route}', 'FrontProductController@filterListing');
+Route::get('product-filter-data', 'FrontProductController@filterProductData');
+Route::post('product-detail-variation-filter', 'FrontProductController@productDetailVariationFilter');
 
+/*End Product Inner Page*/
 
-Route::get('front-category/{route}', 'FrontController@category');
+Route::get('front-category/{route}', 'FrontProductController@category');
 Route::get('test', 'FrontController@test');
 
 
@@ -142,10 +144,6 @@ Route::get('contact-us', 'FrontController@contactUs');
 Route::get('top-management', 'FrontController@topManagement');
 Route::get('services', 'FrontController@services');
 Route::get('innovations', 'FrontController@innovations');
-
-
-
-
 
 
 #Dashboard CMS
@@ -164,6 +162,7 @@ Route::post('submit-reset-password', 'UserController@submitResetPassword');
         Route::get('/me','UserController@me')->middleware('auth:sanctum');
         Route::post('/logout', 'UserController@logout')->middleware('auth:sanctum');
         Route::post('/update-profile', 'UserController@updateProfile')->middleware('auth:sanctum');
+        Route::post('/change-password', 'UserController@changePassword')->middleware('auth:sanctum');
 
 
 

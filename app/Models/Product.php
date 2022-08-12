@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ProductVariation;
 
+/**
+ * @method static create(array $array)
+ */
 class Product extends Model
 {
     use HasFactory;
@@ -32,6 +35,7 @@ class Product extends Model
 //        "type"
 //
 //    );
+
 
 
     public function getRouteKeyName()
@@ -167,6 +171,12 @@ class Product extends Model
 
         return $this->hasOne(Category::class,'id','category_id')->select('id','route','parent_id');
 
+    }
+
+
+    public function productvariations(){
+
+        return $this->hasOne(ProductVariation::class)->select('id','product_id','code','upper_price','in_stock','images');
     }
 
      /*   End Product Detail Relationship */

@@ -104,7 +104,7 @@ class UserController extends Controller
     }
 
 
-    public function updateProfile(ResetRequest $request){
+    public function updateProfile(Request $request){
         try{
 
             $data = $request->all();
@@ -120,6 +120,29 @@ class UserController extends Controller
             return response()->json('Email/Password is invalid.', 404);
 
         }
+    }
+
+
+    public function changePassword(ResetRequest  $request){
+
+        try{
+
+            $data = $request->all();
+            $user =  UserService::changePassword($data);
+            return $user;
+            if($user){
+                return response()->json('Updated Successfully',200);
+            }
+
+
+        } catch(BadMethodCallException $e){
+
+            return response()->json('Email/Password is invalid.', 404);
+
+        }
+
+
+
     }
 
 

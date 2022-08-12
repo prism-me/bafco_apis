@@ -36,7 +36,7 @@
 return [
     'paths' => ['v1/*' ,'api/*','sanctum/csrf-cookie'],
     'allowed_methods' => ['POST', 'GET', 'DELETE', 'PUT', '*'],
-    'allowed_origins' => ['http://localhost:8080', 'https://client.myapp.com'],
+    'allowed_origins' => ['http://localhost:3000', 'http://bafco-next.herokuapp.com/'],
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['X-Custom-Header', 'Upgrade-Insecure-Requests', '*'],
      'exposed_headers' => false,
