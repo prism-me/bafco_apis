@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Models\VariationValues;
 use Illuminate\Http\Request;
 use App\Services\ProductService;
 use App\Services\CartService;
@@ -65,7 +66,7 @@ class ProductController extends Controller
     }
 
 
-    public function store(ProductRequest $request) 
+    public function store(ProductRequest $request)
     {
         try{
 
@@ -90,12 +91,13 @@ class ProductController extends Controller
     }
 
 
-    public function show(Product $product)
+    public function show($id)
     {
 
-        $productData =  Product::with('variations')->where('route', $product->route)->first();
+
+        $productData =  Product::with('variations')->where('id',$id)->first();
         foreach ($productData['variations'] as $variant){
-            $data = ProductPivotVariation::where('product_variation_id', $variant->id)->get(['id','variation_value_id']);
+            $data = ProductPivotVariation::where('product_variation_id', $variant->id)->pluck('variation_value_id');
             $variant['variationItems'] = $data;
         }
         return response()->json($productData , 200);
@@ -112,9 +114,12 @@ class ProductController extends Controller
 
 
 
-    public function destroy(Product $product)
+    public function changeStatus(Request $request , $id)
     {
 
+        $data['status'] = $request->status;
+        Product::where('id',$id)->update($data);
+        return response()->json('Product Disabled Successfully!', 200);
     }
 
 

@@ -35,7 +35,7 @@ class ProductPivotVariation extends Model
 
     public function productVariationValues(){
 
-        return $this->belongsTo(VariationValues::class,'variation_value_id' ,'id')->select('id','variation_id','name');
+        return $this->belongsTo(VariationValues::class,'variation_value_id' ,'id')->select('id','variation_id','name','route','type_value');
 
     }
 }

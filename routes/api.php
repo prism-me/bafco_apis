@@ -21,7 +21,9 @@ use Illuminate\Support\Facades\Route;
 #Products
     Route::get('products' , 'ProductController@index');
     Route::post('products' , 'ProductController@store')->middleware('auth:sanctum');
-    Route::get('products/{product}' , 'ProductController@show');
+    Route::get('products/{id}' , 'ProductController@show');
+    Route::put('change-status/{id}' , 'ProductController@changeStatus')->middleware('auth:sanctum');
+
 
 // Route::delete('products/{product}' , 'ProductController@destroy')->middleware('auth:sanctum');
 
