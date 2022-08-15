@@ -119,7 +119,7 @@ use Illuminate\Support\Facades\Route;
     Route::get('product-detail/{route}', 'FrontProductController@productDetail');
 
     Route::get('home-product-category-filter/{route}', 'FrontProductController@homeProductCategoryFilter');
-    Route::get('filters-listing/{route}', 'FrontProductController@filterListing');
+    Route::get('category-filters-list/{category}', 'FrontProductController@filterListing');
     Route::get('product-filter-data', 'FrontProductController@filterProductData');
     Route::post('product-detail-variation-filter', 'FrontProductController@productDetailVariationFilter');
 
