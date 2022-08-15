@@ -126,6 +126,12 @@ class FrontProductController extends Controller
         //
         //        ]);
 
+                $brands = Product::distinct()->where('category_id',$category->id)->pluck('brand');
+                $variations =  DB::select("CALL CategoryFilterList('". $category->route ."')");
+
+                return response()->json(['brands' => $brands , 'variations' => $variations] , 200);
+
+
 
             }
 
