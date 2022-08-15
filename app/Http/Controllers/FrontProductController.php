@@ -60,8 +60,10 @@ class FrontProductController extends Controller
 
         ];
 
-        $relatedProducts = Product::with('variations','productDetailCategory.parentCategory')->paginate(4);
-        $randomProducts = Product::with('variations','productDetailCategory.parentCategory')->inRandomOrder()
+        //$relatedProducts = Product::with('variations','productDetailCategory.parentCategory')->paginate(4);
+        $relatedProducts = Product::with('productCategory','productvariations.productVariationName.productVariationValues')->where('category_id',$productDetails->category_id)->paginate(4);
+
+        $randomProducts = Product::with('productCategory','productvariations.productVariationName.productVariationValues')->inRandomOrder()
             ->limit(4)
             ->paginate(4);
 
