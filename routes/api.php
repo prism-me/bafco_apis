@@ -118,14 +118,16 @@ use Illuminate\Support\Facades\Route;
 /*Product Inner page*/
 
     Route::get('front-products/{route}', 'FrontProductController@frontProducts');
-    Route::get('product-detail/{route}', 'FrontProductController@productDetail');
+    Route::get('product-detail/{route}/{id?}', 'FrontProductController@productDetail');
 
     Route::get('home-product-category-filter/{route}', 'FrontProductController@homeProductCategoryFilter');
-    Route::get('category-filters-list/{category}', 'FrontProductController@filterListing');
     Route::get('product-filter-data', 'FrontProductController@filterProductData');
-    Route::post('product-detail-variation-filter', 'FrontProductController@productDetailVariationFilter');
 
-/*End Product Inner Page*/
+    /*End Product Inner Page*/
+
+
+    Route::get('category-filters-list/{category}', [\App\Http\Controllers\CategoryFilters::class , 'CategoryFilterList']);
+
 
     Route::get('front-category/{route}', 'FrontProductController@category');
     Route::get('test', 'FrontController@test');

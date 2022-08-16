@@ -74,6 +74,7 @@ class ProductController extends Controller
 
 
                 $product = ProductService::updateProduct($request->all());
+                return $product;
 
             }else{
 

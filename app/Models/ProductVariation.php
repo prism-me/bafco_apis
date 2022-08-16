@@ -22,12 +22,14 @@ class ProductVariation extends Model
         "depth",
         "width",
         "description",
-        "images"
+        "images",
+        "variation_combination"
     ];
 
 
     protected $casts = [
-        'images' => 'array'
+        'images' => 'array',
+        'variation_combination' => 'array'
     ];
 
 

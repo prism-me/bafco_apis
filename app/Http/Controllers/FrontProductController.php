@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductPivotVariation;
-use App\Models\ProductVaraition;
+use App\Models\Variation;
 use App\Models\ProductVariation;
 use App\Models\VariationValues;
 use Illuminate\Http\Request;
@@ -37,9 +37,8 @@ class FrontProductController extends Controller
 
     /* Products Inner Page*/
 
-
         #Product Inner Category Listing
-            public function frontProducts($route)
+        public function frontProducts($route)
         {
 
             $products = Category::with('parentCategory','products.productvariations.productVariationName.productVariationValues')->where('route',$route)->first(['id','route','name','parent_id']);
@@ -47,8 +46,9 @@ class FrontProductController extends Controller
         }
 
         #Product Detail Page
-            public function productDetail($route)
+        public function productDetail($route , $id = null)
         {
+
             //\DB::enableQueryLog();
             $productDetails =  Product::where('route', $route)->first();
             $headRest = VariationValues::whereIn('id',$productDetails->headrest )->get();
@@ -77,64 +77,47 @@ class FrontProductController extends Controller
             if (isset($productDetails) && !empty($productDetails)) {
                 $productVariationIdArr = $productDetails->variations()->pluck('id');
 
-                #First Variation
-                $productPivotListingSingle = ProductPivotVariation::whereIn('product_variation_id',$productVariationIdArr)->first();
-                $productSingleVariation = Product::getProductDetail($productPivotListingSingle);
+
                 $productPivotListings = ProductPivotVariation::whereIn('product_variation_id',$productVariationIdArr)->get();
                 $productAllVariations  = $productPivotListings->transform(function($item){
                     $item->product_details = Product::getProductVariation($item);
                     return $item;
                 })->all();
 
+
+
+                if($id == null){
+
+                    #First Variation
+                    $productSingleVariation['product_variation_details'] = ProductVariation::where('product_id',$productDetails['id'])->first();
+                    $productSingleVariation['variation_value_details'] =  ProductPivotVariation::where('product_variation_id',$productSingleVariation['product_variation_details']['id'])->with('variation_values.variant')->get();
+
+                }else {
+
+                    $productSingleVariation['product_variation_details'] = ProductVariation::where('id',$id)->first();
+                    $productSingleVariation['variation_value_details'] = ProductPivotVariation::where('product_variation_id',$id)->with('variation_values.variant')->get();
+//
+                }
+
+
+
             }
+            $dropDown  = ProductVariation::where('product_id',$productDetails['id'])->pluck('variation_combination');
+
+
             return response()->json([
                 'single_product_details' => $product,
                 'product_single_variation' => $productSingleVariation,
                 'product_all_varitaions' => $productAllVariations,
                 'related_products' => $relatedProducts,
                 'random_purchase' => $relatedProducts,
-                'dimensions' => $dimensions
+                'dimensions' => $dimensions,
+                'dropDown' => $dropDown
             ]);
         }
 
-        #Detail Page Filter
 
-            #Filter Listing
-            public function filterListing(Category $category){
-
-                $brands = Product::distinct()->where('category_id',$category->id)->pluck('brand');
-                $variations =  DB::select("CALL VariationNamesOnly('". $category->route ."')");
-
-                return response()->json(['brands' => $brands , 'variations' => $variations] , 200);
-
-
-            }
-
-            #Filter Data
-            public function productDetailVariationFilter(Request $request){
-
-                $IDs = $request->all();
-                $product_single_variation  = ProductPivotVariation::where('product_id',$IDs['product_id'])
-                    ->where('product_variation_id',$IDs['product_variation_id'])
-                    ->where('variation_value_id',$IDs['variation_value_id'])
-                    ->get();
-                dd($data);
-                $productVariation  = ProductPivotVariation::where('product_variation_id',$IDs['product_variation_id'])->get('variation_value_id');
-        //        $value  = Variation
-        //        return response()->json([
-        //            'product_single_variation' => $productVariation,
-        //
-        //        ]);
-
-                $brands = Product::distinct()->where('category_id',$category->id)->pluck('brand');
-                $variations =  DB::select("CALL CategoryFilterList('". $category->route ."')");
-
-                return response()->json(['brands' => $brands , 'variations' => $variations] , 200);
-
-
-
-            }
-
+    /* Category Page */
 
 
     /* Category Product Inner  Page */
@@ -143,7 +126,7 @@ class FrontProductController extends Controller
 
         $category = Category::where('route' , $route)->with('subcategoryProducts')->get(['id','name','route']);
 
-       return response()->json($category);
+        return response()->json($category);
     }
 
     /*End Category Filter On Inner Page */

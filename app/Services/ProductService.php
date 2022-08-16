@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Models\Product;
 use App\Models\ProductPivotVariation;
 use App\Models\ProductVariation;
+use App\Models\Variation;
 use App\Models\VariationValues;
 
 class ProductService
@@ -15,9 +16,95 @@ class ProductService
 
         try {
 
-            \DB::beginTransaction();
+            //\DB::beginTransaction();
 
-            $product = Product::create([
+                $product = Product::create([
+                    "name" => $data['name'],
+                    "short_description" => $data['short_description'],
+                    "featured_image" => $data['featured_image'],
+                    "route" => $data['route'],
+                    "long_description" => $data['long_description'],
+                    "shiping_and_return" => $data['shiping_and_return'],
+                    "category_id" => $data['category_id'],
+                    "related_categories" => $data['related_categories'],
+                    "brand" => $data['brand'],
+                    "album" => $data['album'],
+                    "download" => $data['download'],
+                    "promotional_images" => $data['promotional_images'],
+                    "footrest" => $data['footrest'],
+                    "headrest" => $data['headrest'],
+                    "seo" => $data['seo'],
+
+                ]);
+
+                $variations = $data['variations'];
+
+                foreach ($variations as $variation) {
+
+                    $item = $variation['variationItems'];
+
+                    $variationItemValue = VariationValues::whereIn('id', $item)->get(['variation_id', 'name']);
+
+                    $variationCombination = [];
+                    foreach ($variationItemValue as $value) {
+
+                        $variationValue = Variation::where('id', $value['variation_id'])->pluck('name');
+                        $variationCombination[$variationValue[0]] = $value['name'];
+                    }
+
+
+                    $product_variation = $product->variations()->create([
+                        "code" => $variation['code'],
+                        "lc_code" => $variation['lc_code'],
+                        "cbm" => $variation['cbm'],
+                        "in_stock" => $variation['in_stock'],
+                        "upper_price" => $variation['upper_price'],
+                        "lower_price" => $variation['lower_price'],
+                        "height" => $variation['height'],
+                        "depth" => $variation['depth'],
+                        "width" => $variation['width'],
+                        "description" => $variation['description'],
+                        "images" => $variation['images'],
+
+
+                    ]);
+
+                    $variationCombination['id'] = $product_variation->id;
+                    $updateVariation['variation_combination'] = $variationCombination;
+                    ProductVariation::where('id' , $product_variation->id )->update($updateVariation);
+
+                    foreach ($item as $values) {
+
+                        $productVariationId = VariationValues::select('id', 'variation_id')->where('id', $values)->first();
+                        $product_variation->product_variation_name()->create([
+                            "product_id" => $product->id,
+                            "variation_id" => $productVariationId->variation_id,
+                            "variation_value_id" => $values,
+                        ]);
+
+                    }
+
+                }
+
+            //\DB::commit();
+            return response()->json('Data has been saved.', 200);
+
+        }
+
+        catch (\Exception $e) {
+
+            //\DB::rollBack();
+            return response(['Product is not added.', 'stack' => $e->getMessage() , 'line' => $e->getLine()], 500);
+        }
+
+    }
+
+
+    #Update Product
+    public function updateProduct($data)
+    {
+        try {
+            $product = Product::where('id', $data['id'])->update([
                 "name" => $data['name'],
                 "short_description" => $data['short_description'],
                 "featured_image" => $data['featured_image'],
@@ -33,18 +120,19 @@ class ProductService
                 "footrest" => $data['footrest'],
                 "headrest" => $data['headrest'],
                 "seo" => $data['seo'],
-
             ]);
 
-
-
-            // dd($product);
             $variations = $data['variations'];
 
             foreach ($variations as $variation) {
-
-
-                $product_variation = $product->variations()->create([
+                $item = $variation['variationItems'];
+                $variationItemValue = VariationValues::whereIn('id', $item)->get(['variation_id', 'name']);
+                $variationCombination = [];
+                foreach ($variationItemValue as $value) {
+                    $variationValue = Variation::where('id', $value['variation_id'])->pluck('name');
+                    $variationCombination[$variationValue[0]] = $value['name'];
+                }
+                $product_variation = ProductVariation::where('id', $variation['id'])->update([
                     "code" => $variation['code'],
                     "lc_code" => $variation['lc_code'],
                     "cbm" => $variation['cbm'],
@@ -56,99 +144,28 @@ class ProductService
                     "width" => $variation['width'],
                     "description" => $variation['description'],
                     "images" => $variation['images'],
-
                 ]);
-                $item = $variation['variationItems'];
+                $variationCombination['id'] = $variation['id'];
+                $updateVariation['variation_combination'] = $variationCombination;
+                ProductVariation::where('id', $variation['id'])->update($updateVariation);
+
+                ProductPivotVariation::where('product_id', $data['id'])->get();
 
                 foreach ($item as $values) {
-
-                    $productVariationId = VariationValues::select('id','variation_id')->where('id', $values)->first();
-                    $product_variation->product_variation_name()->create([
-                        "product_id" => $product->id,
+                    $productVariationId = VariationValues::where('id', $values)->first('variation_id');
+                    ProductPivotVariation::create([
+                        "product_id" => $data['id'],
+                        "product_variation_id" => $variation['id'],
                         "variation_id" => $productVariationId->variation_id,
-                        "variation_value_id" => $values,
+                        "variation_value_id" => $values
                     ]);
-
                 }
-
             }
-            \DB::commit();
             return response()->json('Data has been saved.', 200);
-
-        }
-
-        catch (\Exception $e) {
-
-            \DB::rollBack();
-            return response(['Product is not added.', 'stack' => $e->getMessage() , 'line' => $e->getLine()], 500);
-        }
-
-    }
-
-
-    #Update Product
-    public function updateProduct($data)
-    {
-        try {
-            $product = Product::where('id', $data['id'])->update([
-            "name" => $data['name'],
-            "short_description" => $data['short_description'],
-            "featured_image" => $data['featured_image'],
-            "route" => $data['route'],
-            "long_description" => $data['long_description'],
-            "shiping_and_return" => $data['shiping_and_return'],
-            "category_id" => $data['category_id'],
-            "related_categories" => $data['related_categories'],
-            "brand" => $data['brand'],
-            "album" => $data['album'],
-            "download" => $data['download'],
-            "promotional_images" => $data['promotional_images'],
-            "footrest" => $data['footrest'],
-            "headrest" => $data['headrest'],
-            "seo" => $data['seo'],
-
-        ]);
-
-            $variations = $data['variations'];
-
-            foreach ($variations as $variation) {
-
-            $product_variation = ProductVariation::where('id', $variation['id'])->update([
-                "code" => $variation['code'],
-                "lc_code" => $variation['lc_code'],
-                "cbm" => $variation['cbm'],
-                "in_stock" => $variation['in_stock'],
-                "upper_price" => $variation['upper_price'],
-                "lower_price" => $variation['lower_price'],
-                "height" => $variation['height'],
-                "depth" => $variation['depth'],
-                "width" => $variation['width'],
-                "description" => $variation['description'],
-                "images" => $variation['images'],
-
-            ]);
-
-
-            $item = $variation['variationItems'];
-
-           foreach ($item as $values) {
-
-                $productVariationId = VariationValues::where('id', $values['variation_value_id'])->first('variation_id');
-
-                ProductPivotVariation::where('id',$values['id'])->update([
-                    "variation_id" => $productVariationId->variation_id,
-                    "variation_value_id" => $values['variation_value_id'],
-                ]);
-            }
-
-        }
-
         } catch (\Exception $e) {
-
             // DB::rollBack();
             return response()->json(['Product is not added.', 'stack' => $e], 500);
         }
-
     }
 
 }
