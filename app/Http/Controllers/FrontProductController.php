@@ -18,19 +18,14 @@ class FrontProductController extends Controller
         public function homeProductCategoryFilter($route)
     {
         if($route == 'all' ){
-
             $product = Product::with('variations.variation_items.variation_values')->get()->take(4);
-
             $data = $product;
         }
         else{
             //$productFilter = Category::with('products')->where('route',$route)->get()->take(4);
-
             $productFilter = Category::with('products.variations.variation_items.variation_values')->where('route',$route)->get()->take(4);
             $data =  $productFilter;
-
         }
-
         return response()->json($data);
     }
     /* ENd Home Page Top Selling Product*/
@@ -40,7 +35,6 @@ class FrontProductController extends Controller
         #Product Inner Category Listing
         public function frontProducts($route)
         {
-
             $products = Category::with('parentCategory','products.productvariations.productVariationName.productVariationValues')->where('route',$route)->first(['id','route','name','parent_id']);
             return response()->json($products);
         }
@@ -48,7 +42,6 @@ class FrontProductController extends Controller
         #Product Detail Page
         public function productDetail($route , $id = null)
         {
-
             //\DB::enableQueryLog();
             $productDetails =  Product::where('route', $route)->first();
             $headRest = VariationValues::whereIn('id',$productDetails->headrest )->get();
@@ -59,8 +52,6 @@ class FrontProductController extends Controller
                 'footrest' => $footRest,
 
             ];
-
-            //$relatedProducts = Product::with('variations','productDetailCategory.parentCategory')->paginate(4);
             $relatedProducts = Product::with('productCategory','productvariations.productVariationName.productVariationValues')->where('category_id',$productDetails->category_id)->paginate(4);
 
             $randomProducts = Product::with('productCategory','productvariations.productVariationName.productVariationValues')->inRandomOrder()
@@ -73,34 +64,22 @@ class FrontProductController extends Controller
                 $dimensions[$i]['images'] =     $value['images'][0];
                 $i++;
             }
-
             if (isset($productDetails) && !empty($productDetails)) {
                 $productVariationIdArr = $productDetails->variations()->pluck('id');
-
 
                 $productPivotListings = ProductPivotVariation::whereIn('product_variation_id',$productVariationIdArr)->get();
                 $productAllVariations  = $productPivotListings->transform(function($item){
                     $item->product_details = Product::getProductVariation($item);
                     return $item;
                 })->all();
-
-
-
                 if($id == null){
-
                     #First Variation
                     $productSingleVariation['product_variation_details'] = ProductVariation::where('product_id',$productDetails['id'])->first();
                     $productSingleVariation['variation_value_details'] =  ProductPivotVariation::where('product_variation_id',$productSingleVariation['product_variation_details']['id'])->with('variation_values.variant')->get();
-
                 }else {
-
                     $productSingleVariation['product_variation_details'] = ProductVariation::where('id',$id)->first();
                     $productSingleVariation['variation_value_details'] = ProductPivotVariation::where('product_variation_id',$id)->with('variation_values.variant')->get();
-//
                 }
-
-
-
             }
             $dropDown  = ProductVariation::where('product_id',$productDetails['id'])->pluck('variation_combination');
 
@@ -116,19 +95,15 @@ class FrontProductController extends Controller
             ]);
         }
 
-
     /* Category Page */
 
-
     /* Category Product Inner  Page */
-
         public function category($route){
 
         $category = Category::where('route' , $route)->with('subcategoryProducts')->get(['id','name','route']);
 
         return response()->json($category);
     }
-
     /*End Category Filter On Inner Page */
 
 

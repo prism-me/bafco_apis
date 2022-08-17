@@ -126,8 +126,8 @@ use Illuminate\Support\Facades\Route;
     /*End Product Inner Page*/
 
 
-    Route::get('category-filters-list/{category}', [\App\Http\Controllers\CategoryFilters::class , 'CategoryFilterList']);
-
+    Route::get('category-filters-list/{category}', [\App\Http\Controllers\CategoryFiltersController::class , 'CategoryFilterList']);
+    Route::get('category-list-filteration', [\App\Http\Controllers\CategoryFiltersController::class , 'CategoryListFilteration']);
 
     Route::get('front-category/{route}', 'FrontProductController@category');
     Route::get('test', 'FrontController@test');

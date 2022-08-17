@@ -16,8 +16,9 @@ class ProductService
 
         try {
 
-            //\DB::beginTransaction();
+            \DB::beginTransaction();
 
+                #Create Product
                 $product = Product::create([
                     "name" => $data['name'],
                     "short_description" => $data['short_description'],
@@ -37,14 +38,30 @@ class ProductService
 
                 ]);
 
-                $variations = $data['variations'];
+                #Adding Headrest and Footrest To the Pivot Table Items Belongs to VariationValues Table
+                $headrests =  $data['headrest'];
+                $footrests =  $data['footrest'];
+                $headrestsFootrests = array_merge($headrests,$footrests);
+
+                foreach($headrestsFootrests  as $headrestsFootrest) {
+
+                    $headrestFootrestVariationId = VariationValues::select('id', 'variation_id')->where('id', $headrestsFootrest)->first();
+                    ProductPivotVariation::create([
+                        "product_id" => $product->id,
+                        "variation_id" => $headrestFootrestVariationId->variation_id,
+                        "variation_value_id" => $headrestsFootrest
+                    ]);
+                }
+
+            #Add VariationItems Using Relationship For ProductVariationTable
+            $variations = $data['variations'];
 
                 foreach ($variations as $variation) {
 
                     $item = $variation['variationItems'];
 
+                    #Variation Combination For FrontEnd DropDown
                     $variationItemValue = VariationValues::whereIn('id', $item)->get(['variation_id', 'name']);
-
                     $variationCombination = [];
                     foreach ($variationItemValue as $value) {
 
@@ -65,35 +82,31 @@ class ProductService
                         "width" => $variation['width'],
                         "description" => $variation['description'],
                         "images" => $variation['images'],
-
+                        "variation_combination" => $variationCombination
 
                     ]);
 
-                    $variationCombination['id'] = $product_variation->id;
-                    $updateVariation['variation_combination'] = $variationCombination;
-                    ProductVariation::where('id' , $product_variation->id )->update($updateVariation);
+                        #Adding Variation Items To the ProductPivotTable
+                        foreach ($item as $values) {
+                            $productVariationId = VariationValues::select('id', 'variation_id')->where('id', $values)->first();
+                            $product_variation->product_variation_name()->create([
+                                "product_id" => $product->id,
+                                "variation_id" => $productVariationId->variation_id,
+                                "variation_value_id" => $values,
+                            ]);
 
-                    foreach ($item as $values) {
-
-                        $productVariationId = VariationValues::select('id', 'variation_id')->where('id', $values)->first();
-                        $product_variation->product_variation_name()->create([
-                            "product_id" => $product->id,
-                            "variation_id" => $productVariationId->variation_id,
-                            "variation_value_id" => $values,
-                        ]);
-
-                    }
+                        }
 
                 }
 
-            //\DB::commit();
+            \DB::commit();
             return response()->json('Data has been saved.', 200);
 
         }
 
         catch (\Exception $e) {
 
-            //\DB::rollBack();
+            \DB::rollBack();
             return response(['Product is not added.', 'stack' => $e->getMessage() , 'line' => $e->getLine()], 500);
         }
 
@@ -104,6 +117,8 @@ class ProductService
     public function updateProduct($data)
     {
         try {
+
+            #Updating Products Against That ID
             $product = Product::where('id', $data['id'])->update([
                 "name" => $data['name'],
                 "short_description" => $data['short_description'],
@@ -122,8 +137,27 @@ class ProductService
                 "seo" => $data['seo'],
             ]);
 
+            #Deleting ALl the  Items against that product_id from PivotTable for headrest , footrest and variation values
+            ProductPivotVariation::where('product_id', $data['id'])->delete();
+
+            #creating headrest and footrest rather than updating them
+            $headrests =  $data['headrest'];
+            $footrests =  $data['footrest'];
+            $headrestsFootrests = array_merge($headrests,$footrests);
+
+            foreach($headrestsFootrests  as $headrestsFootrest) {
+
+                $headrestFootrestVariationId = VariationValues::select('id', 'variation_id')->where('id', $headrestsFootrest)->first();
+                ProductPivotVariation::create([
+                    "product_id" => $data['id'],
+                    "variation_id" => $headrestFootrestVariationId->variation_id,
+                    "variation_value_id" => $headrestsFootrest
+                ]);
+            }
+
             $variations = $data['variations'];
 
+            #Add Product Variation
             foreach ($variations as $variation) {
                 $item = $variation['variationItems'];
                 $variationItemValue = VariationValues::whereIn('id', $item)->get(['variation_id', 'name']);
@@ -149,8 +183,8 @@ class ProductService
                 $updateVariation['variation_combination'] = $variationCombination;
                 ProductVariation::where('id', $variation['id'])->update($updateVariation);
 
-                ProductPivotVariation::where('product_id', $data['id'])->get();
 
+                #Adding ProductVariationItem to The Pivot Table
                 foreach ($item as $values) {
                     $productVariationId = VariationValues::where('id', $values)->first('variation_id');
                     ProductPivotVariation::create([
