@@ -1,5 +1,7 @@
 <?php
 
+use App\Services\payment\PaymentService;
+use App\Services\payment\PostPayPaymentService;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,5 +23,9 @@ Route::get('reset-password/{token}', 'UserController@resetPassword');
 
 
 
+// Route::get('/payment',function(){
+
+//     return (new PaymentService())->pay(new PostPayPaymentService());
+// });
 
 

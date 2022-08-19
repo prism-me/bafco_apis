@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PaymentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -119,6 +120,11 @@ Route::get('addresses/{id}', 'AddressController@index')->middleware('auth:sanctu
 Route::post('addresses', 'AddressController@store')->middleware('auth:sanctum');
 Route::delete('addresses/{address}', 'AddressController@destroy')->middleware('auth:sanctum');
 Route::put('set-default/{id}', 'AddressController@setDefault')->middleware('auth:sanctum');
+
+
+#Payment
+
+Route::post('/checkout' , [PaymentController::class , 'checkout'] );
 
 #Front Controllers
 
