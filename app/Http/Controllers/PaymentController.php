@@ -15,4 +15,20 @@ class PaymentController extends Controller
         return $data;
 
     }
+
+    public function successResponse(Request $request){
+
+        if(!empty($request->order_id) && $request->status === 'APPROVED'){
+            $data = (new PaymentService())->capture(new PostPayPaymentService() , $request); 
+        }
+
+    }   
+
+    public function failedResponse(Request $request){
+        return $request->all();
+    }
+
+
+
+
 }

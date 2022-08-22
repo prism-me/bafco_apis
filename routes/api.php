@@ -125,6 +125,8 @@ Route::put('set-default/{id}', 'AddressController@setDefault')->middleware('auth
 #Payment
 
 Route::post('/checkout' , [PaymentController::class , 'checkout'] );
+Route::get('/paymentSuccess' , [PaymentController::class , 'successResponse']);
+Route::get('/paymentFailed' , [PaymentController::class , 'failedResponse']);
 
 #Front Controllers
 
