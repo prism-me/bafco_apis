@@ -23,12 +23,13 @@ class VariationValues extends Model
 
     public function variant(){
 
-        return $this->hasOne(Variation::class , 'id','variation_id');
+        return $this->hasOne(Variation::class , 'id','variation_id')->select('id','name','route','type');
 
     }
+
 
     public function variationNameValue()
     {
         return $this->belongsToThrough(Category::class, [Product::class ,ProductVariation::class, ProductPivotVariation::class]);
     }
-    }
+}

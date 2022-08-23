@@ -11,7 +11,7 @@ use App\Http\Requests\blog\BlogRequest;
 
 class BlogController extends Controller
 {
-    
+
     public function index()
     {
         try{
@@ -22,15 +22,16 @@ class BlogController extends Controller
             return response()->json($blog, 200);
         }
         catch (\Exception $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
     }
 
     public function store(BlogRequest $request)
     {
+
         try{
 
-            $data = [ 
+            $data = [
                     'title' =>  $request->title ,
                     'sub_title' => $request->sub_title ,
                     'description' =>  $request->description ,
@@ -42,9 +43,9 @@ class BlogController extends Controller
                     'route' => $request->route ,
                     'seo' => $request->seo
             ];
-        
 
-                if(Blog::where('route', $request->route)->exists()  OR Blog::where('id', $request->id)->exists()){ 
+
+                if(Blog::where('route', $request->route)->exists()  OR Blog::where('id', $request->id)->exists()){
 
                     #update
                     $blog = Blog::where('id', $request->id)->update($data);
@@ -63,8 +64,8 @@ class BlogController extends Controller
             return response()->json(['ex_message'=>'Blog Not found.' , 'line' =>$exception->getLine() ], 400);
         }
         catch (\Error $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
-        } 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
     }
 
     public function show(Blog $blog)
@@ -72,7 +73,7 @@ class BlogController extends Controller
         if(!$blog){
             return response()->json('No Record Found.' , 404);
         }
-       
+
         return response()->json($blog , 200);
     }
 

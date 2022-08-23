@@ -30,7 +30,10 @@ class BlogRequest extends FormRequest
             'short_description' => 'required',
             'route' =>'required',
             'tags' =>'required',
-         
+
         ];
     }
+
+
+
 }

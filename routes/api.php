@@ -4,16 +4,7 @@ use App\Http\Controllers\PaymentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+
 
 # Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 #     return $request->user();
@@ -31,7 +22,10 @@ Route::get('sub-category' , 'CategoryController@subCategory');
 #Products
 Route::get('products' , 'ProductController@index');
 Route::post('products' , 'ProductController@store')->middleware('auth:sanctum');
-Route::get('products/{product}' , 'ProductController@show');
+Route::get('products/{id}' , 'ProductController@show');
+Route::put('change-status/{id}' , 'ProductController@changeStatus')->middleware('auth:sanctum');
+Route::get('disable-products' , 'ProductController@disableProducts')->middleware('auth:sanctum');
+
 
 // Route::delete('products/{product}' , 'ProductController@destroy')->middleware('auth:sanctum');
 
@@ -112,7 +106,23 @@ Route::post('promo-codes', 'PromoCodeController@store')->middleware('auth:sanctu
 Route::get('promo-codes/{id}', 'PromoCodeController@show');
 Route::delete('promo-codes/{id}', 'PromoCodeController@destroy')->middleware('auth:sanctum');
 
+#Project
+Route::get('projects', 'ProjectController@index');
+Route::post('projects', 'ProjectController@store')->middleware('auth:sanctum');
+Route::get('projects/{project}', 'ProjectController@show');
+Route::delete('projects/{project}', 'ProjectController@destroy')->middleware('auth:sanctum');
 
+#Project
+Route::get('fabrics ', 'FabricController@index');
+Route::post('fabrics', 'FabricController@store')->middleware('auth:sanctum');
+Route::get('fabrics/{id}', 'FabricController@show');
+Route::delete('fabrics/{id}', 'FabricController@destroy')->middleware('auth:sanctum');
+
+#
+Route::get('fabrics ', 'BrochureController@index');
+Route::post('fabrics', 'BrochureController@store')->middleware('auth:sanctum');
+Route::get('fabrics/{id}', 'BrochureController@show');
+Route::delete('fabrics/{id}', 'BrochureController@destroy')->middleware('auth:sanctum');
 
 
 #Cart
@@ -131,17 +141,23 @@ Route::get('/paymentSuccess' , [PaymentController::class , 'successResponse']);
 Route::get('/paymentFailed' , [PaymentController::class , 'failedResponse']);
 
 #Front Controllers
-
 /*Product Inner page*/
+
 Route::get('front-products/{route}', 'FrontProductController@frontProducts');
-Route::get('product-detail/{route}', 'FrontProductController@productDetail');
+Route::get('product-detail/{route}/{id?}', 'FrontProductController@productDetail');
+//Route::post('variation-change', 'FrontProductController@variationChange');
 
 Route::get('home-product-category-filter/{route}', 'FrontProductController@homeProductCategoryFilter');
-Route::get('filters-listing/{route}', 'FrontProductController@filterListing');
 Route::get('product-filter-data', 'FrontProductController@filterProductData');
-Route::post('product-detail-variation-filter', 'FrontProductController@productDetailVariationFilter');
+Route::get('related-products/{route}', 'FrontProductController@relatedProducts');
+Route::get('random-products', 'FrontProductController@randomProducts');
 
 /*End Product Inner Page*/
+
+
+Route::get('category-filters-list/{category}', 'CategoryFiltersController@CategoryFilterList');
+Route::post('category-list-filteration','CategoryFiltersController@CategoryListFilteration');
+
 
 Route::get('front-category/{route}', 'FrontProductController@category');
 Route::get('test', 'FrontController@test');
@@ -159,39 +175,39 @@ Route::get('innovations', 'FrontController@innovations');
 #Dashboard CMS
 Route::get('all-users', 'DashboardController@allUsers');
 
-#Forget Password
+#Forgot Password
 Route::post('forget-password', 'UserController@forgetPassword');
 Route::post('submit-reset-password', 'UserController@submitResetPassword');
 
-    Route::group(['prefix' => 'auth'], function ($router) {
+Route::group(['prefix' => 'auth'], function ($router) {
 
-        Route::post('/register', 'UserController@register');
-        Route::post('/email-verification', 'UserController@emailVerify');
+    Route::post('/register', 'UserController@register');
+    Route::post('/email-verification', 'UserController@emailVerify');
 
-        Route::post('/login', 'UserController@login');
-        Route::get('/me','UserController@me')->middleware('auth:sanctum');
-        Route::post('/logout', 'UserController@logout')->middleware('auth:sanctum');
-        Route::post('/update-profile', 'UserController@updateProfile')->middleware('auth:sanctum');
-        Route::post('/change-password', 'UserController@changePassword')->middleware('auth:sanctum');
+    Route::post('/login', 'UserController@login');
+    Route::get('/me','UserController@me')->middleware('auth:sanctum');
+    Route::post('/logout', 'UserController@logout')->middleware('auth:sanctum');
+    Route::post('/update-profile', 'UserController@updateProfile')->middleware('auth:sanctum');
+    Route::post('/change-password', 'UserController@changePassword')->middleware('auth:sanctum');
 
 
 
-        #Wishlist
-        Route::get('wishlists/{id}', 'WishlistController@index')->middleware('auth:sanctum');
-        Route::post('wishlists', 'WishlistController@store')->middleware('auth:sanctum');
-        Route::delete('wishlists/{wishlist}', 'WishlistController@removeWishlist')->middleware('auth:sanctum');
+    #Wishlist
+    Route::get('wishlists/{id}', 'WishlistController@index')->middleware('auth:sanctum');
+    Route::post('wishlists', 'WishlistController@store')->middleware('auth:sanctum');
+    Route::delete('wishlists/{wishlist}', 'WishlistController@removeWishlist')->middleware('auth:sanctum');
 
-        #Promo Check
-        Route::post('promo-check','PromoUserController@promoCheck')->middleware('auth:sanctum');
+    #Promo Check
+    Route::post('promo-check','PromoUserController@promoCheck')->middleware('auth:sanctum');
 
-        #Cart
-        Route::get('cart/{id}', 'CartController@index')->middleware('auth:sanctum');
-        Route::post('cart', 'CartController@store')->middleware('auth:sanctum');
-        Route::delete('remove-cart/{id}', 'CartController@removeCart')->middleware('auth:sanctum');
-        Route::delete('clear-all-cart/{id}', 'CartController@clearAllCart')->middleware('auth:sanctum');
-        Route::post('cart-qty', 'CartController@incrementQty')->middleware('auth:sanctum');
+    #Cart
+    Route::get('cart/{id}', 'CartController@index')->middleware('auth:sanctum');
+    Route::post('cart', 'CartController@store')->middleware('auth:sanctum');
+    Route::delete('remove-cart/{id}', 'CartController@removeCart')->middleware('auth:sanctum');
+    Route::delete('clear-all-cart/{id}', 'CartController@clearAllCart')->middleware('auth:sanctum');
+    Route::post('cart-qty', 'CartController@incrementQty')->middleware('auth:sanctum');
 
-    });
+});
 
 Route::fallback(function () {
     return response()->json(['message'=>'Invalid Route'] , 400);

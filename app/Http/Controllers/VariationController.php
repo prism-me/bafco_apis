@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests\variation\VariationRequest;
 use Validator;
 class VariationController extends Controller
-{   
-    
+{
+
     /**
      * Display a listing of the resource.
      *
@@ -16,9 +16,9 @@ class VariationController extends Controller
      */
     public function index()
     {
-      
+
         try{
-            
+
             $variation = Variation::with('variantValues:id,variation_id,name,type,type_value')->get();
 
             if($variation->isEmpty()){
@@ -27,7 +27,7 @@ class VariationController extends Controller
             return response()->json($variation, 200);
         }
         catch (\Exception $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
     }
 
@@ -44,9 +44,9 @@ class VariationController extends Controller
         $data['type'] = isset( $request->type ) ? $request->type:'';
         try{
 
-           $data['name'] = strtolower($request->name);
+           $data['route'] = strtolower($request->route);
 
-           if(Variation::where('route', $request->route)->exists()){ 
+           if(Variation::where('route', $request->route)->exists()){
                 //update
                 $variation = Variation::where('route',$request->route)->update($data);
 
@@ -62,11 +62,11 @@ class VariationController extends Controller
             return response()->json(['ex_message'=>'Variation Not found.' , 'line' =>$exception->getLine() ], 400);
         }
         catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);
         }
         catch (\Error $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
-        } 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
     }
 
     /**
@@ -77,7 +77,7 @@ class VariationController extends Controller
      */
     public function show(Variation $variation)
     {
-        
+
         if(!$variation){
             return response()->json(['data'=> 'No Record Found.'] , 404);
         }
@@ -94,7 +94,7 @@ class VariationController extends Controller
     public function destroy(Variation $variation)
     {
         if($variation->delete()){
-            
+
             return response()->json(['data'=> 'Variation has been deleted.'] , 200);
         }
         return response()->json(['data'=> 'Server Error.'] , 400);

@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Models\Cart;
 use App\Models\CartCalculation;
 use App\Models\Product;
+use DB;
 
 
 
@@ -21,7 +22,6 @@ class CartService {
 
         ];
         $cartValue = Cart::where('product_id', $data['product_id'])->where('variation_id', $data['variation_id'])->where('user_id',$data['user_id'])->first();
-
 
         if( $cartValue){
 

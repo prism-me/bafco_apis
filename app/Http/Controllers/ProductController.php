@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Models\VariationValues;
 use Illuminate\Http\Request;
 use App\Services\ProductService;
 use App\Services\CartService;
@@ -20,13 +21,10 @@ class ProductController extends Controller
 
     public function index()
     {
-        // return substr(exec('getmac'), 0, 17);
-        //return $req->ip();
-
         try{
             // DB::enableQueryLog();
 
-            return Product::with('variations','category','variations.variation_items')->get();
+            return Product::with('variations','category','variations.variation_items')->where('status', 1)->get();
 
 
             // return DB::getQueryLog();
@@ -65,7 +63,7 @@ class ProductController extends Controller
     }
 
 
-    public function store(ProductRequest $request) 
+    public function store(ProductRequest $request)
     {
         try{
 
@@ -73,6 +71,7 @@ class ProductController extends Controller
 
 
                 $product = ProductService::updateProduct($request->all());
+                return $product;
 
             }else{
 
@@ -90,12 +89,13 @@ class ProductController extends Controller
     }
 
 
-    public function show(Product $product)
+    public function show($id)
     {
 
-        $productData =  Product::with('variations')->where('route', $product->route)->first();
+
+        $productData =  Product::with('variations')->where('id',$id)->first();
         foreach ($productData['variations'] as $variant){
-            $data = ProductPivotVariation::where('product_variation_id', $variant->id)->get(['id','variation_value_id']);
+            $data = ProductPivotVariation::where('product_variation_id', $variant->id)->pluck('variation_value_id');
             $variant['variationItems'] = $data;
         }
         return response()->json($productData , 200);
@@ -110,11 +110,25 @@ class ProductController extends Controller
 
 
 
+    public function disableProducts(){
+
+        try{
+
+            return Product::with('variations','category','variations.variation_items')->where('status', 0)->get();
+
+        }
+        catch (\Exception $exception) {
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
+    }
 
 
-    public function destroy(Product $product)
+    public function changeStatus(Request $request , $id)
     {
 
+        $data['status'] = $request->status;
+        Product::where('id',$id)->update($data);
+        return response()->json('Product Disabled Successfully!', 200);
     }
 
 

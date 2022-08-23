@@ -42,32 +42,45 @@ class UserService {
 
         public function changePassword($data){
 
+
             $user = User::where('id', $data['user_id'])->first();
 
             if ($user->exists()) {
-                $password =  Hash::check( $data['password'],  $user['password']);
-                if($password == 1){
+                $password =  Hash::check( $data['change_password'],  $user['password']);
+                $currentPassword =  Hash::check( $data['password'],  $user['password']);
 
-                    echo json_encode(['message' => 'Current Password and New Password cannot be same.']);
+                if( $currentPassword == 1){
 
-                }else{
+                    if($password == 1){
 
-                    $data['password'] = bcrypt($data['password']);
-                    unset($data['user_id']);
-                    unset($data['change_password']);
-//
-//                   User::where('id', $data['user_id'])->first();
-                    $isUserUpdated = User::where('email', $user['email'])->update($data);
+                        echo json_encode(['message' => 'Current Password and New Password cannot be same']);
 
-                    if ($isUserUpdated) {
+                    }else{
 
-                        echo json_encode(['message' => 'Data Updated successfully.']);
+                        $update['password'] = bcrypt($data['change_password']);
+                        unset($data['user_id']);
+                        unset($data['change_password']);
+                        unset($data['confirm_password']);
 
-                    } else {
+                        $isUserUpdated = User::where('email', $user['email'])->update($update);
 
-                        echo json_encode(['message' => 'Wrong Information']);
+                        if ($isUserUpdated) {
+
+                            echo json_encode(['message' => 'Data Updated successfully.']);
+
+                        } else {
+
+                            echo json_encode(['message' => 'Wrong Information']);
+                        }
+
+
+
                     }
 
+                }
+                else{
+
+                    echo json_encode(['message' => 'Wrong Current Password']);
                 }
 
 

@@ -8,7 +8,7 @@ use Validator;
 use DB;
 use App\Http\Requests\variant_values\VariationValueRequest;
 class VariationValueController extends Controller
-{   
+{
     /**
      * Display a listing of the resource.
      *
@@ -29,9 +29,9 @@ class VariationValueController extends Controller
             }
             return response()->json($variation_values, 200);
         }
-       
+
         catch (\Exception $eexception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
     }
 
@@ -41,7 +41,7 @@ class VariationValueController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    //form request 
+    //form request
     public function store(VariationValueRequest $request)
     {
         $data['variation_id'] = isset( $request->variation_id ) ? $request->variation_id:null;
@@ -50,9 +50,8 @@ class VariationValueController extends Controller
         $data['type'] = isset( $request->type ) ? $request->type:'';
         $data['type_value'] = isset( $request->type_value ) ? $request->type_value:'';
         try{
-            $data['name'] = strtolower($request->name);
-            
-           if(VariationValues::where('route', $request->route)->exists()){ 
+            $data['route'] = strtolower($request->route);
+           if(VariationValues::where('route', $request->route)->exists()){
             //update
                 $variation_values = VariationValues::where('route',$request->route)->update($data);
            }else{
@@ -69,11 +68,11 @@ class VariationValueController extends Controller
             return response()->json(['ex_message'=>'Variation Values Not found.' , 'line' =>$exception->getLine() ], 400);
         }
         catch(QueryException $exception){
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);   
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine() ], 400);
         }
         catch (\Error $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
-        } 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
     }
 
     /**
@@ -83,14 +82,14 @@ class VariationValueController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(VariationValues $variation_value)
-    {   
+    {
         if(!$variation_value){
             return response()->json(['data'=> 'No Record Found.'] , 404);
         }
         $variation_value->variation_name = $variation_value->variant->name;
 
         unset($variation_value->variant);
-        
+
         return response()->json(['data'=> $variation_value] , 200);
     }
 

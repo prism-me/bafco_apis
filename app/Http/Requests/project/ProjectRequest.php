@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\user;
+namespace App\Http\Requests\project;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ResetRequest extends FormRequest
+class ProjectRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,13 @@ class ResetRequest extends FormRequest
     public function rules()
     {
         return [
-            'change_password' => 'string|min:6',
-            'confirm_password' => 'same:change_password'
+            'type' => 'required',
+            'title' => 'required|min:3',
+            'description' => 'required',
+            'route' =>'required'
         ];
     }
-}
 
+
+
+}
