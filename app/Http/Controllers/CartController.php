@@ -24,9 +24,9 @@ class CartController extends Controller
 
                 $i=0;
                 foreach($cart as $cartValue){
+
                     $data[$i]['productData'] = Product::where('id',$cartValue->product_id)->with('productCategory.parentCategory')->get(['name','id', 'route' ,'category_id']);
-                    $data[$i]['variation'] = ProductVariation::where('id',$cartValue->product_variation_id)->get(['product_id' , 'images']);
-                    $data[$i]['variation_value'] = VariationValues::where('id',$cartValue->variation_value_id)->get(['id' , 'variation_id','name','type_value']);
+                    $data[$i]['variation'] = ProductVariation::where('id',$cartValue->product_variation_id)->with('productVariationName.productVariationValues.variant')->get(['id','product_id' , 'images']);
                     $data[$i]['qty'] = $cartValue->qty;
                     $data[$i]['total'] = $cartValue->total;
                     $i++;
@@ -56,12 +56,11 @@ class CartController extends Controller
 
             $data = $request->all();
             $cart = CartService::addToCart($data);
-            $cart = Cart::where('id',$cart->id)->first();
-            $cartData = $this->cartData($cart);
+
 
             if($cart){
 
-                return response()->json($cartData , 200);
+                return response()->json($cart , 200);
 
             }else{
 
@@ -97,69 +96,30 @@ class CartController extends Controller
 
     public function incrementQty(Request $request){
 
-        $data['qty'] = $request['qty'];
-        $cartUpdate = Cart::where('id',$request->cart_id)->update($data);
-        $cart = Cart::where('id',$request->cart_id)->first();
-        $cartData = $this->cartData($cart);
+        try{
 
-        if($cart){
+            $data = $request->all();
+            $cart = CartService::incrementQty($data);
 
-            return response()->json($cartData , 200);
+            if($cart){
 
-        }else{
-
-            return response()->json('Something went wrong!', 404);
-        }
-
-    }
-
-    public function cartData($cart){
-
-        try {
-
-            DB::beginTransaction();
-                $productDetail = Product::where('id',$cart->product_id)->with('cartCategory.parentCategory' )->first(['name','featured_image','route','category_id']);
-                $productVariant = ProductVariation::where('id',$cart->product_variation_id)->first(['id','code','upper_price']);
-                $variationValue = VariationValues::where('id',$cart->variation_value_id)->first(['id','variation_id','name']);
-                $quantity =  $cart->qty;
-                $price = $productVariant['upper_price'];
-                $finalPrice = $quantity * $price;
-                $cartPrice = Cart::where('id',$cart->id)->update(['total' => $finalPrice]);
-
-                $cartCalculation =   [
-                    'user_id' => $cart->user_id ,
-                    'total' => $finalPrice,
-                    'sub_total' => $finalPrice
-                ];
-
-                if($cartcal = CartCalculation::where('user_id',$cart->user_id)->exists()){
-
-                    CartCalculation::where('user_id',$cart->user_id)->update($cartCalculation);
+                return response()->json($cart , 200);
 
             }else{
 
-                $cartCalculation = CartCalculation::create($cartCalculation);
-
+                return response()->json('Something went wrong!', 404);
             }
-
-            DB::commit();
-                $data = $productDetail;
-                $data['variation'] = $productVariant;
-                $data['variationValue'] = $variationValue;
-                $data['quantity'] = $quantity;
-                $data['total'] = $finalPrice;
-
-            return $data;
-
-        } catch (\Exception $e) {
-
-            DB::rollBack();
-                return response()->json(['Product is not added.', 'stack' => $e], 500);
+        }
+        catch (ModelNotFoundException  $exception) {
+            return response()->json(['ex_message'=>'Cart Value Not found.' , 'line' =>$exception->getLine() ], 400);
+        }
+        catch (\Error $exception) {
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
 
-
-
     }
+
+
 
 
 

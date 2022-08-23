@@ -18,8 +18,6 @@ class CreateCartsTable extends Migration
             $table->string('user_id')->nullable();
             $table->string('product_id')->nullable();
             $table->string('qty')->nullable();
-            $table->string('variation_id')->nullable();
-            $table->string('variation_value_id')->nullable();
             $table->string('product_variation_id')->nullable();
             $table->decimal('total')->nullable();
 
