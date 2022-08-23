@@ -21,13 +21,10 @@ class ProductController extends Controller
 
     public function index()
     {
-        // return substr(exec('getmac'), 0, 17);
-        //return $req->ip();
-
         try{
             // DB::enableQueryLog();
 
-            return Product::with('variations','category','variations.variation_items')->get();
+            return Product::with('variations','category','variations.variation_items')->where('status', 1)->get();
 
 
             // return DB::getQueryLog();
@@ -113,6 +110,17 @@ class ProductController extends Controller
 
 
 
+    public function disableProducts(){
+
+        try{
+
+            return Product::with('variations','category','variations.variation_items')->where('status', 0)->get();
+
+        }
+        catch (\Exception $exception) {
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
+    }
 
 
     public function changeStatus(Request $request , $id)

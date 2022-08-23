@@ -135,7 +135,7 @@ class Product extends Model
     public function getProductDetail($fields){
 
         return [
-            'product_variation_details' => ProductVariation::find($fields['product_variation_id']),
+                'product_variation_details' => ProductVariation::find($fields['product_variation_id']),
             'variation_details' => Variation::find($fields['variation_id']),
             'variation_value_details' => VariationValues::find($fields['variation_value_id'])
         ];

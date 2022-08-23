@@ -37,9 +37,9 @@ class Handler extends ExceptionHandler
      * @return void
      */
     public function register()
-    {   
+    {
         //not found exception controll
-       
+
         $this->renderable(function (Exception $e, $request) {
            $class = class_basename($e);
             dd($class);
@@ -61,15 +61,15 @@ class Handler extends ExceptionHandler
                 return response()->json(['ex_message' => 'Invalid Route or method.' ,'type' => 'MethodNotAllowedHttpException'], 404);
             }
         });
-        
+
                // route not found exception controll
         $this->renderable(function (BadMethodCallException $e, $request) {
             if ($request->is('v1/api/*')) {
                 return response()->json(['ex_message' => 'Bad Request.' ,'type' => 'BadMethodCallException'], 404);
             }
         });
-        
-        
+
+
 
         $this->renderable(function (ModelNotFoundException $e, $request) {
             if ($request->is('v1/api/*')) {
@@ -77,8 +77,10 @@ class Handler extends ExceptionHandler
             }
         });
 
-      
-        
+
+
+
+
 
 
     }
@@ -99,13 +101,13 @@ class Handler extends ExceptionHandler
     //         case 'TokenMismatchException':
 
     //             return response()->json(['error' => 66, 'errors' => ['forms' => 'Your request was denied. Please try again or reload your page']], 403);
-                
+
     //         break;
     //         case 'ThrottleRequestsException':
     //             return response()->json(['errors' => ['forms' => 'You have been rate limited, please try again shortly']], 429);
     //         break;
     //         case 'MethodNotAllowedHttpException':
-           
+
     //                 return response()->json(['errors' => ['forms' => 'Method Not Allowed']],405);
 
     //         break;
@@ -115,7 +117,7 @@ class Handler extends ExceptionHandler
 
     //         break;
     //         case 'MaintenanceModeException':
-              
+
     //                 return response()->json(['errors' => ['forms' => 'The site is currently down for maintenance, please check back with us soon']],503);
 
     //         break;

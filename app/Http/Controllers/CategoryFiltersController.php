@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 
+use App\Http\Resources\ProductVariation;
 use App\Models\Category;
 use App\Models\Product;
+
 use Illuminate\Http\Request;
 use DB;
 use Illuminate\Support\Facades\Redis;
@@ -39,46 +41,42 @@ class CategoryFiltersController extends Controller
 
     }
 
-    public function CategoryListFilteration(Request $request){
 
-        $brand = str_replace('-', ' ', $request->brand);
-        $filtered =  DB::select("CALL CategoryFilterList('". $request->category ."')");
 
-        $filtered->filter(function ($value, $key) {
-            dd($value);
-        });
+    public function CategoryListFilteration(Request $request)
+    {
+        $brand = $request->brand;
+        $categoryId = $request->category_id;
+        $max = $request->max;
+        $min = $request->min;
+        $variationItems = $request->variationItems;
 
-        //return response()->json(['data' => $filtered] , 200);
+        $query = Product::where('category_id',$categoryId)->with('category.parent');
+        if (isset($brand)) {
+
+            $query->where('brand', $brand);
+        }
+
+        #Price Range
+        if ($min && $max !== null) {
+            $query->leftJoin('product_variations', 'products.id', '=', 'product_variations.product_id')
+                ->whereBetween('lower_price', [$min,$max]);
+
+        }else{
+
+            $query->leftJoin('product_variations', 'products.id', '=', 'product_variations.product_id');
+        }
+
+        $products = $query->get();
+        return new ProductVariation($products);
+
     }
 
 
 
 
-// $results = Order::when(!empty($request->startDate), function($q){
-//     $start = Carbon::createFromFormat('Y-m-d', request('startDate'))->startOfDay();
-//     $q->where('created_at','>=', $start);
 
-// })
-// ->when(!empty($request->endDate), function($q){
-//     $end = Carbon::createFromFormat('Y-m-d', request('endDate'))->endOfDay();
-//     $q->where('created_at', '<=', $end);
-// })
-// ->when(!empty($request->orderStatus), function($q){
-//     $q->where('status', request('orderStatus'));
-// })
-// ->when(!empty($request->paymentMethod), function($q){
-//     $q->where('paymentmethod', request('paymentMethod'));
-// })
-// ->when(count($request->all()) === 0, function($q){
-//     return ['data'=>'No record found.','status'=>404];
-// })->get();
-// //->where('status', $request->orderStatus)->get();
 
-// if($results->count() > 0){
-//      return response($results , 200);
-// }else{
-//     return ['data'=>'No record found.','status'=>404];
-// }
 
 
 

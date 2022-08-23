@@ -25,19 +25,15 @@ class ProductRequest extends FormRequest
     {
         return [
             "name" => "required|min:3",
-            "featured_image" => "required",        
+            "featured_image" => "required",
             "short_description" =>"required|min:6",
             "long_description" => "required|min:6",
-            "shiping_and_return" => "required",
             "category_id" => "required",
-            "related_categories" => "required",//array
-            "promotional_images"=> "required",//array
             "brand" => "required",
-            "album" => "required", //array
             // "download" => "required",
             "variations" => "required",
             // "dimentions" => "required",
-            "route" => "required", 
+            "route" => "required",
             //"seo" => "required"
         ];
     }
