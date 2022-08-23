@@ -30,7 +30,7 @@ class PostPayPaymentService implements PaymentInterface {
             ])->post($this->baseURL .'/checkouts', $request->all());
             
              $data = $response->json();
-            
+
             if($response->getStatusCode() == 200 && !empty($data->token)) {
                return $data->redirect_url;
             }else{
@@ -45,18 +45,17 @@ class PostPayPaymentService implements PaymentInterface {
 
 
     public function capturePayment($request){
-    
         try{
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . $this->baseCode,
                 ])->post($this->baseURL .'/orders'. '/' .$request->order_id.'/capture');
                 
                  $data = $response->json();
-                    return $data;
-                if($response->getStatusCode() == 200 && !empty($data->token)) {
-                   return $data->redirect_url;
+
+                if($response->getStatusCode() == 200 AND $data['order_id'] == $request->order_id AND $data['status'] == 'captured') {
+                   return $data;
                 }else{
-                    return $data;
+                    return 'Error';
                 }   
             }
             catch(RESTfulException $e) {
@@ -65,6 +64,7 @@ class PostPayPaymentService implements PaymentInterface {
     
 
     }
+
     // public function successResponse($data){
 
     //     return $data;

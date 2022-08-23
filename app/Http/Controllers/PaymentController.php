@@ -16,11 +16,27 @@ class PaymentController extends Controller
 
     }
 
-    public function successResponse(Request $request){
+    public function guestCheckout(Request $request){
 
+        $orderNumber = 'OR'. rand(999 , 999999);
+
+        
+
+    }
+
+    public function authCheckout(Request $request){
+        return 'login users checkout';
+    } 
+
+    public function successResponse(Request $request){
+        
         if(!empty($request->order_id) && $request->status === 'APPROVED'){
             $data = (new PaymentService())->capture(new PostPayPaymentService() , $request); 
+            
+            return $data;
         }
+
+        return 'invlaid request';
 
     }   
 
