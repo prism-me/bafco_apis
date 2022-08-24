@@ -25,7 +25,7 @@ class WishlistController extends Controller
             $i = 0;
             foreach ($wishlist as $wishlistValue) {
                 $data[$i]['productData'] = Product::where('id', $wishlistValue->product_id)->with('productCategory.parentCategory')->get(['name', 'id', 'route', 'category_id']);
-                $data[$i]['variation'] = ProductVariation::where('id',$wishlistValue->product_variation_id)->get(['id','product_id' , 'images']);
+                $data[$i]['variation'] = ProductVariation::where('id',$wishlistValue->product_variation_id)->with('productVariationName.productVariationValues.variant')->get(['id','product_id' , 'images']);
                 $i++;
             }
 

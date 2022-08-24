@@ -3,6 +3,8 @@
 namespace App\Services;
 use App\Models\Wishlist;
 use App\Models\Category;
+use App\Models\ProductVariation;
+use DB;
 
 use App\Models\Product;
 
@@ -23,7 +25,7 @@ class WishlistService {
         if( $wishlistValue){
 
             $wishlist = Wishlist::where('id',$wishlistValue->id)->first();
-            $wishlistData = $this->WishlistDetail($wishlist);
+            $wishlistData = (new WishlistService)->WishlistDetail($wishlist);
             return $wishlistData;
 
         }else{
@@ -31,9 +33,8 @@ class WishlistService {
             #create
             $wishlistCreate = Wishlist::create($create);
             $wishlist = Wishlist::where('id',$wishlistCreate->id)->first();
-            $wishlistData = $this->WishlistDetail($wishlist);
+            $wishlistData = (new WishlistService)->WishlistDetail($wishlist);
             return $wishlistData;
-
 
         }
 

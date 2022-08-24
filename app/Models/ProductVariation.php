@@ -35,6 +35,7 @@ class ProductVariation extends Model
 
 
     /* Product Detail */
+
     public function hasOnePivot(){
         return $this->hasOne(ProductPivotVariation::class);
     }

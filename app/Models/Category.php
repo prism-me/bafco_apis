@@ -44,11 +44,11 @@ class Category extends Model
 
     public function subcategoryProducts(){
 
-        return $this->hasMany(Category::class , 'parent_id','id')->with('products')->select('id','name','route','parent_id');
+        return $this->hasMany(Category::class , 'parent_id','id')->with('products')->select('id','name','route','parent_id','featured_image','description');
     }
 
     public function products(){
-        return $this->hasMany(Product::class , 'category_id','id')->select('id','name','route',  'category_id','featured_image');
+        return $this->hasMany(Product::class , 'category_id','id')->select('id','name','route',  'brand','category_id','featured_image');
 
     }
 
