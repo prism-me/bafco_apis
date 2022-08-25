@@ -172,7 +172,7 @@ Route::get('services', 'FrontController@services');
 Route::get('innovations', 'FrontController@innovations');
 
 
-#Dashboard CMS
+#Dashboard CMS changed
 Route::get('all-users', 'DashboardController@allUsers');
 
 #Forgot Password
