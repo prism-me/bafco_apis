@@ -18,14 +18,16 @@ class PaymentController extends Controller
 
     public function guestCheckout(Request $request){
 
-        $orderNumber = 'OR'. rand(999 , 999999);
-
         
+        $result = (new PaymentService())->guestCheckoutService($request);
+        return $result;
+
 
     }
 
     public function authCheckout(Request $request){
-        return 'login users checkout';
+        $result = (new PaymentService())->authCheckoutService($request);
+        return $result;
     } 
 
     public function successResponse(Request $request){

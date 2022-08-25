@@ -35,7 +35,7 @@ class RegisterService {
             $fourRandomDigit = rand(10000,99999);
             $userData['code'] = $fourRandomDigit;
             $userCreate = TempUser::create($userData);
-            event(new RegisterCreate($userData));
+            // event(new RegisterCreate($userData));
             return json_encode(['message' => 'E-Mail Verification has been sent to your registered account!','status' => 200]);
         }
 
