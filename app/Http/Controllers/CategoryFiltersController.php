@@ -3,12 +3,9 @@
 namespace App\Http\Controllers;
 
 
-use App\Http\Resources\ProductVariation;
 use App\Models\Category;
-use App\Models\Product;
-
-use Illuminate\Http\Request;
 use DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
 class CategoryFiltersController extends Controller
@@ -50,53 +47,59 @@ class CategoryFiltersController extends Controller
         $max = $request->max;
         $min = $request->min;
 
-        $category = Category::with(['parentCategory'])->where('route',$route)->first();
+        $category = Category::with(['parentCategory'])->where('route', $route)->first();
+        $products = "" ;
+        if($brand && $min && $max !== null ){
 
-        #Brands
-        if (isset($brand)) {
+            $products =  Category::with(['parentCategory'])->with(['products' => function($query) use($brand,$category,$min, $max) {
+                                                                        $query->where('brand', '=', $brand)
+                                                                    ->with(['productvariations' =>  function ($range) use ($min, $max) {
+                                                                        $range->where('lower_price', '>=', $min)->where('upper_price', '<=', $max);
+                                                                        }]);
+                                                                    }])
+                                                                    ->whereHas('products.productvariations')
+                                                                    ->where('id',$category->id)
+                                                                    ->first();
 
+
+        }elseif( isset($brand) !== null){
+
+            #Brands
             $products = Category::with(['parentCategory'])->with(['products'=> function($query) use($brand,$category) {
-                $query->where('brand','=', $brand)->where('category_id',$category->id)->with(['productvariations']);
-            }])->where('id',$category->id)->get();
+                                                                $query->where('brand','=', $brand)
+                                                                ->where('category_id',$category->id)
+                                                                ->with(['productvariations']);
+                                                            }])
+                                                            ->where('id',$category->id)->first();
+
+
+        }elseif($min && $max !== null){
+
+            #Price Range
+            $products = Category::with(['parentCategory'])
+                                            ->with(['products.productvariations' => function ($range) use ($min, $max) {
+                                                $range->where('lower_price', '>=', $min)->where('upper_price', '<=', $max);
+
+
+                                            }])
+                                                ->whereHas('products.productvariations')
+                                                ->where('id', $category->id)
+                                                ->first();
+
+
+        }else {
+                return response()->json('No Product Found',404);
 
         }
 
-        #Price Range
-        if ( $min && $max !== null) {
-
-            $productId =  Category::with(['parentCategory'])->with(['products.productvariations' => function ($range) use ($min, $max) {
-                        $range->whereBetween('lower_price', [$min, $max]);
-                        }])->where('id',$category->id);
-
-            foreach($productId as $product){
-
-                if(isset( $product['products'][0]['productvariations']['product_id']) !== null) {
-
-                    $id = $product['products'][0]['productvariations']['product_id'];
-
-                    $products = Category::with(['parentCategory'])
-                                                        ->with(['products' => function ($productsID) use ($productId, $min, $max,$category,$id) {
-                                                            $productsID->where('id', $id)
-
-                                                        ->with(['productvariations' => function ($range) use ($min, $max, $productId ,$id) {
-                                                            $range->whereBetween('lower_price', [$min, $max])
-                                                                ->where('product_id', $id);
-                                                        }]);
-                                                                }])
-                                                        ->where('id', $category->id)->get();
-                }
-
-            }
-
-        }
-
-        return  $products;
-
+        return response()->json($products);
 
 
 
 
     }
+
+
 
 
 

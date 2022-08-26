@@ -25,6 +25,10 @@ class Category extends Model
         return $this->hasMany(Category::class , 'parent_id','id');
     }
 
+    public function headerChild(){
+        return $this->hasMany(Category::class , 'parent_id','id')->select('id','name','route','parent_id','featured_image');
+    }
+
     public function parent(){
         return $this->hasOne(Category::class , 'parent_id','id');
     }

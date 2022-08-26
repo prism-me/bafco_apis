@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductPivotVariation;
-use App\Models\Variation;
 use App\Models\ProductVariation;
 use App\Models\VariationValues;
-use Illuminate\Http\Request;
 use DB;
+
 class FrontProductController extends Controller
 {
 
@@ -55,6 +54,7 @@ class FrontProductController extends Controller
 
         ];
         $dimensions = ProductVariation::where('product_id',$productDetails->id)->get(['product_id', 'id','code','lc_code','height','depth','width' ,'images']);
+
         $i=0;
         foreach($dimensions as $value){
             $dimensions[$i]['images'] =     $value['images'][0];
@@ -114,18 +114,6 @@ class FrontProductController extends Controller
         return response()->json($category);
     }
 
-    #not in use might need later
-    //    public function variationChange(Request $request){
-    //
-    //
-    //        $productVariationId = ProductPivotVariation::where('product_id',$request->product_id)->whereIn('variation_value_id',$request->item)->get();
-    //        $id = $productVariationId[0]['product_variation_id'];
-    //        $productSingleVariation['product_variation_details'] = ProductVariation::where('id',$id)->first();
-    //        $productSingleVariation['variation_value_details'] = ProductPivotVariation::where('product_variation_id',$id)->with('variation_values.variant')->get();
-    //
-    //        return response()->json(['product_single_variation' => $productSingleVariation]);
-    //    }
-
     public function relatedProducts($route){
         $category = Category::where('route',$route)->first();
         $relatedProducts = Product::with('productCategory','productvariations.productVariationName.productVariationValues')->where('category_id',$category->id)->paginate(4);
@@ -142,6 +130,34 @@ class FrontProductController extends Controller
 
     }
     /*End Category Filter On Inner Page */
+
+
+    /* Head Category */
+
+    public function headerCategory(){
+
+       $category = Category::with(['headerChild'])->get(['id','name','route','parent_id','featured_image']);
+       return response($category,200);
+    }
+
+    /*End Head Category*/
+
+    /*Top Selling Prodcuts*/
+
+    public function topSellingProductsCategory(){
+        $category = Category::where('parent_id', NULL)->get(['id','name','route']);
+        return response($category,200);
+    }
+
+    public function topSellingProducts($id){
+        $category = Category::with('child')->where('id', $id)->get();
+        $products = Category::where('parentCategory','products.productvariations.productVariationName.productVariationValues')->where('id',$category)->get();
+        return response($products,200);
+    }
+
+
+
+    /* End Top Selling Products*/
 
 
 

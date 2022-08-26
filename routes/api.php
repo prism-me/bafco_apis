@@ -1,9 +1,7 @@
 <?php
 
 use App\Http\Controllers\PaymentController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 
 
 # Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -160,7 +158,10 @@ Route::post('category-list-filteration','CategoryFiltersController@CategoryListF
 
 
 Route::get('front-category/{route}', 'FrontProductController@category');
-Route::get('test', 'FrontController@test');
+Route::get('header-category', 'FrontProductController@headerCategory');
+Route::get('top-selling-products', 'FrontProductController@topSellingProducts');
+Route::get('top-selling-products-category-list', 'FrontProductController@topSellingProductsCategory');
+
 
 
 

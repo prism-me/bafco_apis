@@ -4,7 +4,6 @@ namespace App\Services;
 use App\Models\Product;
 use App\Models\ProductPivotVariation;
 use App\Models\ProductVariation;
-use App\Models\Variation;
 use App\Models\VariationValues;
 
 class ProductService
@@ -46,16 +45,6 @@ class ProductService
 
                 $item = $variation['variationItems'];
 
-                #Variation Combination For FrontEnd DropDown
-                $variationItemValue = VariationValues::whereIn('id', $item)->get(['variation_id', 'name']);
-                $variationCombination = [];
-                foreach ($variationItemValue as $value) {
-
-                    $variationValue = Variation::where('id', $value['variation_id'])->pluck('name');
-                    $variationCombination[$variationValue[0]] = $value['name'];
-                }
-
-
                 $product_variation = $product->variations()->create([
                     "code" => $variation['code'],
                     "lc_code" => $variation['lc_code'],
@@ -71,10 +60,6 @@ class ProductService
 
 
                 ]);
-
-                $variationCombination['id'] = $product_variation->id;
-                $updateVariation['variation_combination'] = $variationCombination;
-                ProductVariation::where('id', $product_variation->id)->update($updateVariation);
 
                 #Adding Variation Items To the ProductPivotTable
                 foreach ($item as $values) {
@@ -109,6 +94,7 @@ class ProductService
         try {
 
             #Updating Products Against That ID
+
             $product = Product::where('id', $data['id'])->update([
                 "name" => $data['name'],
                 "short_description" => $data['short_description'],
@@ -127,22 +113,42 @@ class ProductService
                 "seo" => $data['seo'],
             ]);
 
+
             #Deleting ALl the  Items against that product_id from PivotTable for headrest , footrest and variation values
             ProductPivotVariation::where('product_id', $data['id'])->delete();
 
 
-            $variations = $data['variations'];
+            $variations =  $data['variations'];
 
             #Add Product Variation
             foreach ($variations as $variation) {
-                $item = $variation['variationItems'];
-                $variationItemValue = VariationValues::whereIn('id', $item)->get(['variation_id', 'name']);
-                $variationCombination = [];
-                foreach ($variationItemValue as $value) {
-                    $variationValue = Variation::where('id', $value['variation_id'])->pluck('name');
-                    $variationCombination[$variationValue[0]] = $value['name'];
-                }
-                $product_variation = ProductVariation::where('id', $variation['id'])->update([
+
+
+                if(ProductVariation::where('id', @$variation['id'])->exists()) {
+
+                    $product_variation = ProductVariation::where('id', $variation['id'])->first();
+
+                    $product_variation->update([
+                        "product_id" => $data['id'],
+                        "code" => $variation['code'],
+                        "lc_code" => $variation['lc_code'],
+                        "cbm" => $variation['cbm'],
+                        "in_stock" => $variation['in_stock'],
+                        "upper_price" => $variation['upper_price'],
+                        "lower_price" => $variation['lower_price'],
+                        "height" => $variation['height'],
+                        "depth" => $variation['depth'],
+                        "width" => $variation['width'],
+                        "description" => $variation['description'],
+                        "images" => $variation['images'],
+                    ]);
+
+
+
+                }else{
+
+                $product_variation = ProductVariation::create([
+                    "product_id" => $data['id'],
                     "code" => $variation['code'],
                     "lc_code" => $variation['lc_code'],
                     "cbm" => $variation['cbm'],
@@ -155,21 +161,32 @@ class ProductService
                     "description" => $variation['description'],
                     "images" => $variation['images'],
                 ]);
-                $variationCombination['id'] = $variation['id'];
-                $updateVariation['variation_combination'] = $variationCombination;
-                ProductVariation::where('id', $variation['id'])->update($updateVariation);
 
 
-                #Adding ProductVariationItem to The Pivot Table
-                foreach ($item as $values) {
-                    $productVariationId = VariationValues::where('id', $values)->first('variation_id');
-                    ProductPivotVariation::create([
-                        "product_id" => $data['id'],
-                        "product_variation_id" => $variation['id'],
-                        "variation_id" => $productVariationId->variation_id,
-                        "variation_value_id" => $values
-                    ]);
-                }
+
+            }
+
+
+
+
+
+                    $item = $variation['variationItems'];
+
+                    #Adding ProductVariationItem to The Pivot Table
+
+                    foreach ($item as $values) {
+
+                        $productVariationId = VariationValues::where('id', $values)->first();
+                            ProductPivotVariation::create([
+                                "product_id" => $data['id'],
+                                "product_variation_id" => $product_variation->id,
+                                "variation_id" => $productVariationId->variation_id,
+                                "variation_value_id" => $values
+                            ]);
+
+                    }
+
+
             }
             return response()->json('Data has been saved.', 200);
         } catch (\Exception $e) {
