@@ -2,18 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
-use App\Models\ProductVariation;
-use App\Models\VariationValues;
-use Illuminate\Http\Request;
-use App\Services\ProductService;
-use App\Services\CartService;
-use App\Models\ProductPivotVariation;
 use App\Http\Requests\product\ProductRequest;
-use Illuminate\Auth\Events\Validated;
+use App\Models\Product;
+use App\Models\ProductPivotVariation;
+use App\Models\ProductVariation;
+use App\Services\ProductService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
@@ -65,10 +60,10 @@ class ProductController extends Controller
 
     public function store(ProductRequest $request)
     {
+
         try{
 
-            if(Product::where('id',$request->id)->exists() && Product::where('route',$request->route)->exists()){
-
+            if(Product::where('id',$request->id)->exists()){
 
                 $product = ProductService::updateProduct($request->all());
                 return $product;
@@ -77,8 +72,7 @@ class ProductController extends Controller
 
                 #create
                 $product = ProductService::insertProduct($request->all());
-
-               return $product;
+                return $product;
             }
 
         }

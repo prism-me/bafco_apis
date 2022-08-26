@@ -25,9 +25,7 @@ class WishlistController extends Controller
             $i = 0;
             foreach ($wishlist as $wishlistValue) {
                 $data[$i]['productData'] = Product::where('id', $wishlistValue->product_id)->with('productCategory.parentCategory')->get(['name', 'id', 'route', 'category_id']);
-                $data[$i]['variation'] = ProductVariation::where('id',$wishlistValue->product_variation_id)->get(['product_id' , 'images']);
-                $data[$i]['variation_value'] = VariationValues::where('id',$wishlistValue->variation_value_id)->get(['id' , 'variation_id','name','type_value']);
-
+                $data[$i]['variation'] = ProductVariation::where('id',$wishlistValue->product_variation_id)->with('productVariationName.productVariationValues.variant')->get(['id','product_id' , 'images']);
                 $i++;
             }
 
@@ -46,12 +44,11 @@ class WishlistController extends Controller
 
             $data = $request->all();
             $wishlist = WishlistService::addToWishlist($data);
-            $wishlist = Wishlist::where('id',$wishlist->id)->first();
-            $wishlistData = $this->WishlistData($wishlist);
+
 
             if($wishlist){
 
-                return response()->json($wishlistData , 200);
+                return response()->json($wishlist , 200);
 
             }else{
 
@@ -77,30 +74,7 @@ class WishlistController extends Controller
     }
 
 
-    public function WishlistData($wishlist){
 
-        try {
-
-            DB::beginTransaction();
-                $productDetail = Product::where('id',$wishlist->product_id)->with('cartCategory.parentCategory')->first(['name','featured_image','route','category_id']);
-                $productVariant = ProductVariation::where('id',$wishlist->product_variation_id)->first(['id','code','upper_price']);
-                $variationValue = VariationValues::where('id',$wishlist->variation_value_id)->first('name');
-                $data = $productDetail;
-                $data['variation'] = $productVariant;
-                $data['variationValue'] = $variationValue;
-
-            DB::commit();
-
-            return $data;
-
-
-        } catch (\Exception $e) {
-
-            DB::rollBack();
-            return response()->json(['Product is not added.', 'stack' => $e], 500);
-        }
-
-    }
 
 
 }

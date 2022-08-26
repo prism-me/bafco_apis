@@ -26,7 +26,6 @@ class CategoryRequest extends FormRequest
         return [
             'name' => 'required|min:3',
             'sub_title'=>'required',
-            'featured_image' => 'url',
             'description' => 'required|min:11',
             'route' =>'required',
             'seo' => 'required'

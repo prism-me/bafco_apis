@@ -35,6 +35,7 @@ class ProductVariation extends Model
 
 
     /* Product Detail */
+
     public function hasOnePivot(){
         return $this->hasOne(ProductPivotVariation::class);
     }
@@ -62,7 +63,7 @@ class ProductVariation extends Model
     }
     public function productVariationName(){
 
-        return $this->hasOne(ProductPivotVariation::class)->select('id','product_variation_id','variation_id','variation_value_id');
+        return $this->hasMany(ProductPivotVariation::class)->select('id','product_variation_id','variation_id','variation_value_id');
 
     }
 
