@@ -36,11 +36,14 @@ class PaymentService {
       
       public function authCheckoutService($request){
             
-            $cartList = Cart::select(['id','product_id','qty','total'])->where('user_id',$request->user_id)->get();
-
-            foreach($cartList as $cart){
-                 $cart->product_name= Product::where('route', $cart->route)->get();
-            }
+            $cartList = Cart::where('user_id',$request->user_id)->with('productName')->get();
+            // $i=0;
+            // foreach($cartList as $cart){
+            
+            //       $cartList[$i]['product_name'] = Product::select('name','route')->where('route', $cart->route)->get(['name']);
+            //       $i++;
+            // }
+            
             // $promoCode = $this->promoCodeCheck($request->coupon_code);
 
             // if(!$promoCode) return response()->json('promo code is expired.' , 400);
@@ -48,7 +51,9 @@ class PaymentService {
             $this->order_number = 'OR'. rand(999 , 888888999999);
             
             $mapedObject = $this->mapPaymentObject($request->all() , $cartList);
+            
             return $mapedObject;
+
       }
 
       public function promoCodeCheck($coupon_code){
@@ -62,14 +67,15 @@ class PaymentService {
       }
 
       public function mapPaymentObject($data , $cartList){
-            $customer = auth()->user();
-             $data['customer']['name'] = $customer->name;
-             $data['customer']['email'] = $customer->email;
+            //  $customer = auth()->user();
+            //  $data['customer']['name'] = $customer->name;
+            //  $data['customer']['email'] = $customer->email;
              $data['item'] = $cartList;
+             $data['merchant']['confirmation_url'] = $this->success_url;
+             $data['merchant']['cancel_url'] = $this->failed_url;
              return $data;
 
       }
-
 
 }
 
