@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\CartCalculation;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\VariationValues;
@@ -25,8 +26,9 @@ class CartController extends Controller
                 $i=0;
                 foreach($cart as $cartValue){
 
+                    $data[$i]['cart'] = Cart::where('id',$cartValue->id)->get(['id']);
                     $data[$i]['productData'] = Product::where('id',$cartValue->product_id)->with('productCategory.parentCategory')->get(['name','id', 'route' ,'category_id']);
-                    $data[$i]['variation'] = ProductVariation::where('id',$cartValue->product_variation_id)->with('productVariationName.productVariationValues.variant')->get(['id','product_id' , 'images']);
+                    $data[$i]['variation'] = ProductVariation::where('id',$cartValue->product_variation_id)->with('productVariationName.productVariationValues.variant')->get(['id','product_id' , 'upper_price','in_stock','images']);
                     $data[$i]['qty'] = $cartValue->qty;
                     $data[$i]['total'] = $cartValue->total;
                     $i++;
@@ -116,6 +118,28 @@ class CartController extends Controller
         catch (\Error $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
+
+    }
+
+
+    public function show($id){
+
+        $cart = Cart::where('id',$id)->first();
+        $productData = Product::where('id',$cart['product_id'])->with('category.parentCategory')->first();
+        $productVariation =  ProductVariation::where('id',$cart['product_variation_id'])->with('productVariationName.productVariationValues')->first();
+        $product = [  $productData , $productVariation ];
+        return response()->json($product);
+
+
+
+    }
+
+
+    public function cartTotal($id){
+
+        $subTotal = CartCalculation::where('user_id',$id)->first();
+        return response()->json($subTotal);
+
 
     }
 

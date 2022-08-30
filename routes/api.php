@@ -57,6 +57,13 @@ Route::post('teams', 'TeamController@store')->middleware('auth:sanctum');
 Route::get('teams/{team}', 'TeamController@show');
 Route::delete('teams/{team}', 'TeamController@destroy')->middleware('auth:sanctum');
 
+
+#Team
+Route::get('project-category', 'ProjectCategoryController@index');
+Route::post('project-category', 'ProjectCategoryController@store')->middleware('auth:sanctum');
+Route::get('project-category/{ProjectCategory}', 'ProjectCategoryController@show');
+Route::delete('project-category/{ProjectCategory}', 'ProjectCategoryController@destroy')->middleware('auth:sanctum');
+
 #Partner
 Route::get('partners', 'PartnerController@index');
 Route::post('partners', 'PartnerController@store')->middleware('auth:sanctum');
@@ -105,7 +112,9 @@ Route::get('promo-codes/{id}', 'PromoCodeController@show');
 Route::delete('promo-codes/{id}', 'PromoCodeController@destroy')->middleware('auth:sanctum');
 
 #Project
+
 Route::get('projects', 'ProjectController@index');
+Route::get('project-product', 'ProjectController@projectProduct');
 Route::post('projects', 'ProjectController@store')->middleware('auth:sanctum');
 Route::get('projects/{project}', 'ProjectController@show');
 Route::delete('projects/{project}', 'ProjectController@destroy')->middleware('auth:sanctum');
@@ -116,7 +125,7 @@ Route::post('fabrics', 'FabricController@store')->middleware('auth:sanctum');
 Route::get('fabrics/{id}', 'FabricController@show');
 Route::delete('fabrics/{id}', 'FabricController@destroy')->middleware('auth:sanctum');
 
-#
+#Fabrics
 Route::get('fabrics ', 'BrochureController@index');
 Route::post('fabrics', 'BrochureController@store')->middleware('auth:sanctum');
 Route::get('fabrics/{id}', 'BrochureController@show');
@@ -125,6 +134,8 @@ Route::delete('fabrics/{id}', 'BrochureController@destroy')->middleware('auth:sa
 
 #Cart
 Route::get('addresses/{id}', 'AddressController@index')->middleware('auth:sanctum');
+Route::get('address-detail/{id}', 'AddressController@show')->middleware('auth:sanctum');
+
 Route::post('addresses', 'AddressController@store')->middleware('auth:sanctum');
 Route::delete('addresses/{address}', 'AddressController@destroy')->middleware('auth:sanctum');
 Route::put('set-default/{id}', 'AddressController@setDefault')->middleware('auth:sanctum');
@@ -139,18 +150,26 @@ Route::get('/paymentSuccess' , [PaymentController::class , 'successResponse']);
 Route::get('/paymentFailed' , [PaymentController::class , 'failedResponse']);
 
 #Front Controllers
-/*Product Inner page*/
 
-Route::get('front-products/{route}', 'FrontProductController@frontProducts');
-Route::get('product-detail/{route}/{id?}', 'FrontProductController@productDetail');
-//Route::post('variation-change', 'FrontProductController@variationChange');
+    /*Product Inner page*/
 
-Route::get('home-product-category-filter/{route}', 'FrontProductController@homeProductCategoryFilter');
-Route::get('product-filter-data', 'FrontProductController@filterProductData');
-Route::get('related-products/{route}', 'FrontProductController@relatedProducts');
-Route::get('random-products', 'FrontProductController@randomProducts');
+        Route::get('front-products/{route}', 'FrontProductController@frontProducts');
+        Route::get('product-detail/{route}/{id?}', 'FrontProductController@productDetail');
+        //Route::post('variation-change', 'FrontProductController@variationChange');
 
-/*End Product Inner Page*/
+        Route::get('home-product-category-filter/{route}', 'FrontProductController@homeProductCategoryFilter');
+        Route::get('product-filter-data', 'FrontProductController@filterProductData');
+        Route::get('related-products/{route}', 'FrontProductController@relatedProducts');
+        Route::get('random-products', 'FrontProductController@randomProducts');
+
+    /*End Product Inner Page*/
+
+    /*Resource Front Page*/
+
+        Route::get('home-resource', 'FrontResourceController@index');
+        Route::get('all-project/{type}', 'FrontResourceController@allProject');
+        Route::get('project-detail/{id}', 'FrontResourceController@projectDetail');
+
 
 
 Route::get('category-filters-list/{category}', 'CategoryFiltersController@CategoryFilterList');
@@ -159,7 +178,7 @@ Route::post('category-list-filteration','CategoryFiltersController@CategoryListF
 
 Route::get('front-category/{route}', 'FrontProductController@category');
 Route::get('header-category', 'FrontProductController@headerCategory');
-Route::get('top-selling-products', 'FrontProductController@topSellingProducts');
+Route::get('top-selling-products/{id}', 'FrontProductController@topSellingProducts');
 Route::get('top-selling-products-category-list', 'FrontProductController@topSellingProductsCategory');
 
 
@@ -195,6 +214,8 @@ Route::group(['prefix' => 'auth'], function ($router) {
 
     #Wishlist
     Route::get('wishlists/{id}', 'WishlistController@index')->middleware('auth:sanctum');
+    Route::get('wishlists/{id}', 'WishlistController@index')->middleware('auth:sanctum');
+    Route::get('wishlist-detail/{id}', 'WishlistController@show')->middleware('auth:sanctum');
     Route::post('wishlists', 'WishlistController@store')->middleware('auth:sanctum');
     Route::delete('wishlists/{wishlist}', 'WishlistController@removeWishlist')->middleware('auth:sanctum');
 
@@ -207,6 +228,9 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::delete('remove-cart/{id}', 'CartController@removeCart')->middleware('auth:sanctum');
     Route::delete('clear-all-cart/{id}', 'CartController@clearAllCart')->middleware('auth:sanctum');
     Route::post('cart-qty', 'CartController@incrementQty')->middleware('auth:sanctum');
+    Route::get('cart-detail/{id}', 'CartController@show')->middleware('auth:sanctum');
+    Route::get('cart-total/{id}', 'CartController@cartTotal')->middleware('auth:sanctum');
+
 
 });
 

@@ -136,7 +136,7 @@ class FrontProductController extends Controller
 
     public function headerCategory(){
 
-       $category = Category::with(['headerChild'])->get(['id','name','route','parent_id','featured_image']);
+       $category = Category::with(['headerChild'])->get(['id','name','route','parent_id','sub_title','featured_image']);
        return response($category,200);
     }
 
@@ -145,14 +145,15 @@ class FrontProductController extends Controller
     /*Top Selling Prodcuts*/
 
     public function topSellingProductsCategory(){
-        $category = Category::where('parent_id', NULL)->get(['id','name','route']);
+        $category = Category::with('subcategory')->where('parent_id', '=', NULL)->get(['id','name','route','parent_id']);
         return response($category,200);
     }
 
     public function topSellingProducts($id){
-        $category = Category::with('child')->where('id', $id)->get();
-        $products = Category::where('parentCategory','products.productvariations.productVariationName.productVariationValues')->where('id',$category)->get();
+
+        $products = Category::with('parentCategory','products.productvariations.productVariationName.productVariationValues')->where('id',$id)->paginate(8);
         return response($products,200);
+
     }
 
 

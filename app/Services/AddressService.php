@@ -10,17 +10,7 @@ class AddressService {
 
         $user =  $data['user_id'];
         $exist = Address::where('user_id',$user)->first();
-        $data = [
-            'user_id' => $data['user_id'],
-            'country' => $data['country'],
-            'state' => $data['state'],
-            'city' => $data['city'],
-            'address_line1' => $data['address_line1'],
-            'address_line2' => $data['address_line2'],
-            'postal_code' => $data['postal_code'],
-            'phone_number' => $data['phone_number'],
-            'address_type' => $data['address_type'],
-        ];
+        
         if( $exist != null) {
 
 

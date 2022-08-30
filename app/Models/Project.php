@@ -9,17 +9,29 @@ class Project extends Model
 {
     use HasFactory;
     protected $fillable = [
-        "type",
+        "category_id",
         "title",
+        "sub_title",
         "description",
         "featured_img",
         "additional_img",
+        "related_products",
         "files",
         "route",
         "seo"
     ];
+
+    protected $casts = [
+        'related_products' => 'array',
+        'category_id' => 'array',
+        'files' => 'array',
+    ];
+
+
     public function getRouteKeyName()
     {
         return 'route';
     }
+
+
 }

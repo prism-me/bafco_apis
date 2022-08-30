@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 use App\Models\Project;
+use App\Models\ProjectCategory;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -10,18 +12,18 @@ use App\Http\Requests\project\ProjectRequest;
 
 class ProjectController extends Controller
 {
+
     public function index()
     {
-        try{
-            $project = Project::all();
-            if($project->isEmpty()){
-                return response()->json([] , 200);
+            try{
+
+                $project = Project::get();
+
+                return response()->json($project, 200);
             }
-            return response()->json($project, 200);
-        }
-        catch (\Exception $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
-        }
+            catch (\Exception $exception) {
+                return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+            }
     }
 
     public function store(ProjectRequest $request)
@@ -31,11 +33,14 @@ class ProjectController extends Controller
 
             $data = [
                 'title' =>  $request->title ,
+                'sub_title' =>  $request->sub_title ,
+                'category_id' =>  $request->category_id ,
                 'description' =>  $request->description ,
-                'type' => $request->type ,
                 'featured_img' => $request->featured_img ,
                 'additional_img' => $request->additional_img ,
+                'related_products' => $request->related_products ,
                 'route' => $request->route ,
+                'files' => $request->files ,
                 'seo' => $request->seo
             ];
 
@@ -65,11 +70,20 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
-        if(!$project){
-            return response()->json('No Record Found.' , 404);
+
+        $i = 0;
+        foreach($project->category_id as $value){
+
+            $category[$i] = ProjectCategory::where('id',$value)->get();
+            $i++;
         }
 
-        return response()->json($project , 200);
+        $projects = [
+            'project' => $project,
+            'category' => $category
+        ];
+
+        return response()->json($projects , 200);
     }
 
     public function destroy(Project $project)
@@ -79,4 +93,13 @@ class ProjectController extends Controller
         }
         return response()->json('Server Error.' , 400);
     }
+
+    public function projectProduct(){
+
+        $product = Product::get(['id','name']);
+        return response()->json($product);
+
+    }
+
+
 }
