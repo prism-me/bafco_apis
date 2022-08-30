@@ -49,6 +49,14 @@ class AddressController extends Controller
     }
 
 
+    public function show($id) {
+
+        $address = Address::where('id',$id)->first();
+        return response()->json($address,200);
+
+    }
+
+
     public function destroy(Address $address)
     {
 

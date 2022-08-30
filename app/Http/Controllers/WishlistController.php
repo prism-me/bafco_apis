@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\VariationValues;
@@ -24,8 +25,9 @@ class WishlistController extends Controller
 
             $i = 0;
             foreach ($wishlist as $wishlistValue) {
+                $data[$i]['wishlist'] = Wishlist::where('id', $wishlistValue->id)->get('id');
                 $data[$i]['productData'] = Product::where('id', $wishlistValue->product_id)->with('productCategory.parentCategory')->get(['name', 'id', 'route', 'category_id']);
-                $data[$i]['variation'] = ProductVariation::where('id',$wishlistValue->product_variation_id)->with('productVariationName.productVariationValues.variant')->get(['id','product_id' , 'images']);
+                $data[$i]['variation'] = ProductVariation::where('id',$wishlistValue->product_variation_id)->with('productVariationName.productVariationValues.variant')->get(['id','product_id' , 'in_stock', 'upper_price', 'images']);
                 $i++;
             }
 
@@ -73,6 +75,18 @@ class WishlistController extends Controller
         }
     }
 
+
+    public function show($id){
+
+        $wishlist = Wishlist::where('id',$id)->first();
+        $productData = Product::where('id',$wishlist['product_id'])->with('category.parentCategory')->first();
+        $productVariation =  ProductVariation::where('id',$wishlist['product_variation_id'])->with('productVariationName.productVariationValues')->first();
+        $product = [  $productData , $productVariation ];
+        return response()->json($product);
+
+
+
+    }
 
 
 

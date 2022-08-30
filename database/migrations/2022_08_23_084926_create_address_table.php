@@ -17,6 +17,7 @@ class CreateAddressTable extends Migration
             $table->id();
             $table->foreignId('user_id');
             $table->string('country')->nullable();
+            $table->string('name')->nullable();
             $table->string('state')->nullable();
             $table->string('city')->nullable();
             $table->text('address_line1')->nullable();
