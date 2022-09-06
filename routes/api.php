@@ -141,8 +141,11 @@ Route::delete('addresses/{address}', 'AddressController@destroy')->middleware('a
 Route::put('set-default/{id}', 'AddressController@setDefault')->middleware('auth:sanctum');
 
 
-#Payment
+Route::get('ttt',function(){
+   $mytime = Carbon\Carbon::now()->toDateTimeString();
+});
 
+#Payment
 Route::post('/checkout' , [PaymentController::class , 'checkout'] );
 Route::post('/guestCheckout' , [PaymentController::class , 'guestCheckout'] );
 Route::post('/authCheckout' , [PaymentController::class , 'authCheckout'] )->middleware('auth:sanctum');
