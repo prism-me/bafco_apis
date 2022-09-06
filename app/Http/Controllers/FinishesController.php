@@ -25,6 +25,7 @@ class FinishesController extends Controller
             "parent_id" => $data->get("category_id"),
         ];
         $finishesCreate = Finishes::create($finishesCreate);
+        
         if($data->category_id != null){
 
             $finishesValueCreate = [
@@ -40,7 +41,7 @@ class FinishesController extends Controller
                 'finishes_id' => $finishesCreate->id,
                 'finishes_value_id' => $finishesValueCreate->finishes_value_id,
             ];
-            $FinishesValuePivot = FinishesValuePivot::create($finishesValuePivotCreate);
+            $finishesValuePivot = FinishesValuePivot::create($finishesValuePivotCreate);
 
         }
         

@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class FinishesValue extends Model
 {
     use HasFactory;
+    protected $fillable = ['name','featured_img','code'];
 }
