@@ -14,4 +14,8 @@ class Cart extends Model
         return $this->hasMany(Product::class,'id','product_id','route');
     }
 
+    public function productName(){
+
+        return $this->belongsTo(Product::class ,'product_id' , 'id' );
+    }
 }

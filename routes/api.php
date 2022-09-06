@@ -148,13 +148,16 @@ use Illuminate\Support\Facades\Route;
     Route::put('set-default/{id}', 'AddressController@setDefault')->middleware('auth:sanctum');
 
 
-#Payment
+Route::get('ttt',function(){
+   $mytime = Carbon\Carbon::now()->toDateTimeString();
+});
 
-    Route::post('/checkout' , [PaymentController::class , 'checkout'] );
-    Route::post('/guestCheckout' , [PaymentController::class , 'guestCheckout'] );
-    Route::post('/authCheckout' , [PaymentController::class , 'authCheckout'] );
-    Route::get('/paymentSuccess' , [PaymentController::class , 'successResponse']);
-    Route::get('/paymentFailed' , [PaymentController::class , 'failedResponse']);
+#Payment
+Route::post('/checkout' , [PaymentController::class , 'checkout'] );
+Route::post('/guestCheckout' , [PaymentController::class , 'guestCheckout'] );
+Route::post('/authCheckout' , [PaymentController::class , 'authCheckout'] )->middleware('auth:sanctum');
+Route::get('/paymentSuccess' , [PaymentController::class , 'successResponse']);
+Route::get('/paymentFailed' , [PaymentController::class , 'failedResponse']);
 
 #Front Controllers
 
@@ -204,6 +207,9 @@ use Illuminate\Support\Facades\Route;
         Route::get('top-selling-products-category-list', 'FrontProductController@topSellingProductsCategory');
 
 
+
+#Dashboard CMS changed
+Route::get('all-users', 'DashboardController@allUsers');
 
     #Front Apis 
         Route::get('home', 'FrontController@home');
