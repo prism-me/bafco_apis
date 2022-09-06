@@ -26,7 +26,6 @@ class ProductRequest extends FormRequest
         return [
             "name" => "required|min:3",
             "featured_image" => "required",
-            "short_description" =>"required|min:6",
             "long_description" => "required|min:6",
             "category_id" => "required",
             "brand" => "required",

@@ -8,4 +8,24 @@ use Illuminate\Database\Eloquent\Model;
 class Brochure extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        "category_id",
+        "title",
+        "sub_title",
+        "featured_img",
+        "thumbnail_img",
+        "files",
+        "short_description",
+        "seo",
+    ];
+
+    protected $casts = [
+        'files' => 'array',
+        'seo' => 'array',
+    ];
+
+    public function broucherCategory(){
+
+        return $this->belongsTo(Category::class , 'category_id','id');
+    }
 }

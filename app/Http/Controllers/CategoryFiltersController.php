@@ -30,8 +30,10 @@ class CategoryFiltersController extends Controller
         $category = Category::with(['parentCategory'])->where('route', $route)->first();
         
         if($brand !== null && $min !== null && $max !== null ){
+            
+            #Brands && Price
             $products =  Category::with(['parentCategory'])->with(['products' => function($query) use($brand,$category,$min, $max) {
-                                $query->where('brand', '=', $brand)
+                                $query->whereIn('brand', $brand)
                             ->with(['productvariations' =>  function ($range) use ($min, $max) {
                                 $range->where('lower_price', '>=', $min)->where('upper_price', '<=', $max);
                                 }]);
@@ -39,13 +41,22 @@ class CategoryFiltersController extends Controller
                             ->whereHas('products.productvariations')
                             ->where('id',$category->id)
                             ->first();
+            $products->products->transform(function ($item){
+                if ($item->productvariations !== null) {
+                    return $item;
+                }
+            })->all();
+        
+           
+
 
             return response()->json($products);
 
         }elseif( isset($brand) && $brand !== null){
+            
             #Brands
             $products = Category::with(['parentCategory'])->with(['products'=> function($query) use($brand,$category) {
-                            $query->where('brand','=', $brand)
+                            $query->whereIn('brand', $brand)
                             ->where('category_id',$category->id)
                             ->with(['productvariations']);
                         }])
@@ -62,6 +73,13 @@ class CategoryFiltersController extends Controller
                             ->whereHas('products.productvariations')
                             ->where('id', $category->id)
                             ->first();
+    
+            $products->products->transform(function ($item){
+                if ($item->productvariations !== null) {
+                    return $item;
+                }
+            })->all();
+        
             return response()->json($products);
 
         }else {

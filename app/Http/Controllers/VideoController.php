@@ -9,11 +9,7 @@ use App\Http\Requests\video\VideoRequest;
 
 class VideoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
         try{
@@ -28,45 +24,20 @@ class VideoController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+ 
     public function store(VideoRequest $request)
     {
        try{
 
-            $data = [ 
-                    'title' =>  $request->title ,
-                    'sub_title' => $request->sub_title ,
-                    'description' =>  $request->description ,
-                    'link' =>  $request->link ,
-                    'thumbnail' =>  $request->thumbnail ,
-                  
-            ];
-        
-
                 if(Video::where('id', $request->id)->exists()){ 
 
                     #update
-                    $video = Video::where('id', $request->id)->update($data);
+                    $video = Video::where('id', $request->id)->update($request->all());
 
                 }else{
 
                     #create
-                    $video = Video::create($data);
+                    $video = Video::create($request->all());
                 }
                 if($video){
                     return  response()->json('Data has been saved.' , 200);

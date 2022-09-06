@@ -20,7 +20,6 @@ class ProductService
             #Create Product
             $product = Product::create([
                 "name" => $data['name'],
-                "short_description" => $data['short_description'],
                 "featured_image" => $data['featured_image'],
                 "route" => $data['route'],
                 "long_description" => $data['long_description'],
@@ -56,9 +55,9 @@ class ProductService
                     "depth" => $variation['depth'],
                     "width" => $variation['width'],
                     "description" => $variation['description'],
-                    "images" => $variation['images']
-
-
+                    "images" => $variation['images'],
+                    "lead_img" => isset($variation['lead_img']) ?  $variation['lead_img'] : '',
+                    "limit" => isset($variation['limit']) ?  $variation['limit'] : ''
                 ]);
 
                 #Adding Variation Items To the ProductPivotTable
@@ -97,7 +96,6 @@ class ProductService
 
             $product = Product::where('id', $data['id'])->update([
                 "name" => $data['name'],
-                "short_description" => $data['short_description'],
                 "featured_image" => $data['featured_image'],
                 "route" => $data['route'],
                 "long_description" => $data['long_description'],
@@ -110,7 +108,8 @@ class ProductService
                 "promotional_images" => $data['promotional_images'],
                 "footrest" => $data['footrest'],
                 "headrest" => $data['headrest'],
-                "seo" => $data['seo'],
+                "seo" => $data['seo']
+
             ]);
 
 
@@ -141,6 +140,8 @@ class ProductService
                         "width" => $variation['width'],
                         "description" => $variation['description'],
                         "images" => $variation['images'],
+                        "lead_img" => isset($variation['lead_img']) ?  $variation['lead_img'] : '',
+                        "limit" => isset($variation['limit']) ?  $variation['limit'] : ''
                     ]);
 
 
@@ -160,15 +161,12 @@ class ProductService
                     "width" => $variation['width'],
                     "description" => $variation['description'],
                     "images" => $variation['images'],
+                    "lead_img" => isset($variation['lead_img']) ?  $variation['lead_img'] : '',
+                    "limit" => isset($variation['limit']) ?  $variation['limit'] : ''
                 ]);
 
 
-
             }
-
-
-
-
 
                     $item = $variation['variationItems'];
 
