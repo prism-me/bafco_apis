@@ -23,8 +23,10 @@ class Project extends Model
 
     protected $casts = [
         'related_products' => 'array',
+        'additional_img' => 'array',
         'category_id' => 'array',
         'files' => 'array',
+        'seo' => 'array',
     ];
 
 
@@ -32,6 +34,13 @@ class Project extends Model
     {
         return 'route';
     }
+
+
+    public function projectCategory(){
+
+        return $this->belongsToMany(ProjectCategory::class , 'project_category_pivots','project_id' , 'category_id');
+    }
+
 
 
 }

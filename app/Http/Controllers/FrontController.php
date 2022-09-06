@@ -13,9 +13,7 @@ use App\Models\Variation;
 use App\Models\ProductVariation;
 use App\Models\VariationValues;
 use App\Models\ProductPivotVariation;
-
-
-
+use App\Models\Faq;
 use App\Models\Testimonial;
 use DB;
 
@@ -106,6 +104,18 @@ class FrontController extends Controller
         $data  = array(
             'innovations' => $innovations,
             'blog' => $blog,
+        );
+        return $data;
+
+    }
+
+    public function faq(){
+
+        $faqBanner = Page::where('identifier','faq')->first(['name','content','route']);
+        $faqs = Faq::all();
+        $data  = array(
+            'FaqBanner' => $faqBanner,
+            'faqs' => $faqs,
         );
         return $data;
 

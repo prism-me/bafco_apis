@@ -5,15 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Fabric extends Model
+class ProjectCategoryPivot extends Model
 {
     use HasFactory;
-
     protected $fillable = [
-        "name",
-        "type",
-        "color_range",
-        "featured_img",
-        "finish"
+        "project_id",
+        "category_id"
     ];
 }

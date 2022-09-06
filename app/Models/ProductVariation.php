@@ -23,7 +23,9 @@ class ProductVariation extends Model
         "width",
         "description",
         "images",
-        "variation_combination"
+        "variation_combination",
+        "lead_img",
+        "limit"
     ];
 
 

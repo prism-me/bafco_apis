@@ -20,6 +20,7 @@ class CreateCartsTable extends Migration
             $table->string('qty')->nullable();
             $table->string('product_variation_id')->nullable();
             $table->decimal('total')->nullable();
+            $table->string('unit_price')->nullable();
 
             $table->timestamps();
         });

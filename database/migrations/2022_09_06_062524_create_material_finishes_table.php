@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFabricsTable extends Migration
+class CreateMaterialFinishesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateFabricsTable extends Migration
      */
     public function up()
     {
-        Schema::create('fabrics', function (Blueprint $table) {
+        Schema::create('material_finishes_pivot', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
-            $table->string('type')->nullable();
-            $table->text('color_range')->nullable();
-            $table->string('finish')->nullable();
-            $table->string('featured_img')->nullable();
+            $table->bigInteger('material_id')->nullable();
+            $table->bigInteger('finishes_id')->nullable();
+            $table->bigInteger('finishes_value_id')->nullable();
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ class CreateFabricsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('fabrics');
+        Schema::dropIfExists('material_finishes');
     }
 }

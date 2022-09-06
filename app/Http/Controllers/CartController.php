@@ -127,10 +127,8 @@ class CartController extends Controller
         $cart = Cart::where('id',$id)->first();
         $productData = Product::where('id',$cart['product_id'])->with('category.parentCategory')->first();
         $productVariation =  ProductVariation::where('id',$cart['product_variation_id'])->with('productVariationName.productVariationValues')->first();
-        $product = [  $productData , $productVariation ];
+        $product = [  $productData , $productVariation ,$cart];
         return response()->json($product);
-
-
 
     }
 
@@ -141,7 +139,8 @@ class CartController extends Controller
         return response()->json($subTotal);
 
 
-    }
+    } 
+
 
 
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\ProjectCategory;
+use App\Models\ProjectCategoryPivot;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Validator;
@@ -17,7 +18,7 @@ class ProjectController extends Controller
     {
             try{
 
-                $project = Project::get();
+                $project = Project::with('projectCategory')->get();
 
                 return response()->json($project, 200);
             }
@@ -31,6 +32,8 @@ class ProjectController extends Controller
 
         try{
 
+            // return $request->files;
+
             $data = [
                 'title' =>  $request->title ,
                 'sub_title' =>  $request->sub_title ,
@@ -38,26 +41,55 @@ class ProjectController extends Controller
                 'description' =>  $request->description ,
                 'featured_img' => $request->featured_img ,
                 'additional_img' => $request->additional_img ,
-                'related_products' => $request->related_products ,
-                'route' => $request->route ,
-                'files' => $request->files ,
+                'related_products' => $request->related_products,
+                'route' => $request->route,
+                'files' => $request->files,
                 'seo' => $request->seo
             ];
 
+            return $data;
 
-            if(Project::where('route', $request->route)->exists()  OR Project::where('id', $request->id)->exists()){
+
+            if(Project::where('id', $request->id)->exists()){
 
                 #update
-                $project = Project::where('route', $request->route)->update($data);
+                $project = Project::where('id', $request->id)->first();
+                $project->update($request->all());
+                ProjectCategoryPivot::where('project_id',$project['id'])->delete();
+
+                $i = 0;
+                foreach($data['category_id'] as $value){
+
+                    $create = [
+                        'project_id' => $project['id'],
+                        'category_id' => $value
+                    ];
+
+
+                    $category[$i] = ProjectCategoryPivot::create($create);
+                    $i++;
+                }
 
             }else{
 
                 #create
-                $project = Project::create($data);
+                $project = Project::create($request->all());
+                $i = 0;
+                foreach($data['category_id'] as $value){
+
+                    $create = [
+                        'project_id' => $project['id'],
+                        'category_id' => $value
+                    ];
+
+
+                    $category[$i] = ProjectCategoryPivot::create($create);
+                    $i++;
+                }
             }
-            if($project){
+
                 return  response()->json('Data has been saved.' , 200);
-            }
+
 
         }
         catch (ModelNotFoundException  $exception) {
@@ -71,17 +103,7 @@ class ProjectController extends Controller
     public function show(Project $project)
     {
 
-        $i = 0;
-        foreach($project->category_id as $value){
-
-            $category[$i] = ProjectCategory::where('id',$value)->get();
-            $i++;
-        }
-
-        $projects = [
-            'project' => $project,
-            'category' => $category
-        ];
+        $projects = $project->with('projectCategory')->first();
 
         return response()->json($projects , 200);
     }
@@ -93,6 +115,9 @@ class ProjectController extends Controller
         }
         return response()->json('Server Error.' , 400);
     }
+
+
+    /* List Of Products For CMS Only*/
 
     public function projectProduct(){
 

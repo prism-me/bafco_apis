@@ -74,7 +74,20 @@ class UploadController extends Controller
         }
 
     }
+    public function files(Request $request)
+    {
+        $file = $request->file('files');
+        $without_ext_name= $this->slugify(preg_replace('/\..+$/', '', $file->getClientOriginalName()));
+        $name = $without_ext_name .'-'. time().rand(1,100).'.'.$file->extension();
+        $files['avatar'] = $name;
+        $files['url'] =  "https://bafco.b-cdn.net/files/"."{$name}";
+        $files['alt_tag'] = time().rand(1,100);
+        $files['type'] = $file->extension();
+        if($this->bunnyCDNStorage->uploadFile($file->getPathName() , $this->storageZone."/files/{$name}")){
+            return json_encode(['data'=> $files['url']  , 'status' => 'Data Updated Succesffully']);
 
+        }
+    }
 
 
 

@@ -33,6 +33,8 @@ class PromoCodeController extends Controller
     {
 
         try{
+
+
             $data = [
                     'name' =>  $request->name ,
                     'value' => $request->value ,

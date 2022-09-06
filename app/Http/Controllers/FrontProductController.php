@@ -81,18 +81,18 @@ class FrontProductController extends Controller
             $j++;
         }
 
-       if($id == null){
+        if($id == null){
 
-           $productSingleVariation['product_variation_details'] = ProductVariation::where('product_id',$productDetails['id'])->first();
-           $productSingleVariation['variation_value_details'] = ProductPivotVariation::where('product_variation_id',$productSingleVariation['product_variation_details']['id'])->with('variation_values.variant')->get();
+            $productSingleVariation['product_variation_details'] = ProductVariation::where('product_id',$productDetails['id'])->first();
+            $productSingleVariation['variation_value_details'] = ProductPivotVariation::where('product_variation_id',$productSingleVariation['product_variation_details']['id'])->with('variation_values.variant')->get();
 
-       }else{
+        }else{
 
-           $productSingleVariation['product_variation_details'] = ProductVariation::where('id',$id)->first();
-           $productSingleVariation['variation_value_details'] = ProductPivotVariation::where('product_variation_id',$id)->with('variation_values.variant')->get();
+            $productSingleVariation['product_variation_details'] = ProductVariation::where('id',$id)->first();
+            $productSingleVariation['variation_value_details'] = ProductPivotVariation::where('product_variation_id',$id)->with('variation_values.variant')->get();
 
 
-       }
+        }
 
 
 
@@ -114,21 +114,24 @@ class FrontProductController extends Controller
         return response()->json($category);
     }
 
+
     public function relatedProducts($route){
         $category = Category::where('route',$route)->first();
-        $relatedProducts = Product::with('productCategory','productvariations.productVariationName.productVariationValues')->where('category_id',$category->id)->paginate(4);
+        $relatedProducts = Product::with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')->where('category_id',$category->id)->paginate(4);
         return response($relatedProducts,200);
 
     }
 
-    public function randomProducts(){
+    public function randomProducts()
+    {
 
-        $randomProducts = Product::with('productCategory','productvariations.productVariationName.productVariationValues')->inRandomOrder()
+        $randomProducts = Product::with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')->inRandomOrder()
             ->limit(4)
             ->paginate(4);
         return response($randomProducts,200);
 
     }
+
     /*End Category Filter On Inner Page */
 
 
@@ -136,8 +139,8 @@ class FrontProductController extends Controller
 
     public function headerCategory(){
 
-       $category = Category::with(['headerChild'])->get(['id','name','route','parent_id','sub_title','featured_image']);
-       return response($category,200);
+        $category = Category::with(['headerChild'])->get(['id','name','route','parent_id','sub_title','featured_image']);
+        return response($category,200);
     }
 
     /*End Head Category*/
