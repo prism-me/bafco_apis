@@ -17,11 +17,17 @@ class Order extends Model
         'payment_id',
         'transaction_status',
         'paid',
-        'payment_date',	
+        'payment_date',
+        'address_id'
     ];
 
 
     public function order_details(){
         return $this->hasMany(OrderDetail::class , 'order_id' , 'id');
     }
+
+    public function orderAddress(){
+        return $this->hasOne(Address::class , 'id' , 'address_id');
+    }
+
 }

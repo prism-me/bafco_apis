@@ -8,5 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class FinishesValue extends Model
 {
     use HasFactory;
-    protected $fillable = ['name','featured_img','code'];
+    protected $fillable = ['finishes_id','featured_img','code'];
+
+    public function values(){
+        return $this->belongsTo(Finishes::class  ,'finishes_id','id' );
+    }
 }

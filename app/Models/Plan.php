@@ -10,7 +10,7 @@ class Plan extends Model
     use HasFactory;
 
      protected $fillable = [
-       
+
        "category_id",
        "title",
        "sub_title",
@@ -18,21 +18,20 @@ class Plan extends Model
        "thumbnail_img",
        "concept",
        "files",
-       "route"
+       "route",
+       "seo"
 
-   ];
-
-
-
+     ];
 
     protected $casts = [
-        'concept' => 'array',
-        'files' => 'array'
-    ];  
+        'featured_img' => 'array',
+        'files' => 'array',
+        'seo' => 'array'
+    ];
 
     public function planCategory(){
 
         return $this->belongsTo(ProjectCategory::class,'category_id','id');
     }
-   
+
 }

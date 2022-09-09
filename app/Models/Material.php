@@ -9,4 +9,12 @@ class Material extends Model
 {
     use HasFactory;
     protected $fillable = ['name'];
+
+
+    public function materialValues(){
+
+          return $this->belongsToMany(FinishesValue::class ,'material_finishes_pivot','material_id','finishes_value_id');
+    }
+
+
 }

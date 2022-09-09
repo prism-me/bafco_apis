@@ -23,4 +23,6 @@ class Address extends Model
         'address_type'
     ];
 
+
+
 }

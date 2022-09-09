@@ -3,21 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\FinishesValuePivot;
 use App\Models\Project;
 use App\Models\Blog;
 use App\Models\Product;
 use App\Models\Brochure;
 use App\Models\Video;
+use App\Models\Finishes;
+use App\Models\Page;
 use App\Models\Plan;
+use App\Models\Material;
 use App\Models\ProjectCategory;
 use App\Models\ProjectCategoryPivot;
+use App\Models\BrochureCategoryPivot;
+
 use Illuminate\Http\Request;
 
 class FrontResourceController extends Controller
 {
 
     public $blogData;
-
 
     public function __construct()
     {
@@ -27,19 +32,32 @@ class FrontResourceController extends Controller
 
     public function index(){
 
-        $project = Project::with('projectCategory')->get(['id','title','sub_title','description','featured_img','additional_img','route'])->take(1);
+        $project = Project::with('projectCategory')->get(['id','title','sub_title','description','featured_img','additional_img','thumbnail_img','route'])->take(1);
         $blog =  $this->blogData;
-        $videos = Video::where('type', "=", 'resource')->get();
+        $videos = Video::where('type', "=", 'resource')->get()->take(8);
         $plans  = Plan::get()->take(3);
+        $pages = Page::where('identifier','=','resources')->first();
+        $fabrics = Finishes::where('parent_id','!=', 0)->with('child')->get();
         $resource = [
-            'project' =>   $project,
-            'blog' => $blog, 
+            'page' => $pages,
+            'project' => $project,
+            'blog' => $blog,
             'videos' => $videos,
             'plans' => $plans,
+            'fabrics' => $fabrics
+
         ];
         return response()->json($resource);
     }
 
+    /*public function Videos*/
+
+    public function frontVideos(){
+
+        $videos = Video::where('type', "=", 'resource')->get();
+        return response()->json($videos);
+
+    }
 
     /* Project Refrences */
 
@@ -53,13 +71,13 @@ class FrontResourceController extends Controller
 
             if($type == "all"){
 
-                $project = Project::with('projectCategory')->get(['id','title','category_id','sub_title','description','additional_img','featured_img','route','related_products'])->take(9);
+                $project = Project::with('projectCategory')->get(['id','title','category_id','sub_title','description','additional_img','featured_img','thumbnail_img','route','related_products'])->take(9);
 
             }else{
 
                 $category = ProjectCategory::where('route',$type)->first();
                 $projectId = ProjectCategoryPivot::where('category_id',$category['id'])->pluck('project_id');
-                $project = Project::with('projectCategory')->whereIn('id',$projectId)->get(['id','title','category_id','sub_title','description','additional_img','featured_img','route','related_products'])->take(9);
+                $project = Project::with('projectCategory')->whereIn('id',$projectId)->get(['id','title','category_id','sub_title','description','additional_img','thumbnail_img','featured_img','route','related_products'])->take(9);
 
             }
 
@@ -74,8 +92,8 @@ class FrontResourceController extends Controller
             $project = Project::where('id',$id)->with('projectCategory')->first();
             $relatedProducts = Product::with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')->whereIn('id',$project->related_products)->get();
             $projectDetail = [
-                    'project' => $project, 
-                    'relatedProducts' => $relatedProducts 
+                    'project' => $project,
+                    'relatedProducts' => $relatedProducts
             ];
             return response()->json($projectDetail);
         }
@@ -96,33 +114,42 @@ class FrontResourceController extends Controller
 
             if($type == "all"){
 
-                $brochure = Brochure::with('broucherCategory')->get(['id','featured_img','title','sub_title']);
+                $brochure = Brochure::with('broucherCategory')->get(['id','featured_img','title','thumbnail_img','sub_title']);
 
             }else{
 
-                $category =  Category::where('route', $type)->first();
-                $brochure = Brochure::where('category_id', $category['id'])->with('broucherCategory')->get(['id','featured_img','title','sub_title']);
+                $category = Category::where('route',$type)->first();
+
+                $brochuretId = BrochureCategoryPivot::where('category_id',$category['id'])->pluck('brochure_id');
+
+                $brochure = Brochure::whereIn('id',$brochuretId)->with('broucherCategory')->get(['id','featured_img','title','thumbnail_img','files','sub_title']);
 
             }
             return response()->json($brochure);
 
         }
 
+        public function brochuresDetail($type){
 
-        public function brochuresDetail($id){
+            if($type == "all"){
 
-            $brochure = Brochure::where('id',$id)->with('broucherCategory')->first();
-            return response()->json($brochure,200);
+                $brochure = Brochure::with('broucherCategory')->get(['id','featured_img','title','thumbnail_img','sub_title']);
+
+            }else{
+
+                $category = ProjectCategory::where('route',$type)->first();
+                $brochuretId = BrochureCategoryPivot::where('category_id',$category['id'])->pluck('brochure_id');
+                $brochure = Brochure::with('brochureCategory')->whereIn('id',$brochuretId)->get(['id','featured_img','title','thumbnail_img','sub_title','files']);
+
+            }
+            return response()->json($brochure);
 
         }
-
 
     /* End Brouchers */
 
 
-
     /* Plans */
-
 
         public function planCategoryList()
         {
@@ -134,18 +161,18 @@ class FrontResourceController extends Controller
 
             if($type == "all"){
 
-                $plan = Plan::with('planCategory')->paginate(9);
+                $plan = Plan::with('planCategory')->get();
+                return $plan;
 
             }else{
 
                 $category = ProjectCategory::where('route',$type)->first();
-                $plan = Plan::with('planCategory')->where('category_id',$category->id)->paginate(9);
+                $plan = Plan::with('planCategory')->where('category_id', $category->id)->get();
 
             }
 
             return response()->json($plan);
         }
-
 
         public function planDetail($id){
 
@@ -153,8 +180,40 @@ class FrontResourceController extends Controller
             return response()->json($planDetail);
         }
 
-
-
     /* End Plans */
-    
+
+
+
+    /* Fabrics and Finishes*/
+
+
+
+
+        public function finishesFilterList($type){
+
+            if($type == "leather"){
+
+                $material = Material::where('name','=', 'Leather')->with('materialValues.values')->first();
+
+                $filterList = FinishesValuePivot::where('material_id', $material->id)->pluck('finishes_id');
+                $categoryList = Finishes::whereIn('id',$filterList)->where('parent_id', '=', 0)->with('child')->get();
+                return response()->json($categoryList);
+
+            }else{
+
+                $material = Material::where('name',$type)->with('materialValues.values')->first();
+
+                $filterList = FinishesValuePivot::where('material_id', $material->id)->pluck('finishes_id');
+                $categoryList = Finishes::whereIn('id',$filterList)->where('parent_id', '=', 0)->with('child')->get();
+                return response()->json($categoryList);
+
+
+            }
+
+        }
+
+
+
+    /**/
+
 }

@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Brochure;
 use App\Models\Category;
+use App\Models\BrochureCategoryPivot;
+
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BrochureController extends Controller
 {
@@ -27,28 +30,54 @@ class BrochureController extends Controller
 
         try{
 
-            $data = [
-                    "category_id" => $request->category_id,
-                    "title" => $request->title,
-                    "sub_title" => $request->sub_title,
-                    "featured_img" => $request->featured_img,
-                    "short_description" => $request->short_description,
-                    "seo" => $request->seo,
-                    "thumbnail_img" => $request->thumbnail_img,
-                    'files' => $request->files,
-        
+
+            $data = $request->all();
+            $createBrochure = [
+                    "category_id" => $data['category_id'],
+                    "title" => $data['title'],
+                    "sub_title" => $data['sub_title'],
+                    "featured_img" => $data['featured_img'],
+                    "short_description" => $data['short_description'],
+                    "seo" => $data['seo'],
+                    "thumbnail_img" => $data['thumbnail_img'],
+                    'files' => $data['files']
             ];
 
             if( Brochure::where('id', $request->id)->exists()){
-                
-                #update
-                $brochuer = Brochure::where('id', $request->id)->update($request->all());
 
+                #update
+                $brochuer = Brochure::where('id', $request->id)->update($createBrochure);
+                BrochureCategoryPivot::where('brochure_id',$request->id)->delete();
+
+                $i = 0;
+                foreach($data['category_id'] as $value){
+
+                    $create = [
+                        'brochure_id' => $request->id,
+                        'category_id' => $value
+                    ];
+
+
+                    $category[$i] = BrochureCategoryPivot::create($create);
+                    $i++;
+                }
 
             }else{
 
                 #create
-                $brochuer = Brochure::create($request->all());
+                $brochuer = Brochure::create($createBrochure);
+                $i = 0;
+                foreach($data['category_id'] as $value){
+
+                    $create = [
+                        'brochure_id' => $brochuer['id'],
+                        'category_id' => $value
+                    ];
+
+
+                    $category[$i] = BrochureCategoryPivot::create($create);
+                    $i++;
+                }
 
             }
 
@@ -80,7 +109,7 @@ class BrochureController extends Controller
     }
 
 
-   
+
 
 
 }

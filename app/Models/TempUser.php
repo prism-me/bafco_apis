@@ -16,6 +16,7 @@ class TempUser extends Model
         'token',
         'redirect_url',
         'isActive',
+        'code'
     ];
-   
+
 }

@@ -15,6 +15,14 @@ class DashboardController extends Controller
         return response()->json($users);
 
     }
-   
+
+
+    public function allOrders(){
+
+        $order = Order::with('orderDetail')->get();
+        return response()->json($order);
+
+    }
+
 
 }
