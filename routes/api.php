@@ -155,7 +155,7 @@ Route::get('ttt',function(){
 #Payment
 Route::post('/checkout' , [PaymentController::class , 'checkout'] );
 Route::post('/guestCheckout' , [PaymentController::class , 'guestCheckout'] );
-Route::post('/authCheckout' , [PaymentController::class , 'authCheckout'] )->middleware('auth:sanctum');
+Route::post('/authCheckout' , [PaymentController::class , 'authCheckout'] );
 Route::get('/paymentSuccess' , [PaymentController::class , 'successResponse']);
 Route::get('/paymentFailed' , [PaymentController::class , 'failedResponse']);
 

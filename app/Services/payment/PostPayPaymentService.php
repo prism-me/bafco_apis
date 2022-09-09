@@ -1,9 +1,10 @@
-<?php 
+<?php
 
 namespace App\Services\payment;
 
 use App\Interfaces\PaymentInterface;
 use App\Models\Cart;
+use App\Models\PaymentHistory;
 use App\Models\Product;
 use App\Services\OrderService;
 use Illuminate\Support\Facades\DB;
@@ -11,105 +12,136 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 use Postpay\Exceptions\RESTfulException;
 
-class PostPayPaymentService implements PaymentInterface { 
+class PostPayPaymentService implements PaymentInterface
+{
 
-    protected $baseURL;
-    protected $baseCode;
-    protected $promoValidity = 1;
+    public $baseURL;
+    public $baseCode;
+    public $promoValidity = 1;
     public $order_number;
-    public $success_url = 'http://127.0.0.1:8000/v1/api/paymentSuccess';
-    public $failed_url = 'http://127.0.0.1:8000/v1/api/paymentFailed';
+    public $success_url = 'http://localhost:8000/v1/api/paymentSuccess';
+    // public $success_url = 'https://prismcloudhosting.com/BAFCO_APIs/public/v1/api/paymentSuccess';
+    public $failed_url = 'http://localhost:8000/v1/api/paymentFailed';
+    // public $failed_url = 'https://prismcloudhosting.com/BAFCO_APIs/public/v1/api/paymentFailed';
 
-    public function __construct(){
+    public function __construct()
+    {
 
-        $this->baseURL = env('POSTPAY_BASE_URL');
-        $this->baseCode = env('POSTPAY_BASECODE');
-    
+        $this->baseURL = config('postpay.base_url');
+        $this->baseCode = config('postpay.base_code');
     }
 
-    public function makePayment($request){
-        
-        try{
+    public function makePayment($request)
+    {
 
-            $cartList = Cart::where('user_id',$request->user_id)->get(['product_id','product_variation_id','qty','total','unit_price']);
-            
-            foreach($cartList as $cart){
-            
-                  $cart['name'] =  Product::where('id' , $cart->product_id)->first()['name'];
-                  $cart['reference'] = $cart->product_id;
-                  $cart['unit_price'] = $cart->unit_price;
+        try {
+
+            $cartList = Cart::where('user_id', $request->user_id)->get(['product_id', 'product_variation_id', 'qty', 'total', 'unit_price']);
+
+            foreach ($cartList as $cart) {
+
+                $cart['name'] =  Product::where('id', $cart->product_id)->first()['name'];
+                $cart['reference'] = $cart->product_id;
+                $cart['unit_price'] = $cart->unit_price;
             }
-            
-            $promoCode = $this->promoCodeCheck($request->coupon_code);
 
-            if(!$promoCode && empty($promoCode)) return response()->json('promo code is expired.' , 400);
+            if (isset($request->coupon_code)) {
 
-            $this->order_number = 'OR'. rand(999 , 888888999999);
-            
-            $mapedObject = $this->mapPaymentObject($request->all() , $cartList , $promoCode);
+                $promoCode = $this->promoCodeCheck($request->coupon_code);
+
+                if (!$promoCode) return response()->json('promo code is expired.', 400);
+            }
+
+            $this->order_number = 'OR' . rand(999, 888888999999);
+
+            $mapedObject = $this->mapPaymentObject($request->all(), $cartList, $promoCode);
 
             $order = (new OrderService())->createOrder($mapedObject);
-            
-            if(empty($mapedObject)) return response()->json('invalid data provided');
+
+            $payment = $this->createPayment($request);
+
+            if (empty($mapedObject) && $order && $payment) return response()->json('Invalid data provided');
 
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . $this->baseCode,
-                ])->post($this->baseURL .'/checkouts', $mapedObject);
-                
-                $data = $response->json();
+            ])->post($this->baseURL . '/checkouts', $mapedObject);
 
-                return ($response->getStatusCode() == 200 && !empty($data->token)) ? $data->redirect_url :  $data;
+            $data = $response->json();
 
-        }     
-        catch(RESTfulException $e) {
-
-            return response()->json(['ex_message'=>$e->getMessage() , 'error'=>$e->getErrorCode(),'line' =>$e->getLine()]);
+            return ($response->getStatusCode() == 200 && !empty($data->token)) ? $data->redirect_url :  $data;
             
+        } catch (RESTfulException $e) {
+
+            return response()->json(['ex_message' => $e->getMessage(), 'error' => $e->getErrorCode(), 'line' => $e->getLine()]);
         }
     }
 
-    public function promoCodeCheck($coupon_code){
+    public function promoCodeCheck($coupon_code)
+    {
 
         $ifValid = DB::table('promo_codes')
-              ->where('name', $coupon_code)
-              ->whereDate('end_date', '>=', date("Y-m-d"))
-              ->first();
-              
-              return ($ifValid) ? $ifValid : false;
-  }
+            ->where('name', $coupon_code)
+            ->whereDate('end_date', '>=', date("Y-m-d"))
+            ->first();
 
-  public function mapPaymentObject($data , $cartList , $promoCode){
-
-        $data['order_id'] = $this->order_number;
-         $data['items'] = $cartList;
-        //  $data['discounts']['code'] = $promoCode->name;
-         $data['merchant']['confirmation_url'] = $this->success_url;
-         $data['merchant']['cancel_url'] = $this->failed_url;
-         return $data;
-
-  }
-
-
-    public function capturePayment($order_id){
-        try{
-            $response = Http::withHeaders([
-                'Authorization' => 'Basic ' . $this->baseCode,
-                ])->post($this->baseURL .'/orders'. '/' .$order_id.'/capture');
-                
-                 $data = $response->json();
-
-                if($response->getStatusCode() == 200 AND $data['order_id'] == $order_id AND $data['status'] == 'captured') {
-                   return $data;
-                   $order = (new OrderService())->updateOrderAfterPayment($order_id);
-                }else{
-                    return 'Error';
-                }   
-            }
-            catch(RESTfulException $e) {
-                return response()->json(['ex_message'=>$e->getMessage() , 'error'=>$e->getErrorCode(),'line' =>$e->getLine()]);
-            }
-    
-
+        return ($ifValid) ? $ifValid : false;
     }
 
+    public function mapPaymentObject($data, $cartList, $promoCode)
+    {
+
+        $data['order_id'] = $this->order_number;
+        $data['items'] = $cartList;
+        $data['merchant']['cancel_url'] = $this->failed_url;
+        return $data;
+    }
+
+    public function createPayment($data)
+    {
+        //rest payment status will be updated in updateOrderAfterPayment function of OrderService Class
+
+        $payment = PaymentHistory::create([
+            'user_id' =>  0,
+            'user_email' => $data['customer']['email'],
+            'order_id' => $this->order_number,
+            'reference_number' => Null,
+            'captured' => false,
+            'amount' => $data['total_amount'],
+        ]);
+        return $payment ? true : false;
+    }
+
+
+    public function capturePayment($order_id)
+    {
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Basic ' . $this->baseCode,
+            ])->post($this->baseURL . '/orders' . '/' . $order_id . '/capture');
+
+            $data = $response->json();
+
+            if ($response->getStatusCode() == 200 && $data['order_id'] == $order_id && $data['status'] == 'captured') {
+
+                $order = (new OrderService())->updateOrderAfterPayment($order_id, $data['reference']);
+                return ($order) ?
+                    response()->json('Order has been Placed.') :
+                    response()->json('Internal Error while payment.');
+            } else if ($response->getStatusCode() == 402 && $data['error'] == 'capture_error') {
+                //payment transaction got failed
+                return response()->json($data['message'], 402);
+            } else if ($response->getStatusCode() == 409 && $data['error'] == 'invalid_status') {
+                //invalid status
+                return response()->json($data['message'], 409);
+            } else if ($response->getStatusCode() == 410 && $data['error'] == 'expired') {
+                //expired capture
+                return response()->json($data['message'], 410);
+            } else {
+                //general error
+                return response()->json('Network Error', 400);
+            }
+        } catch (RESTfulException $e) {
+            return response()->json(['ex_message' => $e->getMessage(), 'error' => $e->getErrorCode(), 'line' => $e->getLine()]);
+        }
+    }
 }
