@@ -7,6 +7,7 @@ use App\Models\Cart;
 use App\Models\PaymentHistory;
 use App\Models\Product;
 use App\Services\OrderService;
+use App\Services\UserService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
@@ -36,7 +37,17 @@ class PostPayPaymentService implements PaymentInterface
 
         try {
 
-            $cartList = Cart::where('user_id', $request->user_id)->get(['product_id', 'product_variation_id', 'qty', 'total', 'unit_price']);
+
+            if (isset($request->guest_id)) {
+                $user = (new UserService)->createUser($request);
+                return $user;
+            }
+            // exit;
+            $cartList = (isset($request->user_id))
+                ?
+                Cart::where('user_id', $request->user_id)->get(['product_id', 'product_variation_id', 'qty', 'total', 'unit_price'])
+                :
+                Cart::where('user_id', $request->user_id)->get(['product_id', 'product_variation_id', 'qty', 'total', 'unit_price']);
 
             foreach ($cartList as $cart) {
 
@@ -69,7 +80,6 @@ class PostPayPaymentService implements PaymentInterface
             $data = $response->json();
 
             return ($response->getStatusCode() == 200 && !empty($data->token)) ? $data->redirect_url :  $data;
-            
         } catch (RESTfulException $e) {
 
             return response()->json(['ex_message' => $e->getMessage(), 'error' => $e->getErrorCode(), 'line' => $e->getLine()]);
@@ -82,7 +92,7 @@ class PostPayPaymentService implements PaymentInterface
         $ifValid = DB::table('promo_codes')
             ->where('name', $coupon_code)
             ->whereDate('end_date', '>=', date("Y-m-d"))
-            ->first();
+            ->first(['name']);
 
         return ($ifValid) ? $ifValid : false;
     }
@@ -93,6 +103,8 @@ class PostPayPaymentService implements PaymentInterface
         $data['order_id'] = $this->order_number;
         $data['items'] = $cartList;
         $data['merchant']['cancel_url'] = $this->failed_url;
+        $data['merchant']['confirmation_url'] = $this->success_url;
+        $data['promocode'] = $promoCode;
         return $data;
     }
 
@@ -110,6 +122,7 @@ class PostPayPaymentService implements PaymentInterface
         ]);
         return $payment ? true : false;
     }
+
 
 
     public function capturePayment($order_id)

@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Category;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
-
 class CategoryFiltersController extends Controller
 {
 
@@ -16,9 +14,8 @@ class CategoryFiltersController extends Controller
 
         $variations =  DB::select("CALL CategoryFilterList('" . $category->route . "')");
         return response()->json($variations, 200);
+
     }
-
-
 
     public function CategoryListFilteration(Request $request)
     {
@@ -68,11 +65,9 @@ class CategoryFiltersController extends Controller
                 ->where('id', $category->id)
                 ->first();
 
-            $products->products->transform(function ($item) {
-                if ($item->productvariations !== null) {
-                    return $item;
-                }
-            })->all();
+            $filteredNull = $products->products->whereNotNull('productvariations');
+            unset($products->products);
+            $products->products = $filteredNull;
 
             return response()->json($products);
         } else {

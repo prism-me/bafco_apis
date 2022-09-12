@@ -17,18 +17,23 @@ class OrderService
     {
         try {
 
-            DB::beginTransaction();
 
-            $order = Order::create(
-                [
-                    'user_id' => $orderData['user_id'],
-                    'order_number' => $orderData['order_id'],
-                    'payment_id' => 1,
-                    'transaction_status' => 0,
-                    'paid' => 0,
-                    'payment_date' => null,
-                ]
-            );
+            $cartDeatils = CartCalculation::where('user_id', $orderData['user_id'])->first();
+            DB::beginTransaction();
+            $order = Order::create([
+                'user_id' => $orderData['user_id'],
+                'order_number' => $orderData['order_id'],
+                'payment_id' => 1,
+                'transaction_status' => 0,
+                'paid' => 0,
+                'coupon' => $orderData['promocode']->name,
+                'discount' => $cartDeatils['discount'],
+                'shipping_charges' => $cartDeatils['shipping_charges'],
+                'total' => $cartDeatils['total'],
+                'sub_total' => $cartDeatils['sub_total'],
+                'status' => 'ORDERPLACED',
+                'payment_date' => null,
+            ]);
 
             foreach ($orderData['items'] as $item) {
 
@@ -78,7 +83,6 @@ class OrderService
             DB::commit();
 
             return true;
-            
         } catch (\Exception $e) {
 
             DB::rollBack();
