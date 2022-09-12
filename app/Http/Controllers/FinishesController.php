@@ -47,8 +47,8 @@ class FinishesController extends Controller
             $FinishesValue->update($finishesValueCreate);
             $finishesValuePivotCreate = [
                'material_id' => $data['material_id'],
-               'finishes_id' => isset($finishesCreated['id']) ? $finishesCreated['id'] : '' ,
-               'finishes_value_id' => isset($FinishesValue->id) ? $FinishesValue->id : '',
+               'finishes_id' => $data['id'],
+               'finishes_value_id' => isset($FinishesValue['id']) ? $FinishesValue['id'] : '',
             ];
             $finishesValuePivot = FinishesValuePivot::where('finishes_id',$request->id)->where('material_id',$data['material_id'])->first();
             $finishesValuePivot->update($finishesValuePivotCreate);
