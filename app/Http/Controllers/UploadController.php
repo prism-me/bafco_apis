@@ -132,6 +132,7 @@ class UploadController extends Controller
     public function delete_images(Upload $upload){
 
 
+
         if($upload->delete()){
 
 

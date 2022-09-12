@@ -32,7 +32,7 @@ class ProjectController extends Controller
 
         try{
 
-            // return $request->files;
+
 
             $data = [
                 'title' =>  $request->title ,
@@ -46,9 +46,6 @@ class ProjectController extends Controller
                 'files' => $request->files,
                 'seo' => $request->seo
             ];
-
-            return $data;
-
 
             if(Project::where('id', $request->id)->exists()){
 
@@ -73,12 +70,13 @@ class ProjectController extends Controller
             }else{
 
                 #create
-                $project = Project::create($request->all());
+                $projectCreate = Project::firstOrcreate($request->all());
+
                 $i = 0;
                 foreach($data['category_id'] as $value){
 
                     $create = [
-                        'project_id' => $project['id'],
+                        'project_id' => $projectCreate['id'],
                         'category_id' => $value
                     ];
 

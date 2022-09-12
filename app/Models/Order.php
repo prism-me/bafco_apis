@@ -12,7 +12,7 @@ class Order extends Model
     protected $table = 'orders';
 
     protected $fillable = [
-        'user_id'	,
+        'user_id',
         'order_number',
         'payment_id',
         'transaction_status',
@@ -29,5 +29,16 @@ class Order extends Model
 
     public function order_details(){
         return $this->hasMany(OrderDetail::class , 'order_id' , 'id');
+    }
+
+    public function orderAddress(){
+        return $this->hasOne(Address::class , 'id' , 'address_id');
+    }
+
+    public function userDetail(){
+
+        return $this->belongsTo(User::class, 'user_id','id');
+
+
     }
 }

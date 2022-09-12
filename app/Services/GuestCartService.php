@@ -1,16 +1,15 @@
 <?php
 
 namespace App\Services;
-use App\Models\Cart;
+use App\Models\GuestCart;
 use App\Models\ProductVariation;
-
-use App\Models\CartCalculation;
+use App\Models\GuestCartCalculation;
 use App\Models\Product;
 use DB;
 
 
 
-class CartService {
+class GuestCartService {
 
     public function addToCart($data){
 
@@ -21,23 +20,23 @@ class CartService {
             'qty' =>  $data['qty'] ,
         ];
 
-        $cartValue = Cart::where('product_id', $data['product_id'])->where('product_variation_id', $data['product_variation_id'])->where('user_id',$data['user_id'])->first();
+        $cartValue = GuestCart::where('product_id', $data['product_id'])->where('product_variation_id', $data['product_variation_id'])->where('user_id',$data['user_id'])->first();
         if( $cartValue){
 
             $create['qty'] = $cartValue['qty'] + 1;
 
             $cartUpdate = $cartValue->update($create);
-            $cart = Cart::where('id',$cartValue->id)->first();
-            $cartData = (new CartService)->cartDetail($cart);
+            $cart = GuestCart::where('id',$cartValue->id)->first();
+            $cartData = (new GuestCartService)->cartDetail($cart);
             return $cartData;
 
         }else{
 
             #create
 
-            $cart = Cart::create($create);
-            $cart = Cart::where('id',$cart->id)->first();
-            $cartData = (new CartService)->cartDetail($cart);
+            $cart = GuestCart::create($create);
+            $cart = GuestCart::where('id',$cart->id)->first();
+            $cartData = (new GuestCartService)->cartDetail($cart);
             return $cartData;
 
         }
@@ -50,12 +49,12 @@ class CartService {
     public function incrementQty($data){
 
 
-        $cart = Cart::where('id',$data['cart_id'])->first();
+        $cart = GuestCart::where('id',$data['cart_id'])->first();
 
         $update['qty'] = $data['qty'] + $cart->qty;
-        $cartUpdate = Cart::where('id',$data['cart_id'])->update($update);
-        $cart = Cart::where('id',$data['cart_id'])->first();
-        $cartData = (new CartService)->cartDetail($cart);
+        $cartUpdate = GuestCart::where('id',$data['cart_id'])->update($update);
+        $cart = GuestCart::where('id',$data['cart_id'])->first();
+        $cartData = (new GuestCartService)->cartDetail($cart);
 
 
         if($cartData){
@@ -92,8 +91,8 @@ class CartService {
 
 
                 $updateCart['total'] = $quantity * $price;
-                $cartUpdated = Cart::where('id', $cart->id)->update($updateCart);
-                $cartPrice = Cart::where('user_id', $cart->user_id)->pluck('total');
+                $cartUpdated = GuestCart::where('id', $cart->id)->update($updateCart);
+                $cartPrice = GuestCart::where('user_id', $cart->user_id)->pluck('total');
                 $finalAmount = $cartPrice->sum();
 
 
@@ -106,14 +105,14 @@ class CartService {
                 ];
 
 
-                if($cartcal = CartCalculation::where('user_id',$cart->user_id)->exists()){
+                if($cartcal = GuestCartCalculation::where('user_id',$cart->user_id)->exists()){
 
-                    CartCalculation::where('user_id',$cart->user_id)->update($cartCalculation);
+                    GuestCartCalculation::where('user_id',$cart->user_id)->update($cartCalculation);
 
                 }else{
 
 
-                    $cartCalculation = CartCalculation::create($cartCalculation);
+                    $cartCalculation = GuestCartCalculation::create($cartCalculation);
 
                 }
 

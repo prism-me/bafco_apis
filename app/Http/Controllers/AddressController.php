@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Address;
-use App\Models\User;
 use App\Services\AddressService;
 use Illuminate\Http\Request;
 
@@ -34,7 +33,7 @@ class AddressController extends Controller
 
             $address = AddressService::addAddress($request->all());
 
-            return $address;
+            //return $address;
             if($address){
 
                  return  response()->json('Data has been saved.' , 200);
@@ -76,10 +75,10 @@ class AddressController extends Controller
 
             $address = AddressService::setDefaultAddress($data,$id);
 
-            return $address;
+//            /return $address;
             if($address){
 
-                 return  response()->json('Data has been saved.' , 200);
+                 return  response()->json('Address Updated Successfully.' , 200);
             }
 
         }

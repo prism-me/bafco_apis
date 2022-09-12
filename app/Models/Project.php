@@ -18,7 +18,8 @@ class Project extends Model
         "related_products",
         "files",
         "route",
-        "seo"
+        "seo",
+        'thumbnail_img'
     ];
 
     protected $casts = [

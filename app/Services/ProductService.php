@@ -91,7 +91,7 @@ class ProductService
     public function updateProduct($data)
     {
         try {
-
+            \DB::beginTransaction();
             #Updating Products Against That ID
 
             $product = Product::where('id', $data['id'])->update([
@@ -186,11 +186,16 @@ class ProductService
 
 
             }
+            \DB::commit();
             return response()->json('Data has been saved.', 200);
         } catch (\Exception $e) {
-            // DB::rollBack();
+            \DB::rollBack();
             return response()->json(['Product is not added.', 'stack' => $e], 500);
         }
     }
+
+
+
+
 
 }

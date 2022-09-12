@@ -35,7 +35,7 @@ class RegisterService {
             $fourRandomDigit = rand(10000,99999);
             $userData['code'] = $fourRandomDigit;
             $userCreate = TempUser::create($userData);
-            // event(new RegisterCreate($userData));
+            event(new RegisterCreate($userData));
             return json_encode(['message' => 'E-Mail Verification has been sent to your registered account!','status' => 200]);
         }
 
@@ -45,20 +45,28 @@ class RegisterService {
 
           $user = TempUser::where('code',$code)->first();
           if($user){
+
             $timeLimit = strtotime($user['created_at']) + 1800;
             if(time() > $timeLimit){
-                return json_encode('Token Expired');
-           }
-            else{
-                $tempUser = TempUser::where('isActive' , 0)->delete();
-                $userCreate =  User::create($user);
+                TempUser::where('email',$user->email)->delete();
+                return response()->json(['error' =>'Token Expired',400]);
+            }else{
 
-                return json_encode('Register Successfully');
+                $create = [
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'password' => $user->password
+                ];
+
+                $userCreate =  User::create($create);
+                $user->delete();
+
+                return response()->json('Register Successfully',200);
             }
-        }else{
-              return json_encode('Token Expired');
+          }else{
+                  return response()->json(['error' => 'Invalid Token!',400]);
 
-       }
+           }
     }
 
 

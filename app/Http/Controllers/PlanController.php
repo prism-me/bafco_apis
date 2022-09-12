@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class PlanController extends Controller
 {
-    
+
     public function index(){
 
         $plan = Plan::with('planCategory')->get();
@@ -15,13 +15,24 @@ class PlanController extends Controller
 
     public function store(Request $request){
 
-
+        $data = $request->all();
+        $create = [
+            'category_id' => $data['category_id'],
+            'title' => $data['title'],
+            'sub_title' => $data['sub_title'],
+            'featured_img' => $data['featured_img'],
+            'thumbnail_img' => $data['thumbnail_img'],
+            'concept' => $data['concept'],
+            'files' => $data['files'],
+            'route' => $data['route'],
+            'seo' => $data['seo']
+        ];
         if(Plan::where('id',$request->id)->exists()){
 
-            $plan = Plan::where('id',$request->id)->update($request->all());
+            $plan = Plan::where('id',$request->id)->update($create);
 
         }else{
-            $plan = Plan::create($request->all());
+            $plan = Plan::create($create);
         }
 
         if($plan){
@@ -31,14 +42,14 @@ class PlanController extends Controller
 
             return response()->json('Something went wrong', 404);
         }
-        
+
 
     }
 
 
     public function show($id){
 
-        $plan = Plan::where('id',$id)->with('planCategory')->first();
+        $plan = Plan::where('id',$id)->first();
         if($plan){
 
             return response()->json($plan,200);

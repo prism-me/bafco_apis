@@ -2,18 +2,15 @@
 
 namespace App\Services;
 use App\Models\Address;
-use App\Models\User;
 
 class AddressService {
 
-    public function addAddress($data){
+    static function addAddress($data){
 
         $user =  $data['user_id'];
         $exist = Address::where('user_id',$user)->first();
-        
+
         if( $exist != null) {
-
-
 
             if (!empty($data['id'])) {
 
@@ -41,7 +38,8 @@ class AddressService {
         }
     }
 
-    public function setDefaultAddress($data,$id){
+    static function setDefaultAddress($data,$id){
+
 
         $setDefault = [
             'default' => 1
@@ -63,7 +61,7 @@ class AddressService {
 
         $address = Address::where('id',$id)->update($setDefault);
         if($address){
-            return  response()->json('Data has been updated.' , 200);
+            return  response()->json('Data has been Updated.' , 200);
         }
     }
 }

@@ -1,32 +1,28 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Cart;
-use App\Models\CartCalculation;
-use App\Models\Category;
+
+use App\Models\GuestCart;
+use App\Models\GuestCartCalculation;
 use App\Models\Product;
 use App\Models\ProductVariation;
-use App\Models\VariationValues;
-use App\Services\CartService;
-use Auth;
-use DB;
+use App\Services\GuestCartService;
 use Illuminate\Http\Request;
 
-class CartController extends Controller
+class GuestCartController extends Controller
 {
-
     public function index($id)
     {
         try{
 
-            $cart = Cart::where('user_id',$id)->get();
+            $cart = GuestCart::where('user_id',$id)->get();
 
             if(!blank($cart)){
 
                 $i=0;
                 foreach($cart as $cartValue){
 
-                    $data[$i]['cart'] = Cart::where('id',$cartValue->id)->get(['id']);
+                    $data[$i]['cart'] = GuestCart::where('id',$cartValue->id)->get(['id']);
                     $data[$i]['productData'] = Product::where('id',$cartValue->product_id)->with('productCategory.parentCategory')->get(['name','id', 'route' ,'category_id']);
                     $data[$i]['variation'] = ProductVariation::where('id',$cartValue->product_variation_id)->with('productVariationName.productVariationValues.variant')->get(['id','product_id' , 'upper_price','in_stock','images']);
                     $data[$i]['qty'] = $cartValue->qty;
@@ -56,7 +52,7 @@ class CartController extends Controller
         try{
 
             $data = $request->all();
-            $cart = CartService::addToCart($data);
+            $cart = GuestCartService::addToCart($data);
 
 
             if($cart){
@@ -79,13 +75,13 @@ class CartController extends Controller
 
     public function removeCart($id)
     {
-        $cart = Cart::where('id',$id)->first();
-        $cartCalc = CartCalculation::where('user_id',$cart['user_id'])->first();
+        $cart = GuestCart::where('id',$id)->first();
+        $cartCalc = GuestCartCalculation::where('user_id',$cart['user_id'])->first();
 
         $update['total'] =  $cartCalc['total'] - $cart['unit_price'];
         $update['sub_total'] =  $cartCalc['sub_total'] - $cart['unit_price'];
-        $cart = CartCalculation::where('user_id',$cart['user_id'])->update($update);
-        Cart::where('id',$id)->delete();
+        $cart = GuestCartCalculation::where('user_id',$cart['user_id'])->update($update);
+        GuestCart::where('id',$id)->delete();
 
         if($cart){
             return response()->json('Cart has been deleted.' , 200);
@@ -95,7 +91,7 @@ class CartController extends Controller
 
     public function clearAllCart($id)
     {
-        $cart = Cart::where('user_id',$id)->delete();
+        $cart = GuestCart::where('user_id',$id)->delete();
         if($cart){
             return response()->json('Cart has been deleted.' , 200);
         }
@@ -107,7 +103,7 @@ class CartController extends Controller
         try{
 
             $data = $request->all();
-            $cart = CartService::incrementQty($data);
+            $cart = GuestCartService::incrementQty($data);
 
             if($cart){
 
@@ -130,7 +126,7 @@ class CartController extends Controller
 
     public function show($id){
 
-        $cart = Cart::where('id',$id)->first();
+        $cart = GuestCart::where('id',$id)->first();
         $productData = Product::where('id',$cart['product_id'])->with('category.parentCategory')->first();
         $productVariation =  ProductVariation::where('id',$cart['product_variation_id'])->with('productVariationName.productVariationValues')->first();
         $product = [  $productData , $productVariation ,$cart];
@@ -141,14 +137,14 @@ class CartController extends Controller
 
     public function cartTotal($id){
 
-        $cartTotal = CartCalculation::where('user_id',$id)->first();
+        $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
 
         if($cartTotal['sub_total'] > 2000){
 
             $update['shipping_charges'] = "Free";
             $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-            CartCalculation::where('user_id',$id)->update($update);
-            $cartTotal = CartCalculation::where('user_id',$id)->first();
+            GuestCartCalculation::where('user_id',$id)->update($update);
+            $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
             return response()->json($cartTotal);
 
         }else{
@@ -158,8 +154,8 @@ class CartController extends Controller
                 $update['shipping_charges']  = 200;
                 $update['total']  = $cartTotal['total'] + 200;
                 $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-                CartCalculation::where('user_id',$id)->update($update);
-                $cartTotal = CartCalculation::where('user_id',$id)->first();
+                GuestCartCalculation::where('user_id',$id)->update($update);
+                $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
                 return response()->json($cartTotal);
 
             }elseif($cartTotal['shipping_charges'] == "Free"){
@@ -167,8 +163,8 @@ class CartController extends Controller
                 $update['shipping_charges']  = 200;
                 $update['total']  = $cartTotal['total'] + 200;
                 $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-                CartCalculation::where('user_id',$id)->update($update);
-                $cartTotal = CartCalculation::where('user_id',$id)->first();
+                GuestCartCalculation::where('user_id',$id)->update($update);
+                $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
                 return response()->json($cartTotal);
 
             }else{
@@ -180,10 +176,4 @@ class CartController extends Controller
         }
 
     }
-
-
-
-
-
-
 }

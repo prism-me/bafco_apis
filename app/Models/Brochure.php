@@ -20,12 +20,13 @@ class Brochure extends Model
     ];
 
     protected $casts = [
+        'category_id' => 'array',
         'files' => 'array',
-        'seo' => 'array',
+        'seo' => 'array'
     ];
 
     public function broucherCategory(){
 
-        return $this->belongsTo(Category::class , 'category_id','id');
+        return $this->belongsToMany(Category::class , 'brochures_category_pivot','brochure_id' , 'category_id');
     }
 }
