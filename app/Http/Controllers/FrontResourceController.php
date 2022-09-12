@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\FinishesValuePivot;
-use App\Models\Project;
 use App\Models\Blog;
-use App\Models\Product;
 use App\Models\Brochure;
-use App\Models\Video;
+use App\Models\BrochureCategoryPivot;
+use App\Models\Category;
 use App\Models\Finishes;
+use App\Models\FinishesValue;
+use App\Models\FinishesValuePivot;
+use App\Models\Material;
 use App\Models\Page;
 use App\Models\Plan;
-use App\Models\Material;
+use App\Models\Product;
+use App\Models\Project;
 use App\Models\ProjectCategory;
 use App\Models\ProjectCategoryPivot;
-use App\Models\BrochureCategoryPivot;
-
+use App\Models\Video;
 use Illuminate\Http\Request;
 
 class FrontResourceController extends Controller
@@ -37,7 +37,7 @@ class FrontResourceController extends Controller
         $videos = Video::where('type', "=", 'resource')->get()->take(8);
         $plans  = Plan::get()->take(3);
         $pages = Page::where('identifier','=','resources')->first();
-        $fabrics = Finishes::where('parent_id','!=', 0)->with('child')->get();
+        $fabrics = FinishesValue::get('featured_img');
         $resource = [
             'page' => $pages,
             'project' => $project,
@@ -195,20 +195,44 @@ class FrontResourceController extends Controller
 
                 $material = Material::where('name','=', 'Leather')->with('materialValues.values')->first();
 
+
                 $filterList = FinishesValuePivot::where('material_id', $material->id)->pluck('finishes_id');
-                $categoryList = Finishes::whereIn('id',$filterList)->where('parent_id', '=', 0)->with('child')->get();
-                return response()->json($categoryList);
+                $finishesList = Finishes::with('child.value')->where('parent_id', 0)->whereIn('id',$filterList)->get();
+                $finishesData = FinishesValue::whereIn('finishes_id',$filterList)->get();
+                $data = [
+                    'finishesList' => $finishesList,
+                    'finishesData' => $finishesData,
+
+                ];
+                return response()->json($data);
 
             }else{
 
                 $material = Material::where('name',$type)->with('materialValues.values')->first();
 
                 $filterList = FinishesValuePivot::where('material_id', $material->id)->pluck('finishes_id');
-                $categoryList = Finishes::whereIn('id',$filterList)->where('parent_id', '=', 0)->with('child')->get();
-                return response()->json($categoryList);
+                $finishesList = Finishes::with('child.value')->where('parent_id', 0)->whereIn('id',$filterList)->get();
+                $finishesData = FinishesValue::whereIn('finishes_id',$filterList)->get();
+                $data = [
+                    'finishesList' => $finishesList,
+                    'finishesData' => $finishesData,
+
+                ];
+                return response()->json($data);
 
 
             }
+
+        }
+
+
+        public function finishesFilterData(Request $request){
+
+            $data = $request->all();
+            $materialId = $data['material_id'];
+            $finishesId = $data['finishes_id'];
+            $value = FinishesValue::where('material_id',$materialId)->where('finishes_id',$finishesId)->with('values.child.value')->first();
+            return response()->json($value);
 
         }
 

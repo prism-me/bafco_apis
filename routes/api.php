@@ -210,7 +210,7 @@ use Illuminate\Support\Facades\Route;
 
         #Plans
             Route::get('finishes-filter-list/{type}', 'FrontResourceController@finishesFilterList');
-            Route::get('finishes-filter-list/{type}', 'FrontResourceController@finishesFilterList');
+            Route::post('finishes-filter-data', 'FrontResourceController@finishesFilterData');
 
 
     /* End Resource Front Page*/
@@ -294,11 +294,16 @@ use Illuminate\Support\Facades\Route;
 
     #Dashboard CMS
         Route::get('all-users', 'DashboardController@allUsers');
+        Route::get('all-orders', 'DashboardController@allOrder');
+        Route::get('order-detail/{id}', 'DashboardController@orderDetail');
+        Route::post('confirm-order', 'DashboardController@confirmOrder');
+        Route::post('cancel-order', 'DashboardController@cancelOrder');
 
 
 
 
-});
+
+    });
 
 Route::fallback(function () {
     return response()->json(['message'=>'Invalid    Route'] , 400);
