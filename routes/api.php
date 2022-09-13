@@ -211,6 +211,7 @@ use Illuminate\Support\Facades\Route;
         #Plans
             Route::get('finishes-filter-list/{type}', 'FrontResourceController@finishesFilterList');
             Route::post('finishes-filter-data', 'FrontResourceController@finishesFilterData');
+            Route::get('finishes-filter-detail/{id}', 'FrontResourceController@finishesFilterDetail');
 
 
     /* End Resource Front Page*/
@@ -298,6 +299,9 @@ use Illuminate\Support\Facades\Route;
         Route::get('order-detail/{id}', 'DashboardController@orderDetail');
         Route::post('confirm-order', 'DashboardController@confirmOrder');
         Route::post('cancel-order', 'DashboardController@cancelOrder');
+        Route::get('product-report-list', 'DashboardController@productReportList');
+        Route::get('product-report-detail/{id}', 'DashboardController@productReportDetail');
+
 
 
 

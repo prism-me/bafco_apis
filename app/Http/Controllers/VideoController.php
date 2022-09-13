@@ -20,24 +20,31 @@ class VideoController extends Controller
             return response()->json($video, 200);
         }
         catch (\Exception $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
     }
 
- 
+
     public function store(VideoRequest $request)
     {
        try{
-
-                if(Video::where('id', $request->id)->exists()){ 
+                $data = [
+                    'title' => $request->title,
+                    'sub_title' => $request->sub_title,
+                    'link' => isset($request->link) ? $request->link : '',
+                    'description' => $request->description,
+                    'thumbnail' => isset($request->thumbnail) ? $request->thumbnail : '',
+                    'type' => $request->type,
+                ];
+                if(Video::where('id', $request->id)->exists()){
 
                     #update
-                    $video = Video::where('id', $request->id)->update($request->all());
+                    $video = Video::where('id', $request->id)->update($data);
 
                 }else{
 
                     #create
-                    $video = Video::create($request->all());
+                    $video = Video::create($data);
                 }
                 if($video){
                     return  response()->json('Data has been saved.' , 200);
@@ -48,8 +55,8 @@ class VideoController extends Controller
             return response()->json(['ex_message'=>'Video Not found.' , 'line' =>$exception->getLine() ], 400);
         }
         catch (\Error $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
-        } 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
     }
 
     public function show(Video $video)
@@ -57,7 +64,7 @@ class VideoController extends Controller
         if(!$video){
             return response()->json('No Record Found.' , 404);
         }
-       
+
         return response()->json($video , 200);
     }
 

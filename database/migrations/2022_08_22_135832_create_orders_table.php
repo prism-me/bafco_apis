@@ -16,12 +16,12 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            $table->bigInteger('address_id')->nullable();
             $table->string('order_number');
             $table->foreignId('payment_id');
             $table->string('transaction_status')->default('pendings');
             $table->boolean('paid')->default(false);
             $table->string('payment_date')->nullable();
+
             $table->timestamps();
         });
     }

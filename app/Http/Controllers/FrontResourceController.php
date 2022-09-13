@@ -198,7 +198,7 @@ class FrontResourceController extends Controller
 
                 $filterList = FinishesValuePivot::where('material_id', $material->id)->pluck('finishes_id');
                 $finishesList = Finishes::with('child.value')->where('parent_id', 0)->whereIn('id',$filterList)->get();
-                $finishesData = FinishesValue::whereIn('finishes_id',$filterList)->get();
+                $finishesData = FinishesValue::where('material_id',$material->id)->whereIn('finishes_id',$filterList)->with('values.child.value')->get();
                 $data = [
                     'finishesList' => $finishesList,
                     'finishesData' => $finishesData,
@@ -212,7 +212,8 @@ class FrontResourceController extends Controller
 
                 $filterList = FinishesValuePivot::where('material_id', $material->id)->pluck('finishes_id');
                 $finishesList = Finishes::with('child.value')->where('parent_id', 0)->whereIn('id',$filterList)->get();
-                $finishesData = FinishesValue::whereIn('finishes_id',$filterList)->get();
+                $finishesData = FinishesValue::where('material_id',$material->id)->whereIn('finishes_id',$filterList)->with('values.child.value')->get();
+
                 $data = [
                     'finishesList' => $finishesList,
                     'finishesData' => $finishesData,
@@ -231,10 +232,33 @@ class FrontResourceController extends Controller
             $data = $request->all();
             $materialId = $data['material_id'];
             $finishesId = $data['finishes_id'];
-            $value = FinishesValue::where('material_id',$materialId)->where('finishes_id',$finishesId)->with('values.child.value')->first();
-            return response()->json($value);
+            $filterList = FinishesValuePivot::where('material_id', $materialId)->pluck('finishes_id');
+            $finishesList = Finishes::with('child.value')->where('parent_id', 0)->whereIn('id',$filterList)->get();
+            $finishesData = FinishesValue::where('material_id',$materialId)->where('finishes_id',$finishesId)->with('values.child.value')->get();
+            $data = [
+                'finishesList' => $finishesList,
+                'finishesData' => $finishesData,
+            ];
+            return response()->json($data);
 
         }
+
+        public function finishesFilterDetail($id){
+
+            $value = FinishesValue::where('finishes_id', $id)->with('values.parent')->first();
+            $materialName = Material::where('id',$value['material_id'])->first(['name']);
+            $data = [
+                'material' => $materialName,
+                'detailData' => $value
+            ];
+            return response()->json($data);
+
+
+
+        }
+
+
+
 
 
 

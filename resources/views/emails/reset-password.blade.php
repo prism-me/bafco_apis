@@ -73,11 +73,10 @@ span.psw {
             {{ @$error }}
         </div>
     @endif
-    @if(!@$error) 
+    @if(!@$error)
     <h2>Reset Password</h2>
     <form action="{{ url('submit-reset-password') }}" method="post" style="padding:2rem">
-    
-        @csrf   
+        @csrf
            <input type="hidden" name="token" value= "{{$token}}">
             <label for="uname"><b>New Pasword</b></label>
             <input type="password" placeholder="Enter Password" name="password" required>
@@ -90,10 +89,10 @@ span.psw {
                 {{ $message }}
             @enderror
             <button type="submit">Reset</button>
-        
+
     </form>
     @endif
-    
+
 </div>
 </body>
 </html>
