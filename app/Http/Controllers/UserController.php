@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use App\Http\Requests\user\LoginRequest;
 use App\Http\Requests\user\ResetRequest;
@@ -200,6 +201,14 @@ class UserController extends Controller
 
     }
     #####End Forgot Password######
+
+
+    public function trackOrder($id){
+
+        $status = Order::where('order_number', $id)->first('status');
+        return $status;
+
+    }
 
 
     public function logout()

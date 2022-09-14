@@ -266,10 +266,12 @@ use Illuminate\Support\Facades\Route;
         Route::post('/logout', 'UserController@logout')->middleware('auth:sanctum');
         Route::post('/update-profile', 'UserController@updateProfile')->middleware('auth:sanctum');
         Route::post('/change-password', 'UserController@changePassword')->middleware('auth:sanctum');
+        Route::get('/track-order/{id}', 'UserController@trackOrder')->middleware('auth:sanctum');
 
 
 
-    #Wishlist
+
+        #Wishlist
         Route::get('wishlists/{id}', 'WishlistController@index')->middleware('auth:sanctum');
         Route::get('wishlists/{id}', 'WishlistController@index')->middleware('auth:sanctum');
         Route::get('wishlist-detail/{id}', 'WishlistController@show')->middleware('auth:sanctum');
@@ -290,18 +292,22 @@ use Illuminate\Support\Facades\Route;
         Route::get('promo-cart-total/{id}', 'CartController@promoCartDetail')->middleware('auth:sanctum');
 
     #Dashboard CMS
+
+        Route::post('dashboard-details', 'DashboardController@dashboardDetails');
         Route::get('all-users', 'DashboardController@allUsers');
         Route::get('all-orders', 'DashboardController@allOrder');
         Route::get('order-detail/{id}', 'DashboardController@orderDetail');
-        Route::post('confirm-order', 'DashboardController@confirmOrder');
-        Route::post('cancel-order', 'DashboardController@cancelOrder');
+        Route::post('change-order-status', 'DashboardController@changeOrderStatus');
         Route::get('product-report-list', 'DashboardController@productReportList');
         Route::get('product-report-detail/{id}', 'DashboardController@productReportDetail');
+        Route::get('transactions', 'DashboardController@transaction');
+        Route::post('transaction-filter','DashboardController@transactionFilter');
 
-
-
-
-
+    #Todo
+        Route::get('todos', 'TodoController@index')->middleware('auth:sanctum');
+        Route::post('todos', 'TodoController@store')->middleware('auth:sanctum');
+        Route::get('todos/{id}', 'TodoController@show')->middleware('auth:sanctum');
+        Route::delete('todos/{id}', 'TodoController@destroy')->middleware('auth:sanctum');
 
     });
 
