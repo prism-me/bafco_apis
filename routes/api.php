@@ -302,6 +302,8 @@ use Illuminate\Support\Facades\Route;
         Route::get('product-report-detail/{id}', 'DashboardController@productReportDetail');
         Route::get('transactions', 'DashboardController@transaction');
         Route::post('transaction-filter','DashboardController@transactionFilter');
+        Route::get('sales-list','DashboardController@salesList');
+        Route::get('sales-count','DashboardController@salesCount');
 
     #Todo
         Route::get('todos', 'TodoController@index')->middleware('auth:sanctum');

@@ -160,6 +160,28 @@ class DashboardController extends Controller
     /* End Payment Transaction History */
 
 
+    /* Sales */
+
+        public function salesList(){
+            $sales = Order::where('status',"ORDERDELIVERED")->with('userDetail')->get();
+            return response()->json($sales);
+        }
+
+        public function salesCount(){
+            $total = Order::where('status',"ORDERDELIVERED")->pluck('total');
+            $discount = Order::where('status',"ORDERDELIVERED")->pluck('discount');
+            $totalSales = $total->sum();
+            $totalDiscount = $discount->sum();
+            $count = [
+                'totalSales' => $totalSales,
+                'discount' => $totalDiscount
+            ];
+            return $count;
+
+
+        }
+    /* End Sales*/
+
     /* Main Dashboard Page */
 
         public function dashboardDetails(Request $request){
