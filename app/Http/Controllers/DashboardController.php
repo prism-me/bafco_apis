@@ -98,4 +98,13 @@ class DashboardController extends Controller
 
     /**/
 
+
+
+    /* Payment Transaction History */
+
+        public function transaction(){
+
+        }
+    /* End Payment Transaction History */
+
 }
