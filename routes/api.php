@@ -160,14 +160,10 @@ use Illuminate\Support\Facades\Route;
         Route::put('set-default/{id}', 'AddressController@setDefault')->middleware('auth:sanctum');
 
 
-    Route::get('ttt',function(){
-       $mytime = Carbon\Carbon::now()->toDateTimeString();
-    });
-
     #Payment
         Route::post('/checkout' , [PaymentController::class , 'checkout'] );
         Route::post('/guestCheckout' , [PaymentController::class , 'guestCheckout'] );
-        Route::post('/authCheckout' , [PaymentController::class , 'authCheckout'] )->middleware('auth:sanctum');
+        Route::post('/authCheckout' , [PaymentController::class , 'authCheckout'] );
         Route::get('/paymentSuccess' , [PaymentController::class , 'successResponse']);
         Route::get('/paymentFailed' , [PaymentController::class , 'failedResponse']);
 

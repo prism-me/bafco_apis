@@ -17,14 +17,13 @@ class Order extends Model
         'payment_id',
         'transaction_status',
         'paid',
-        'payment_date',
-        'address_id',
-        'coupon',
         'discount',
+        'coupon',
         'shipping_charges',
-        'status',
-        'sub_total',
         'total',
+        'sub_total',
+        'status',
+        'payment_date',	
     ];
 
 
