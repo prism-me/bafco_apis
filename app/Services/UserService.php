@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Address;
 use App\Models\User;
 use auth;
 use Hash;
+use Illuminate\Support\Facades\DB;
 
 class UserService
 {
@@ -44,6 +46,8 @@ class UserService
         $user = User::where('id', $data['user_id'])->first();
 
         if ($user->exists()) {
+
+
             $password =  Hash::check($data['change_password'],  $user['password']);
             $currentPassword =  Hash::check($data['password'],  $user['password']);
 
@@ -79,9 +83,72 @@ class UserService
         }
     }
 
-
+    //convert guest user into registered user
     public function createUser($user)
     {
-        return $user;
+        DB::beginTransaction();
+
+        try {
+
+            $isExist = User::where('email', $user['customer']['email'])->first(['id']);
+            $data = $user['billing_address'];
+            $getId = $isExist;
+            if (!$isExist) {
+
+                $getId = User::create([
+                    'name' => $data['first_name'] . $data['last_name'],
+                    'email' => $user['customer']['email'],
+                    'password' => bcrypt('Bafco123'),
+                    'user_type' => 'user',
+                ]);
+
+                Address::create([
+                    'user_id' => $getId->id,
+                    'name' => $data['first_name'] . $data['last_name'],
+                    'country' => $data['country'],
+                    'state' => $data['state'],
+                    'city' => $data['city'],
+                    'address_line1' => $data['line1'],
+                    'address_line2' => $data['line2'],
+                    'postal_code' => $data['postal_code'],
+                    'phone_number' => $data['phone'],
+                    'default' => 1,
+                    'address_type' => 'billing'
+                ]);
+
+            } else {
+
+                Address::create([
+                    'user_id' => $getId->id,
+                    'name' => $data['first_name'] . " " . $data['last_name'],
+                    'country' => $data['country'],
+                    'state' => $data['state'],
+                    'city' => $data['city'],
+                    'address_line1' => $data['line1'],
+                    'address_line2' => $data['line2'],
+                    'postal_code' => $data['postal_code'],
+                    'phone_number' => $data['phone'],
+                    'default' => 1,
+                    'address_type' => 'billing'
+                ]);
+            }
+
+            DB::commit();
+            return $getId->id;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return false;
+        }
     }
 }
+
+
+//when user is logged in then only address id will be sent to me and i have to get it from database.
+
+
+// in case of guest users we have to first check if that user exists or not
+
+
+// if user exist then we dont need to resigter just add the address in the database
+
+// if user does not exist then add address and user data into database

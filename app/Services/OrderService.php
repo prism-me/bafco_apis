@@ -12,16 +12,14 @@ use Illuminate\Support\Facades\DB;
 class OrderService
 {
 
-
-    public function createOrder($orderData)
+    public function createOrder($orderData , $user_id)
     {
         try {
 
-
-            $cartDeatils = CartCalculation::where('user_id', $orderData['user_id'])->first();
+           $cartDeatils = CartCalculation::where('user_id', $user_id)->first();
             DB::beginTransaction();
             $order = Order::create([
-                'user_id' => $orderData['user_id'],
+                'user_id' => $user_id,
                 'order_number' => $orderData['order_id'],
                 'payment_id' => 1,
                 'transaction_status' => 0,
@@ -47,8 +45,10 @@ class OrderService
 
                 ]);
             }
+            
 
             DB::commit();
+            return true;
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -60,13 +60,13 @@ class OrderService
     {
 
         try {
-            DB::beginTransaction();
-
+            // DB::beginTransaction();
             $order = Order::where('order_number', $orderData)->first();
             $order->transaction_status = 1;
             $order->paid = 1;
             $order->payment_date = \Carbon\Carbon::now()->toDateTimeString();
             $order->save();
+
 
             $payment = PaymentHistory::where('order_id', $orderData)->first();;
             $payment->reference_number =  $reference;
@@ -75,17 +75,17 @@ class OrderService
             $payment->save();
 
             $cart = Cart::where('user_id', $order->user_id)->firstOrFail();
-            $cart->delete();
+            // $cart->delete();
 
             $cartCal = CartCalculation::where('user_id', $order->user_id)->firstOrFail();
-            $cartCal->delete();
+            // $cartCal->delete();
 
-            DB::commit();
+            // DB::commit();
 
             return true;
         } catch (\Exception $e) {
 
-            DB::rollBack();
+            // DB::rollBack();
             return false;
         }
     }
