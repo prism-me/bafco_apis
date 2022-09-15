@@ -24,6 +24,7 @@ class GuestCartService {
         if( $cartValue){
 
             $create['qty'] = $cartValue['qty'] + 1;
+            $create['total'] = $create['qty'] * $cartValue['unit_price'];
 
             $cartUpdate = $cartValue->update($create);
             $cart = GuestCart::where('id',$cartValue->id)->first();
@@ -51,7 +52,8 @@ class GuestCartService {
 
         $cart = GuestCart::where('id',$data['cart_id'])->first();
 
-        $update['qty'] = $data['qty'] + $cart->qty;
+        $update['qty'] = $data['qty'];
+        $update['total'] = $data['qty'] * $cart['unit_price'];
         $cartUpdate = GuestCart::where('id',$data['cart_id'])->update($update);
         $cart = GuestCart::where('id',$data['cart_id'])->first();
         $cartData = (new GuestCartService)->cartDetail($cart);
@@ -72,7 +74,7 @@ class GuestCartService {
 
         try {
 
-            //DB::beginTransaction();
+            DB::beginTransaction();
                 $productDetail = Product::where('id',$cart->product_id)->with('cartCategory.parentCategory' )->first(['name','featured_image','route','category_id']);
                 $productVariant = ProductVariation::where('id',$cart->product_variation_id)->with('productVariationName.productVariationValues.variant')->first(['id','code','lower_price','upper_price','limit']);
                 $quantity =  $cart->qty;
@@ -116,7 +118,7 @@ class GuestCartService {
 
                 }
 
-            //DB::commit();
+            DB::commit();
                 $data['products'] = $productDetail;
                 $data['variation'] = $productVariant;
                 $data['quantity'] = $quantity;
@@ -126,7 +128,7 @@ class GuestCartService {
 
         } catch (\Exception $e) {
 
-            //DB::rollBack();
+            DB::rollBack();
                 return response()->json(['Cart not updated.', 'stack' => $e], 500);
         }
 

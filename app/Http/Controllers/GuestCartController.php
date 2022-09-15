@@ -139,15 +139,7 @@ class GuestCartController extends Controller
 
         $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
 
-        if($cartTotal['sub_total'] > 2000){
-
-            $update['shipping_charges'] = "Free";
-            $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-            GuestCartCalculation::where('user_id',$id)->update($update);
-            $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
-            return response()->json($cartTotal);
-
-        }else{
+        if($cartTotal['sub_total'] < 2000){
 
             if($cartTotal['shipping_charges'] == NULL){
 
@@ -172,6 +164,16 @@ class GuestCartController extends Controller
                 return response()->json($cartTotal);
 
             }
+
+
+
+        }else{
+
+            $update['shipping_charges'] = "Free";
+            $update['decimal_amount'] = $cartTotal['total'] * 100.00;
+            GuestCartCalculation::where('user_id',$id)->update($update);
+            $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
+            return response()->json($cartTotal);
 
         }
 

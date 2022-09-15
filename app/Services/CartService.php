@@ -30,7 +30,7 @@ class CartService
         if ($cartValue) {
 
             $create['qty'] = $cartValue['qty'] + 1;
-
+            $create['total'] = $create['qty'] * $cartValue['unit_price'];
             $cartUpdate = $cartValue->update($create);
             $cart = Cart::where('id', $cartValue->id)->first();
             $cartData = (new CartService)->cartDetail($cart);
@@ -52,7 +52,8 @@ class CartService
 
         $cart = Cart::where('id', $data['cart_id'])->first();
 
-        $update['qty'] = $data['qty'] + $cart->qty;
+        $update['qty'] = $data['qty'];
+        $update['total'] = $data['qty'] * $cart['unit_price'];
         $cartUpdate = Cart::where('id', $data['cart_id'])->update($update);
         $cart = Cart::where('id', $data['cart_id'])->first();
         $cartData = (new CartService)->cartDetail($cart);
@@ -72,6 +73,7 @@ class CartService
 
         try {
             DB::beginTransaction();
+
             $productDetail = Product::where('id', $cart->product_id)->with('cartCategory.parentCategory')->first(['name', 'featured_image', 'route', 'category_id']);
             $productVariant = ProductVariation::where('id', $cart->product_variation_id)->with('productVariationName.productVariationValues.variant')->first(['id', 'code', 'lower_price', 'upper_price', 'limit']);
             $quantity =  $cart->qty;
@@ -141,7 +143,7 @@ class CartService
 
                 ]);
 
-                $guest->delete();
+                //$guest->delete();
             }
 
             $guestCartCalculation = GuestCartCalculation::where('user_id', $guest_id)->firstOrFail();
@@ -156,8 +158,8 @@ class CartService
                 'sub_total' => $guestCartCalculation->sub_total
             ]);
 
-             $guestCart->delete();
-            $guestCartCalculation->delete();
+//             $guestCart->delete();
+//            $guestCartCalculation->delete();
 
             //DB::commit();
 
