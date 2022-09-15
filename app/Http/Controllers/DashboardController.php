@@ -83,18 +83,16 @@ class DashboardController extends Controller
 
     public function productReportList(){
 
-        $productId = OrderDetail::get();
+        $productId = OrderDetail::with('productDetail')->get();
         $Id =  $productId->groupBy('product_id');
-        $count = $Id->transform(function ($item){
-            return $item->count();
-        })->all();
 
         $i = 0;
         $collection = [];
-        foreach($count as $key => $value)
+        foreach($Id as $key => $value)
         {
-
             $collection['productData'][$i] = OrderDetail::where('product_id',$key)->with('productDetail','variationDetail')->first();
+            $collection['productData'][$i]['total_purchase'] = OrderDetail::where('product_id',$key)->with('productDetail','variationDetail')->sum('qty');
+            $collection['productData'][$i]['total_amount'] = OrderDetail::where('product_id',$key)->with('productDetail','variationDetail')->sum('total');
 
             $i++;
         }
@@ -184,14 +182,12 @@ class DashboardController extends Controller
 
     /* Main Dashboard Page */
 
-        public function dashboardDetails(Request $request){
+        public function dashboardDetails(){
 
-            $start = Carbon::createFromFormat('Y-m-d', request('startDate'))->endOfDay();
-            $end = Carbon::createFromFormat('Y-m-d', request('endDate'))->endOfDay();
-            $totalOrder = Order::where('created_at','>=', $start)->where('created_at' , '<=',$end)->get()->count();
-            $totalSales = Order::where('created_at','>=', $start)->where('created_at' , '<=',$end)->get()->sum('total');
-            $totalUsers = User::where('created_at','>=', $start)->where('created_at' , '<=',$end)->get()->count();
-            $totalProducts = Product::where('created_at','>=', $start)->where('created_at' , '<=',$end)->get()->count();
+            $totalOrder = Order::get()->count();
+            $totalSales = Order::get()->sum('total');
+            $totalUsers = User::get()->count();
+            $totalProducts = Product::get()->count();
             $data = [
               'totalOrder' => $totalOrder,
               'totalSales' => $totalSales,

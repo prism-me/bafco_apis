@@ -196,7 +196,7 @@ class FrontResourceController extends Controller
                 $material = Material::where('name','=', 'Leather')->with('materialValues.values')->first();
                 $finishesList = Finishes::with('value','childValue')->where('parent_id', 0)->get();
                 $finishes = FinishesValue::where('material_id', $material->id)->where('finishes_id',$finishesList)->pluck('finishes_id');
-                $finishesData = Finishes::where('name','Finishes')->with('childValue')->get();
+                $finishesData = Finishes::where('name','Finishes')->with('childValue.value')->get();
                 $data = [
                     'finishesList' => $finishesList,
                     'finishesData' => $finishesData,
@@ -209,8 +209,11 @@ class FrontResourceController extends Controller
                 $material = Material::where('name',$type)->with('materialValues.values')->first();
 
                 $finishesList = Finishes::with('value','childValue')->where('parent_id', 0)->get();
-                $finishes = FinishesValue::where('material_id', $material->id)->where('finishes_id',$finishesList)->pluck('finishes_id');
-                $finishesData = Finishes::where('name','Finishes')->with('childValue')->get();
+//                $finishes = FinishesValue::where('material_id', $material->id)->where('finishes_id',$finishesList)->first();
+//                $finishesParent = Finishes::where('id', $finishes['finishes_id'])->with('parent')->first();
+//                $ID =  $finishesParent['parent']['id'];
+//                $finishesData = Finishes::where('id', $ID)->with('childValue.value')->get();
+                $finishesData = Finishes::where('name','Finishes')->with('childValue.value')->get();
                 $data = [
                     'finishesList' => $finishesList,
                     'finishesData' => $finishesData,
@@ -231,7 +234,9 @@ class FrontResourceController extends Controller
             $materialId = $data['material_id'];
             $finishesId = $data['finishes_id'];
             $finishes = FinishesValue::where('material_id',$materialId)->where('finishes_id',$finishesId)->first();
-            $finishesData = Finishes::where('id',$finishes['finishes_id'])->with('childValue.value')->get();
+            $finishesParent = Finishes::where('id', $finishes['finishes_id'])->with('parent')->first();
+            $ID =  $finishesParent['parent']['id'];
+            $finishesData = Finishes::where('id', $ID)->with('childValue.value')->get();
             $data = [
                 'finishesData' => $finishesData,
             ];

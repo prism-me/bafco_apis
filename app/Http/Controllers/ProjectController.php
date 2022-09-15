@@ -101,9 +101,8 @@ class ProjectController extends Controller
     public function show(Project $project)
     {
 
-        $projects = $project->with('projectCategory')->first();
 
-        return response()->json($projects , 200);
+        return response()->json($project , 200);
     }
 
     public function destroy(Project $project)
