@@ -39,7 +39,6 @@ class FinishesController extends Controller
                 "finishes_id" => $data['id'],
                 "material_id" => isset($data['material_id']) ? $data['material_id'] : '',
                 "featured_img" => isset($data['featured_img']) ? $data['featured_img'] : '',
-                "additional_img" => isset($data['additional_img']) ? $data['additional_img'] : '',
                 "code" => isset($data['code']) ? $data['code'] : '',
 
             ];
@@ -47,8 +46,8 @@ class FinishesController extends Controller
             $FinishesValue->update($finishesValueCreate);
             $finishesValuePivotCreate = [
                'material_id' => $data['material_id'],
-               'finishes_id' => isset($finishesCreated['id']) ? $finishesCreated['id'] : '' ,
-               'finishes_value_id' => isset($FinishesValue->id) ? $FinishesValue->id : '',
+               'finishes_id' => $data['id'],
+               'finishes_value_id' => isset($FinishesValue['id']) ? $FinishesValue['id'] : '',
             ];
             $finishesValuePivot = FinishesValuePivot::where('finishes_id',$request->id)->where('material_id',$data['material_id'])->first();
             $finishesValuePivot->update($finishesValuePivotCreate);
@@ -69,7 +68,6 @@ class FinishesController extends Controller
                         "material_id" => isset($data['material_id']) ? $data['material_id'] : '',
                         "finishes_id" => $finishesCreated->id,
                         "featured_img" => isset($data['featured_img']) ? $data['featured_img'] : '',
-                        "additional_img" => isset($data['additional_img']) ? $data['additional_img'] : '',
                         "code" => isset($data['code']) ? $data['code'] : '',
 
                     ];

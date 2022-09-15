@@ -23,7 +23,7 @@ class Order extends Model
         'total',
         'sub_total',
         'status',
-        'payment_date',	
+        'payment_date',
     ];
 
 
@@ -40,5 +40,9 @@ class Order extends Model
         return $this->belongsTo(User::class, 'user_id','id');
 
 
+    }
+
+    public function transactionAddress(){
+        return $this->hasOne(Address::class , 'id' , 'address_id')->select('id','phone_number');
     }
 }

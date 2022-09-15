@@ -114,7 +114,7 @@ class FrontResourceController extends Controller
 
             if($type == "all"){
 
-                $brochure = Brochure::with('broucherCategory')->get(['id','featured_img','title','thumbnail_img','sub_title']);
+                $brochure = Brochure::with('broucherCategory')->get(['id','featured_img','title','thumbnail_img','sub_title','files']);
 
             }else{
 
@@ -133,7 +133,7 @@ class FrontResourceController extends Controller
 
             if($type == "all"){
 
-                $brochure = Brochure::with('broucherCategory')->get(['id','featured_img','title','thumbnail_img','sub_title']);
+                $brochure = Brochure::with('broucherCategory')->get(['id','featured_img','title','thumbnail_img','sub_title','files']);
 
             }else{
 
@@ -191,14 +191,12 @@ class FrontResourceController extends Controller
 
         public function finishesFilterList($type){
 
-            if($type == "leather"){
+            if($type == "Leather"){
 
                 $material = Material::where('name','=', 'Leather')->with('materialValues.values')->first();
-
-
-                $filterList = FinishesValuePivot::where('material_id', $material->id)->pluck('finishes_id');
-                $finishesList = Finishes::with('child.value')->where('parent_id', 0)->whereIn('id',$filterList)->get();
-                $finishesData = FinishesValue::whereIn('finishes_id',$filterList)->get();
+                $finishesList = Finishes::with('value','childValue')->where('parent_id', 0)->get();
+                $finishes = FinishesValue::where('material_id', $material->id)->where('finishes_id',$finishesList)->pluck('finishes_id');
+                $finishesData = Finishes::where('name','Finishes')->with('childValue')->get();
                 $data = [
                     'finishesList' => $finishesList,
                     'finishesData' => $finishesData,
@@ -210,15 +208,16 @@ class FrontResourceController extends Controller
 
                 $material = Material::where('name',$type)->with('materialValues.values')->first();
 
-                $filterList = FinishesValuePivot::where('material_id', $material->id)->pluck('finishes_id');
-                $finishesList = Finishes::with('child.value')->where('parent_id', 0)->whereIn('id',$filterList)->get();
-                $finishesData = FinishesValue::whereIn('finishes_id',$filterList)->get();
+                $finishesList = Finishes::with('value','childValue')->where('parent_id', 0)->get();
+                $finishes = FinishesValue::where('material_id', $material->id)->where('finishes_id',$finishesList)->pluck('finishes_id');
+                $finishesData = Finishes::where('name','Finishes')->with('childValue')->get();
                 $data = [
                     'finishesList' => $finishesList,
                     'finishesData' => $finishesData,
 
                 ];
                 return response()->json($data);
+
 
 
             }
@@ -231,10 +230,31 @@ class FrontResourceController extends Controller
             $data = $request->all();
             $materialId = $data['material_id'];
             $finishesId = $data['finishes_id'];
-            $value = FinishesValue::where('material_id',$materialId)->where('finishes_id',$finishesId)->with('values.child.value')->first();
-            return response()->json($value);
+            $finishes = FinishesValue::where('material_id',$materialId)->where('finishes_id',$finishesId)->first();
+            $finishesData = Finishes::where('id',$finishes['finishes_id'])->with('childValue.value')->get();
+            $data = [
+                'finishesData' => $finishesData,
+            ];
+            return response()->json($data);
 
         }
+
+        public function finishesFilterDetail($id){
+
+            $value = FinishesValue::where('finishes_id', $id)->with('values.parent')->first();
+            $materialName = Material::where('id',$value['material_id'])->first(['name']);
+            $data = [
+                'material' => $materialName,
+                'detailData' => $value
+            ];
+            return response()->json($data);
+
+
+
+        }
+
+
+
 
 
 

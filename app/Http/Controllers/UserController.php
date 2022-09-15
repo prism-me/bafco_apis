@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use App\Http\Requests\user\LoginRequest;
 use App\Http\Requests\user\ResetRequest;
@@ -34,11 +35,6 @@ class UserController extends Controller
 
             $data = $request->all();
             $user = RegisterService::registerUser($data);
-            return $user;
-            if($user){
-                return  response()->json('Data has been saved.' , 200);
-            }
-
         }
         catch (\Error $exception) {
              return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
@@ -53,9 +49,23 @@ class UserController extends Controller
         try{
             $data = $request->all();
 
-            return RegisterService::tokenVerify($data);
+            $user =  RegisterService::tokenVerify($data);
+
             if($user){
-                return  response()->json('Data has been saved.' , 200);
+
+                if (!Auth::attempt(['email'=>$user['email'], 'password'=>$user['password']])) {
+
+                    return response()->json([ 'error' => 'Credentials does not match']);
+
+                }
+
+                $token = auth()->user()->createToken('API_Token')->plainTextToken;
+
+                return response()->json('Logged in successfully', 200)->header('x_auth_token', $token)->header('access-control-expose-headers' , 'x_auth_token');
+
+            }else{
+
+                return response()->json('Something Went Wrong!', 200);
             }
         }
         catch (\Error $exception) {
@@ -66,6 +76,8 @@ class UserController extends Controller
 
     }
     ####End Register#####
+
+
     public function login(LoginRequest $request){
 
         try{
@@ -200,6 +212,17 @@ class UserController extends Controller
 
     }
     #####End Forgot Password######
+
+
+    public function trackOrder($id){
+
+        $status = Order::where('order_number', $id)->first('status');
+        return $status;
+
+    }
+
+
+
 
 
     public function logout()
