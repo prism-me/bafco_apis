@@ -3,6 +3,7 @@
 namespace App\Services\payment;
 
 use App\Interfaces\PaymentInterface;
+use App\Jobs\OrderPlacedJob;
 use App\Models\Cart;
 use App\Models\PaymentHistory;
 use App\Models\Product;
@@ -36,15 +37,20 @@ class PostPayPaymentService implements PaymentInterface
     }
 
     public function makePayment($request)
-    {
+    {   
+        // dispatch(new OrderPlacedJob($request));
+        // dd('sd');
+        // exit;
         try {
             DB::beginTransaction();
             if (isset($request->guest_id)) {
 
                 $user = (new UserService())->createUser($request);
+                // dd($user);
                 if (!empty($user)) {
                     $user_id = $user;
                     $cart = (new CartService())->guestCartToUserCart($request->guest_id, $user);
+                    // return $cart;
                     if (!$cart) {
                         return response()->json('User does not have any item in cart.', 200);
                     }
@@ -53,7 +59,7 @@ class PostPayPaymentService implements PaymentInterface
                 $user_id = $request->user_id;
             }
             // exit;
-            $cartList = Cart::where('user_id', $user_id)->get(['product_id', 'product_variation_id', 'qty', 'total', 'unit_price']);
+            $cartList = Cart::where('user_id', $user_id)->get(['product_id', 'product_variation_id', 'qty', 'total', 'unit_price','user_id']);
 
             foreach ($cartList as $cart) {
 
@@ -65,8 +71,9 @@ class PostPayPaymentService implements PaymentInterface
             if (isset($request->coupon_code)) {
 
                 $promoCode = $this->promoCodeCheck($request->coupon_code);
-
-                if (!$promoCode) return response()->json('promo code is expired.', 400);
+                // if (!$promoCode) return response()->json('promo code is expired.', 400);
+            } else {
+                $promoCode = 'test';
             }
 
             $this->order_number = 'OR' . rand(999, 888888999999);
@@ -76,11 +83,11 @@ class PostPayPaymentService implements PaymentInterface
             $order = (new OrderService())->createOrder($mapedObject, $user_id);
 
             if (!$order) throw new  \Exception("Error Processing Request", 1);
-            
+
             $payment = $this->createPayment($request, $user_id);
 
             if (!$payment) throw new  \Exception("Error Processing Request", 1);
-            
+
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . $this->baseCode,
             ])->post($this->baseURL . '/checkouts', $mapedObject);
@@ -117,7 +124,7 @@ class PostPayPaymentService implements PaymentInterface
         $data['items'] = $cartList;
         $data['merchant']['cancel_url'] = $this->failed_url;
         $data['merchant']['confirmation_url'] = $this->success_url;
-        $data['promocode'] = $promoCode;
+        $data['promocode'] = $promoCode ? $promoCode : null;
         return $data;
     }
 
@@ -138,38 +145,32 @@ class PostPayPaymentService implements PaymentInterface
 
 
 
-
-
-
     public function capturePayment($order_id)
     {
         try {
-            // $response = Http::withHeaders([
-            //     'Authorization' => 'Basic ' . $this->baseCode,
-            // ])->post($this->baseURL . '/orders' . '/' . $order_id . '/capture');
+            $response = Http::withHeaders([
+                'Authorization' => 'Basic ' . $this->baseCode,
+            ])->post($this->baseURL . '/orders' . '/' . $order_id . '/capture');
 
-            // $data = $response->json();
+            $data = $response->json();
+            if ($response->getStatusCode() == 200 && $data['order_id'] == $order_id && $data['status'] == 'captured') {
+                $status = 'captured';
+            } else if ($response->getStatusCode() == 402 && $data['error'] == 'capture_error') {
+                $status = 'capture_error';
+            } else if ($response->getStatusCode() == 409 && $data['error'] == 'invalid_status') {
+                $status = 'invalid_status';
+            } else if ($response->getStatusCode() == 410 && $data['error'] == 'expired') {
+                //expired capture
+                $status = 'expired';
+            } else {
+                //general error
+                $status = 'not_found';
+            }
 
-            // if ($response->getStatusCode() == 200 && $data['order_id'] == $order_id && $data['status'] == 'captured') {
-
-            $order = (new OrderService())->updateOrderAfterPayment($order_id, 'reference');
-            return $order;
-            return ($order) ?
-                response()->json('Order has been Placed.') :
-                response()->json('Internal Error while payment.');
-            // } else if ($response->getStatusCode() == 402 && $data['error'] == 'capture_error') {
-            //     //payment transaction got failed
-            //     return response()->json($data['message'], 402);
-            // } else if ($response->getStatusCode() == 409 && $data['error'] == 'invalid_status') {
-            //     //invalid status
-            //     return response()->json($data['message'], 409);
-            // } else if ($response->getStatusCode() == 410 && $data['error'] == 'expired') {
-            //     //expired capture
-            //     return response()->json($data['message'], 410);
-            // } else {
-            //     //general error
-            //     return response()->json('Network Error', 400);
-            // }
+            $order = (new OrderService())->updateOrderAfterPayment($order_id, $data['reference'], $status);
+            return ($order) 
+                ? redirect()->away('https://bafco-next.herokuapp.com/checkout/') 
+                : response()->json(['message' => 'Internal Error while payment.', 'status' => $status], 404);
         } catch (RESTfulException $e) {
             return response()->json(['ex_message' => $e->getMessage(), 'error' => $e->getErrorCode(), 'line' => $e->getLine()]);
         }

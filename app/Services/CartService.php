@@ -130,7 +130,8 @@ class CartService
             DB::beginTransaction();
             $guestCart = GuestCart::where('user_id', $guest_id)->get();
             foreach ($guestCart as $guest) {
-                Cart::create([
+                // return $guest;
+                $cart =Cart::create([
                     'user_id' => $user_id,
                     'product_id' => $guest->product_id,
                     'product_variation_id' => $guest->product_variation_id,
@@ -139,8 +140,7 @@ class CartService
                     'total' => $guest->total
 
                 ]);
-
-                // $guest->delete();
+                $guest->delete();
             }
 
             $guestCartCalculation = GuestCartCalculation::where('user_id', $guest_id)->firstOrFail();
@@ -156,7 +156,7 @@ class CartService
             ]);
 
             // $guestCart->delete();
-        //    $guestCartCalculation->delete();
+           $guestCartCalculation->delete();
 
             DB::commit();
 

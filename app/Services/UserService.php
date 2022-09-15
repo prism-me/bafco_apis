@@ -6,7 +6,7 @@ use App\Models\Address;
 use App\Models\User;
 use auth;
 use Hash;
-use Illuminate\Support\Facades\DB;
+use DB;
 
 class UserService
 {
@@ -89,14 +89,13 @@ class UserService
         DB::beginTransaction();
 
         try {
-
             $isExist = User::where('email', $user['customer']['email'])->first(['id']);
             $data = $user['billing_address'];
             $getId = $isExist;
-            if (!$isExist) {
 
+            if (!$isExist) {
                 $getId = User::create([
-                    'name' => $data['first_name'] . $data['last_name'],
+                    'name' => $data['name'],
                     'email' => $user['customer']['email'],
                     'password' => bcrypt('Bafco123'),
                     'user_type' => 'user',
@@ -104,7 +103,7 @@ class UserService
 
                 Address::create([
                     'user_id' => $getId->id,
-                    'name' => $data['first_name'] . $data['last_name'],
+                    'name' => $data['name'],
                     'country' => $data['country'],
                     'state' => $data['state'],
                     'city' => $data['city'],
@@ -115,12 +114,10 @@ class UserService
                     'default' => 1,
                     'address_type' => 'billing'
                 ]);
-
             } else {
-
                 Address::create([
                     'user_id' => $getId->id,
-                    'name' => $data['first_name'] . " " . $data['last_name'],
+                    'name' => $data['name'],
                     'country' => $data['country'],
                     'state' => $data['state'],
                     'city' => $data['city'],
@@ -136,6 +133,7 @@ class UserService
             DB::commit();
             return $getId->id;
         } catch (\Exception $e) {
+            dd('sdf');
             DB::rollBack();
             return false;
         }
