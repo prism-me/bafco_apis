@@ -73,7 +73,7 @@ class DashboardController extends Controller
         }
 
         $updateOrder = Order::where('id',$request->id)->update($update);
-        return response()->json('Order Confirmed Successfully');
+        return response()->json('Status Updated Successfully');
 
     }
 
