@@ -247,13 +247,22 @@ use Illuminate\Support\Facades\Route;
         Route::get('faq', 'FrontController@faq');
 
 
+   #Forms Submission
+        Route::post('enquiries', 'EnquiryController@store');
+        Route::get('enquiries', 'EnquiryController@index');
+        Route::get('enquiries/{id}', 'EnquiryController@show');
+        Route::delete('enquiries/{id}', 'EnquiryController@destroy');
+
+
+
+
+
     #Forgot Password
             Route::post('forget-password', 'UserController@forgetPassword');
             Route::post('submit-reset-password', 'UserController@submitResetPassword');
 
     #Order Detail User
         Route::get('user-order-detail/{id}', 'UserOrderDetailController@userOrderDetail');
-
 
 
     Route::group(['prefix' => 'auth'], function ($router) {
@@ -290,10 +299,13 @@ use Illuminate\Support\Facades\Route;
         Route::get('cart-detail/{id}', 'CartController@show')->middleware('auth:sanctum');
         Route::get('cart-total/{id}', 'CartController@cartTotal')->middleware('auth:sanctum');
         Route::get('promo-cart-total/{id}', 'CartController@promoCartDetail')->middleware('auth:sanctum');
+        Route::post('get-guest-cart', 'CartController@getGuestCart')->middleware('auth:sanctum');
 
-    #Dashboard CMS
 
-        Route::post('dashboard-details', 'DashboardController@dashboardDetails');
+
+        #Dashboard CMS
+
+        Route::get('dashboard-details', 'DashboardController@dashboardDetails');
         Route::get('all-users', 'DashboardController@allUsers');
         Route::get('all-orders', 'DashboardController@allOrder');
         Route::get('order-detail/{id}', 'DashboardController@orderDetail');

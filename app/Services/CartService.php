@@ -71,8 +71,7 @@ class CartService
     {
 
         try {
-
-            //DB::beginTransaction();
+            DB::beginTransaction();
             $productDetail = Product::where('id', $cart->product_id)->with('cartCategory.parentCategory')->first(['name', 'featured_image', 'route', 'category_id']);
             $productVariant = ProductVariation::where('id', $cart->product_variation_id)->with('productVariationName.productVariationValues.variant')->first(['id', 'code', 'lower_price', 'upper_price', 'limit']);
             $quantity =  $cart->qty;
@@ -109,7 +108,7 @@ class CartService
                 $cartCalculation = CartCalculation::create($cartCalculation);
             }
 
-            //DB::commit();
+            DB::commit();
             $data['products'] = $productDetail;
             $data['variation'] = $productVariant;
             $data['quantity'] = $quantity;
@@ -118,7 +117,7 @@ class CartService
             return $data;
         } catch (\Exception $e) {
 
-            //DB::rollBack();
+            DB::rollBack();
             return response()->json(['Cart not updated.', 'stack' => $e], 500);
         }
     }
@@ -126,8 +125,10 @@ class CartService
 
     public function guestCartToUserCart($guest_id, $user_id)
     {
+
+
         try {
-            DB::beginTransaction();
+            //DB::beginTransaction();
             $guestCart = GuestCart::where('user_id', $guest_id)->get();
             foreach ($guestCart as $guest) {
                 Cart::create([
@@ -140,7 +141,7 @@ class CartService
 
                 ]);
 
-                // $guest->delete();
+                $guest->delete();
             }
 
             $guestCartCalculation = GuestCartCalculation::where('user_id', $guest_id)->firstOrFail();
@@ -155,15 +156,15 @@ class CartService
                 'sub_total' => $guestCartCalculation->sub_total
             ]);
 
-            // $guestCart->delete();
-        //    $guestCartCalculation->delete();
+             $guestCart->delete();
+            $guestCartCalculation->delete();
 
-            DB::commit();
+            //DB::commit();
 
             return true;
         } catch (\Exception $e) {
             // return response()->json($e, 400);
-            DB::rollBack();
+            //DB::rollBack();
             return false;
         }
     }

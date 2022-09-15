@@ -182,6 +182,24 @@ class CartController extends Controller
     }
 
 
+    public function getGuestCart(Request $request){
+
+        $guest_id = $request['user_id'];
+        $status = $request['status'];
+        $user =  auth()->user();
+        $user_id = $user['id'];
+        if($status == true){
+
+            $cart = CartService::guestCartToUserCart($guest_id,$user_id);
+            return response()->json('success');
+        }else{
+
+            return  response()->json("Something Went wrong");
+        }
+
+    }
+
+
 
 
 
