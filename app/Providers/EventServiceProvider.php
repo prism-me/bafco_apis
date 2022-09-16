@@ -9,7 +9,14 @@ use Illuminate\Support\Facades\Event;
 use App\Listeners\NotifyForgetPasswordCreated;
 use App\Events\ForgetPasswordMail;
 use App\Listeners\NotifyRegisterCreated;
-use App\Events\RegisterCreate;
+use App\Events\RegisterMail;
+
+use App\Listeners\NotifyCancelCreated;
+use App\Events\OrderCancelMail;
+use App\Listeners\NotifyPlaceCreated;
+use App\Events\OrderPlaceMail;
+use App\Listeners\NotifyDeliverCreated;
+use App\Events\OrderDeliverMail;
 
 
 
@@ -29,8 +36,17 @@ class EventServiceProvider extends ServiceProvider
         ForgetPasswordMail::class => [
             NotifyForgetPasswordCreated::class,
         ],
-        RegisterCreate::class => [
+        RegisterMail::class => [
             NotifyRegisterCreated::class,
+        ],
+        OrderPlaceMail::class => [
+            NotifyPlaceCreated::class,
+        ],
+        OrderCancelMail::class => [
+            NotifyCancelCreated::class,
+        ],
+        OrderDeliverMail::class => [
+            NotifyCancelCreated::class,
         ],
     ];
 
