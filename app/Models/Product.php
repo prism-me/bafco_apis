@@ -58,6 +58,11 @@ class Product extends Model
 
     }
 
+    public function category_route(){
+        return $this->hasOne(Category::class,'id','category_id')->select('id','route','parent_id');
+
+    }
+
     public function cartCategory(){
 
         return $this->hasOne(Category::class,'id','category_id')->select('id','route','parent_id');

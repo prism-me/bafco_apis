@@ -15,7 +15,7 @@ class OrderPlacedJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $details;
+    private $details;
 
     /**
      * Create a new job instance.
@@ -24,7 +24,7 @@ class OrderPlacedJob implements ShouldQueue
      */
     public function __construct($details)
     {
-        //$this->details = $details;
+        $this->details = $details;
     }
 
     /**
@@ -34,8 +34,6 @@ class OrderPlacedJob implements ShouldQueue
      */
     public function handle()
     {
-        $email = new OrderPlaced();
-        // Mail::to($this->details['email'])->send($email);
-        Mail::to('bilal@prism-me.com')->send($email);
+        Mail::to('bilal@prism-me.com')->send(new OrderPlaced($this->details));
     }
 }

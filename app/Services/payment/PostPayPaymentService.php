@@ -4,6 +4,7 @@ namespace App\Services\payment;
 
 use App\Interfaces\PaymentInterface;
 use App\Jobs\OrderPlacedJob;
+use App\Mail\OrderPlaced;
 use App\Models\Cart;
 use App\Models\PaymentHistory;
 use App\Models\Product;
@@ -13,6 +14,7 @@ use App\Services\OrderService;
 use App\Services\UserService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Postpay\Exceptions\RESTfulException;
 
@@ -38,9 +40,11 @@ class PostPayPaymentService implements PaymentInterface
 
     public function makePayment($request)
     {   
+        // $mail = Mail::to('bilal@prism-me.com')->send(new OrderPlaced($request));
+
         // dispatch(new OrderPlacedJob($request));
-        // dd('sd');
-        // exit;
+        OrderPlacedJob::dispatch($request->total_amount);
+        dd('died');
         try {
             DB::beginTransaction();
             if (isset($request->guest_id)) {
@@ -59,7 +63,7 @@ class PostPayPaymentService implements PaymentInterface
                 $user_id = $request->user_id;
             }
             // exit;
-            $cartList = Cart::where('user_id', $user_id)->get(['product_id', 'product_variation_id', 'qty', 'total', 'unit_price','user_id']);
+            $cartList = Cart::where('user_id', $user_id)->get(['product_id', 'product_variation_id', 'qty', 'total', 'unit_price', 'user_id']);
 
             foreach ($cartList as $cart) {
 
@@ -168,8 +172,8 @@ class PostPayPaymentService implements PaymentInterface
             }
 
             $order = (new OrderService())->updateOrderAfterPayment($order_id, $data['reference'], $status);
-            return ($order) 
-                ? redirect()->away('https://bafco-next.herokuapp.com/checkout/') 
+            return ($order)
+                ? redirect()->away('https://bafco-next.herokuapp.com/checkout?status=success')
                 : response()->json(['message' => 'Internal Error while payment.', 'status' => $status], 404);
         } catch (RESTfulException $e) {
             return response()->json(['ex_message' => $e->getMessage(), 'error' => $e->getErrorCode(), 'line' => $e->getLine()]);

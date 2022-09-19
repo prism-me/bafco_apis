@@ -9,6 +9,8 @@ use Illuminate\Queue\SerializesModels;
 
 class OrderPlaced extends Mailable
 {
+    public $data;
+
     use Queueable, SerializesModels;
 
     /**
@@ -16,9 +18,9 @@ class OrderPlaced extends Mailable
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($data)
     {
-        //
+        $this->data = $data;
     }
 
     /**
@@ -28,7 +30,7 @@ class OrderPlaced extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.orderPlacedEmail');
-        
+        return $this->from('prism.marketing786@gmail.com','Order Placed | Bafco')->subject('Order Placed!')->markdown('emails.orderPlacedEmail')->with('userData', $this->data);
+        // return $this->view('emails.orderPlacedEmail')->compact($this->data);
     }
 }
