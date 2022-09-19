@@ -9,7 +9,8 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-
+use App\Events\OrderCancelMail;
+use App\Events\OrderDeliverMail;
 
 class DashboardController extends Controller
 {
@@ -48,15 +49,50 @@ class DashboardController extends Controller
 
     public function changeOrderStatus(Request $request){
 
-        $status = Order::where('id',$request->id)->first();
-        $update['status'] = $status['status'];
+        $order = Order::where('id',$request->id)->with('order_details.productDetail.productvariations','orderAddress','userDetail')->first();
+        $userData = [
+                'orderNumber' =>    $order['order_number'],
+                'name' =>    $order['userDetail']['name'],
+                'email' =>    $order['userDetail']['email'],
+                'sub_total' =>    $order['sub_total'],
+                'total' =>    $order['total'],
+                'shipping_charges' =>    isset( $order['shipping_charges']) ?  $order['shipping_charges'] : "Free",
+                'coupon' =>    isset( $order['coupon']) ?  $order['coupon'] : "",
+                'discount' =>    isset( $order['discount']) ?  $order['discount'] : "",
+                'address_name' =>    $order['orderAddress']['name'],
+                'address_country' =>    $order['orderAddress']['country'],
+                'address_state' =>    $order['orderAddress']['state'],
+                'address_city' =>    $order['orderAddress']['city'],
+                'address_line1' =>    $order['orderAddress']['address_line1'],
+                'address_line2' =>    $order['orderAddress']['address_line2'],
+                'postal_code' =>    $order['orderAddress']['postal_code'],
+                'phone_number' =>    $order['orderAddress']['phone_number'],
+                'orderDate' =>    $order['created_at'],
+                'cancellationReson' => isset($request->message ) ? $request->message  : "",
+            ];
+
+
+        $i = 0 ;
+        foreach($order['order_details'] as $value){
+            $userData['product_detail'][$i]['qty'] = $value['qty'];
+            $userData['product_detail'][$i]['price'] = $value['total'];
+            $userData['product_detail'][$i]['product_name'] = $value['productDetail']['name'];
+            $userData['product_detail'][$i]['product_variation'] =  $value['productDetail']['productvariations']['images'];
+            $i++;
+        }
+
+
+
+
         if($request->status ==  "confirm")
         {
             $update['status'] = $this->confirm;
 
+
         }elseif($request->status ==  "cancel")
         {
             $update['status'] = $this->cancel;
+            event(new OrderCancelMail($userData));
 
         }elseif($request->status ==  "dispatch")
         {
@@ -65,6 +101,7 @@ class DashboardController extends Controller
         }elseif($request->status ==  "deliver")
         {
             $update['status'] = $this->deliver;
+            event(new OrderDeliverMail($userData));
 
         }else{
 

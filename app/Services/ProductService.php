@@ -33,6 +33,7 @@ class ProductService
                 "footrest" => $data['footrest'],
                 "headrest" => $data['headrest'],
                 "seo" => $data['seo'],
+                "top_selling" => $data['top_selling'],
 
             ]);
 
@@ -108,8 +109,8 @@ class ProductService
                 "promotional_images" => $data['promotional_images'],
                 "footrest" => $data['footrest'],
                 "headrest" => $data['headrest'],
-                "seo" => $data['seo']
-
+                "seo" => $data['seo'],
+                "top_selling" => $data['top_selling'],
             ]);
 
 

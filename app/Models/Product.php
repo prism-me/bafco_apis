@@ -31,7 +31,8 @@ class Product extends Model
        "promotional_images",
        "footrest",
        "headrest",
-       "type"
+       "type",
+       'top_selling'
 
    ];
 

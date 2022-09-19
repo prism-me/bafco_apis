@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Events;
+
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -10,18 +11,16 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use App\Model\User;
 
-class RegisterCreate
+class OrderCancelMail
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $userData;
 
-  
+
     public function __construct($userData)
     {
-        $this->userData = $userData;   
-    } 
-
-   
+        $this->userData = $userData;
+    }
 
     /**
      * Get the channels the event should broadcast on.
@@ -30,6 +29,6 @@ class RegisterCreate
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('register-user');
+        return new PrivateChannel('order-cancel');
     }
 }

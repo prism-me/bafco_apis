@@ -58,6 +58,8 @@ class ForgetService {
 
     public function submitResetPassword(Request $request)
     {
+
+        return 'hi';
         \Validator::validate($request->all(), [
             'password' => 'required|string|min:6',
             'password_confirmation' => 'required|same:password'
@@ -74,10 +76,10 @@ class ForgetService {
         $updatePassword = PasswordReset::where([
             'token' => $request->token
         ])
-        ->first();
+            ->first();
 
         if(!$updatePassword){
-            return view('emails.reset-password', ['token' => $token] , compact('error'));
+            return view('reset-password', ['token' => $token] , compact('error'));
         }
 
         $update = array(

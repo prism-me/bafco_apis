@@ -36,7 +36,7 @@ class GuestCartController extends Controller
 
             }else{
 
-                return response()->json('No Data Found', 404);
+                return response()->json(['error' => 'No Data Found', 200]);
             }
 
 
@@ -139,41 +139,23 @@ class GuestCartController extends Controller
 
         $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
 
-        if($cartTotal['sub_total'] < 2000){
+        if($cartTotal['sub_total'] > 2000){
 
-            if($cartTotal['shipping_charges'] == NULL){
-
-                $update['shipping_charges']  = 200;
-                $update['total']  = $cartTotal['total'] + 200;
+                $update['shipping_charges'] = "Free";
                 $update['decimal_amount'] = $cartTotal['total'] * 100.00;
                 GuestCartCalculation::where('user_id',$id)->update($update);
                 $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
                 return response()->json($cartTotal);
-
-            }elseif($cartTotal['shipping_charges'] == "Free"){
-
-                $update['shipping_charges']  = 200;
-                $update['total']  = $cartTotal['total'] + 200;
-                $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-                GuestCartCalculation::where('user_id',$id)->update($update);
-                $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
-                return response()->json($cartTotal);
-
-            }else{
-
-                return response()->json($cartTotal);
-
-            }
-
 
 
         }else{
 
-            $update['shipping_charges'] = "Free";
-            $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-            GuestCartCalculation::where('user_id',$id)->update($update);
-            $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
-            return response()->json($cartTotal);
+                $update['shipping_charges']  = 200;
+                $update['total']  = $cartTotal['sub_total'] + 200;
+                $update['decimal_amount'] = $cartTotal['total'] * 100.00;
+                GuestCartCalculation::where('user_id',$id)->update($update);
+                $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
+                return response()->json($cartTotal);
 
         }
 

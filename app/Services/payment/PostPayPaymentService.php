@@ -39,12 +39,7 @@ class PostPayPaymentService implements PaymentInterface
     }
 
     public function makePayment($request)
-    {   
-        // $mail = Mail::to('bilal@prism-me.com')->send(new OrderPlaced($request));
-
-        // dispatch(new OrderPlacedJob($request));
-        OrderPlacedJob::dispatch($request->total_amount);
-        dd('died');
+    {
         try {
             DB::beginTransaction();
             if (isset($request->guest_id)) {
@@ -99,6 +94,7 @@ class PostPayPaymentService implements PaymentInterface
             $data = $response->json();
 
             DB::commit();
+
             return ($response->getStatusCode() == 200 && !empty($data->token)) ? $data->redirect_url :  $data;
         } catch (RESTfulException $e) {
 
@@ -172,9 +168,11 @@ class PostPayPaymentService implements PaymentInterface
             }
 
             $order = (new OrderService())->updateOrderAfterPayment($order_id, $data['reference'], $status);
-            return ($order)
-                ? redirect()->away('https://bafco-next.herokuapp.com/checkout?status=success')
-                : response()->json(['message' => 'Internal Error while payment.', 'status' => $status], 404);
+
+            return ['order' => $order, 'status' => $status, 'order_id' => $order_id, 'status' => $response->getStatusCode()];
+            // return ($order)
+            //     ? redirect()->away('https://bafco-next.herokuapp.com/checkout?status=success')
+            //     : response()->json(['message' => 'Internal Error while payment.', 'status' => $status], 404);
         } catch (RESTfulException $e) {
             return response()->json(['ex_message' => $e->getMessage(), 'error' => $e->getErrorCode(), 'line' => $e->getLine()]);
         }

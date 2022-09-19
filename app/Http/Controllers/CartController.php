@@ -25,7 +25,6 @@ class CartController extends Controller
 
                 $i=0;
                 foreach($cart as $cartValue){
-
                     $data[$i]['cart'] = Cart::where('id',$cartValue->id)->get(['id']);
                     $data[$i]['productData'] = Product::where('id',$cartValue->product_id)->with('productCategory.parentCategory')->get(['name','id', 'route' ,'category_id']);
                     $data[$i]['variation'] = ProductVariation::where('id',$cartValue->product_variation_id)->with('productVariationName.productVariationValues.variant')->get(['id','product_id' , 'upper_price','in_stock','images']);
@@ -40,7 +39,7 @@ class CartController extends Controller
 
             }else{
 
-                return response()->json('No Data Found', 404);
+                return response()->json(['error' => 'No Data Found', 200]);
             }
 
 
@@ -145,37 +144,20 @@ class CartController extends Controller
 
         if($cartTotal['sub_total'] > 2000){
 
-            $update['shipping_charges'] = "Free";
-            $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-            CartCalculation::where('user_id',$id)->update($update);
-            $cartTotal = CartCalculation::where('user_id',$id)->first();
-            return response()->json($cartTotal);
+                $update['shipping_charges'] = "Free";
+                $update['decimal_amount'] = $cartTotal['total'] * 100.00;
+                CartCalculation::where('user_id',$id)->update($update);
+                $cartTotal = CartCalculation::where('user_id',$id)->first();
+                return response()->json($cartTotal);
 
         }else{
 
-            if($cartTotal['shipping_charges'] == NULL){
-
                 $update['shipping_charges']  = 200;
-                $update['total']  = $cartTotal['total'] + 200;
+                $update['total']  = $cartTotal['sub_total'] + 200;
                 $update['decimal_amount'] = $cartTotal['total'] * 100.00;
                 CartCalculation::where('user_id',$id)->update($update);
                 $cartTotal = CartCalculation::where('user_id',$id)->first();
                 return response()->json($cartTotal);
-
-            }elseif($cartTotal['shipping_charges'] == "Free"){
-
-                $update['shipping_charges']  = 200;
-                $update['total']  = $cartTotal['total'] + 200;
-                $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-                CartCalculation::where('user_id',$id)->update($update);
-                $cartTotal = CartCalculation::where('user_id',$id)->first();
-                return response()->json($cartTotal);
-
-            }else{
-
-                return response()->json($cartTotal);
-
-            }
 
         }
 

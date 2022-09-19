@@ -37,7 +37,7 @@ class FrontController extends Controller
     ###Home Section#######
 
     /* Home Page Data*/
-    public function home(){
+        public function home(){
 
         $pages = Page::where('identifier','home')->first(['name','content']);
         $blog =  $this->blogData;
@@ -51,75 +51,75 @@ class FrontController extends Controller
 
     }
 
-    #####End Home Section########
+    /* End Home Page Data*/
 
-    public function about(){
+        public function about(){
 
-        $about = Page::where('identifier','about')->first(['name','content']);
-        $team =  $this->teamData;
-        $partner =  $this->partnerData;
+            $about = Page::where('identifier','about')->first(['name','content']);
+            $team =  $this->teamData;
+            $partner =  $this->partnerData;
 
-        $data  = array(
-            'about' => $about,
-            'team' => $team,
-            'partner' => $partner
-        );
-        return $data;
+            $data  = array(
+                'about' => $about,
+                'team' => $team,
+                'partner' => $partner
+            );
+            return $data;
 
-    }
+        }
 
 
-    public function contactUs(){
+        public function contactUs(){
 
-        $contact = Page::where('identifier','contact')->first(['name','content']);
-        return $contact;
+            $contact = Page::where('identifier','contact')->first(['name','content']);
+            return $contact;
 
-    }
+        }
 
-    public function topManagement(){
+        public function topManagement(){
 
-        $management = Page::where('identifier','management')->first(['name','content']);
-        return $management;
+            $management = Page::where('identifier','management')->first(['name','content']);
+            return $management;
 
-    }
+        }
 
-    public function services(){
+        public function services(){
 
-        $services = Page::where('identifier','services')->first(['name','content']);
-        $testimonial = $this->testimonialData;
+            $services = Page::where('identifier','services')->first(['name','content']);
+            $testimonial = $this->testimonialData;
 
-        $data  = array(
-            'services' => $services,
-            'testimonial' => $testimonial,
-        );
-        return $data;
+            $data  = array(
+                'services' => $services,
+                'testimonial' => $testimonial,
+            );
+            return $data;
 
-    }
+        }
 
-    public function innovations(){
+        public function innovations(){
 
-        $innovations = Page::where('identifier','innovations')->first(['name','content']);
-        $blog = $this->blogData;
+            $innovations = Page::where('identifier','innovations')->first(['name','content']);
+            $blog = $this->blogData;
 
-        $data  = array(
-            'innovations' => $innovations,
-            'blog' => $blog,
-        );
-        return $data;
+            $data  = array(
+                'innovations' => $innovations,
+                'blog' => $blog,
+            );
+            return $data;
 
-    }
+        }
 
-    public function faq(){
+        public function faq(){
 
-        $faqBanner = Page::where('identifier','faq')->first(['name','content','route']);
-        $faqs = Faq::all();
-        $data  = array(
-            'FaqBanner' => $faqBanner,
-            'faqs' => $faqs,
-        );
-        return $data;
+            $faqBanner = Page::where('identifier','faq')->first(['name','content','route']);
+            $faqs = Faq::all();
+            $data  = array(
+                'FaqBanner' => $faqBanner,
+                'faqs' => $faqs,
+            );
+            return $data;
 
-    }
+        }
 
 
 
