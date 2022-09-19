@@ -222,8 +222,9 @@ use Illuminate\Support\Facades\Route;
     #Product Detail
         Route::get('front-category/{route}', 'FrontProductController@category');
         Route::get('header-category', 'FrontProductController@headerCategory');
+
         Route::get('top-selling-products/{id}', 'FrontProductController@topSellingProducts');
-        Route::get('top-selling-products-category-list', 'FrontProductController@topSellingProductsCategory');
+        Route::get('top-selling-product', 'FrontProductController@topSellingProduct');
 
 
    #Guest Cart

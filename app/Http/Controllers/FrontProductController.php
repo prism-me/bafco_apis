@@ -147,17 +147,27 @@ class FrontProductController extends Controller
 
     /*Top Selling Prodcuts*/
 
-    public function topSellingProductsCategory(){
-        $category = Category::with('subcategory')->where('parent_id', '=', NULL)->get(['id','name','route','parent_id']);
-        return response($category,200);
-    }
-
     public function topSellingProducts($id){
 
         $products = Category::with('parentCategory','products.productvariations.productVariationName.productVariationValues')->where('id',$id)->paginate(8);
         return response($products,200);
 
     }
+
+    public function topSellingProduct(){
+        $productsData = Product::where('top_selling', 1)->get();
+        $i = 0;
+        foreach($productsData as $product){
+
+            $products[$i]= Category::with('parentCategory')->with('products', function($q){
+                                                                        $q->where('top_selling', '=' , 1)->with('productvariations.productVariationName.productVariationValues');
+                                                                    })->where('id', $product['category_id'])->first();
+            $i ++;
+        }
+        return $products;
+    }
+
+
 
 
 

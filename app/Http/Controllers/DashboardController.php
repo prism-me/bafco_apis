@@ -68,6 +68,7 @@ class DashboardController extends Controller
                 'postal_code' =>    $order['orderAddress']['postal_code'],
                 'phone_number' =>    $order['orderAddress']['phone_number'],
                 'orderDate' =>    $order['created_at'],
+                'cancellationReson' => isset($request->message ) ? $request->message  : "",
             ];
 
 

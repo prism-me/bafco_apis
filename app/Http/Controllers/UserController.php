@@ -121,7 +121,6 @@ class UserController extends Controller
 
             $data = $request->all();
             $user = UserService::update($data);
-            return $user;
             if($user){
                 return response()->json('Updated Successfully',200);
             }
@@ -141,7 +140,6 @@ class UserController extends Controller
 
             $data = $request->all();
             $user =  UserService::changePassword($data);
-            return $user;
             if($user){
                 return response()->json('Updated Successfully',200);
             }
@@ -164,7 +162,6 @@ class UserController extends Controller
         try{
 
             $forget = ForgetService::sendToken($request->all());
-            return $forget;
             if($forget){
 
                 return  response()->json('Data has been saved.' , 200);
@@ -196,6 +193,7 @@ class UserController extends Controller
 
     public function submitResetPassword(ForgetRequest $request)
     {
+        return 'hi';
         try{
             $data = $request->all();
             $forget = ForgetService::submitResetPassword($data);
