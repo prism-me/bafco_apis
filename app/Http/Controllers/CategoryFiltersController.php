@@ -23,16 +23,28 @@ class CategoryFiltersController extends Controller
         $route = $request->route;
         $max = $request->max;
         $min = $request->min;
+        $color  = $request->color;
+
+
 
         $category = Category::with(['parentCategory'])->where('route', $route)->first();
 
-        if ($brand !== null && $min !== null && $max !== null) {
+//        $products = Category::with(['parentCategory'])
+//            ->with(['products.productvariations.product_variation_values.variantValues' => function ($color) {
+//                $color->where('route' , $color);
+//
+//            }])
+//            ->whereHas('products.productvariations')
+//            ->where('id', $category->id)
+//            ->first();
+
+        if (!empty($brand) && isset($min) && $min !== null && $max !== null) {
 
             #Brands && Price
             $products =  Category::with(['parentCategory'])->with(['products' => function ($query) use ($brand, $category, $min, $max) {
                 $query->whereIn('brand', $brand)
                     ->with(['productvariations' =>  function ($range) use ($min, $max) {
-                        $range->where('lower_price', '>=', $min)->where('upper_price', '<=', $max);
+                        $range->whereBetween('lower_price' , [$min, $max]);
                     }]);
             }])
                 ->whereHas('products.productvariations')
@@ -44,7 +56,7 @@ class CategoryFiltersController extends Controller
             $products->products = $filteredNull;
 
             return response()->json($products);
-        } elseif (isset($brand) && $brand !== null) {
+        } elseif (!empty($brand)) {
 
             #Brands
             $products = Category::with(['parentCategory'])->with(['products' => function ($query) use ($brand, $category) {
@@ -55,19 +67,14 @@ class CategoryFiltersController extends Controller
                 ->where('id', $category->id)->first();
 
             return response()->json($products);
-        } elseif ($min && $max !== null) {
-
-            //return 'hi';
-            #Price Range
+        } elseif (isset($min) && $min !== null && $max !== null) {
             $products = Category::with(['parentCategory'])
                 ->with(['products.productvariations' => function ($range) use ($min, $max) {
-                    $range->where('lower_price','>',$min)->where('lower_price','<',$max);
-
+                    $range->whereBetween('lower_price' , [$min, $max]);
                 }])
                 ->whereHas('products.productvariations')
                 ->where('id', $category->id)
                 ->first();
-
             $filteredNull = $products->products->whereNotNull('productvariations');
             unset($products->products);
             $products->products = $filteredNull;

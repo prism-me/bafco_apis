@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Str;
 use Redirect;
+use DB;
+
 
 
 class ForgetService {

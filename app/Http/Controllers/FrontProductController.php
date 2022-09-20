@@ -17,7 +17,7 @@ class FrontProductController extends Controller
         public function homeProductCategoryFilter($route)
     {
         if($route == 'all' ){
-            $product = Product::with('variations.variation_items.variation_values')->get()->take(4);
+            $product = Product::with('variations.variation_items.variation_values')->where('status',1)->get()->take(4);
             $data = $product;
         }
         else{
@@ -119,7 +119,7 @@ class FrontProductController extends Controller
 
         public function relatedProducts($route){
             $category = Category::where('route',$route)->first();
-            $relatedProducts = Product::with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')->where('category_id',$category->id)->paginate(4);
+            $relatedProducts = Product::with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')->where('category_id',$category->id)->where('status',1)->paginate(4);
             return response($relatedProducts,200);
 
         }
@@ -127,7 +127,9 @@ class FrontProductController extends Controller
         public function randomProducts()
         {
 
-            $randomProducts = Product::with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')->inRandomOrder()
+            $randomProducts = Product::with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')
+                ->where('status',1)
+                ->inRandomOrder()
                 ->limit(4)
                 ->paginate(4);
             return response($randomProducts,200);
@@ -152,7 +154,10 @@ class FrontProductController extends Controller
     public function topSellingProduct()
     {
 
-        $products = Product::where('top_selling', 1)->with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')->take(8)->get();
+        $products = Product::where('top_selling', 1)->with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')
+            ->where('status',1)
+            ->take(8)
+            ->get();
         return response($products,200);
 
     }
