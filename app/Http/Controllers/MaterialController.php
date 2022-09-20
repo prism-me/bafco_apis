@@ -8,6 +8,7 @@ use DB;
 
 class MaterialController extends Controller
 {
+    
     public function index()
     {
          try{

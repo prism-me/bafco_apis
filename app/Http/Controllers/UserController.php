@@ -29,12 +29,14 @@ class UserController extends Controller
 {
 
     ####Register#####
-    public function register(RegisterRequest $request) {
+
+        public function register(RegisterRequest $request) {
 
         try{
 
             $data = $request->all();
             $user = RegisterService::registerUser($data);
+            return $user;
         }
         catch (\Error $exception) {
              return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
@@ -44,7 +46,7 @@ class UserController extends Controller
 
     }
 
-    public function emailVerify(Request $request)
+        public function emailVerify(Request $request)
     {
         try{
             $data = $request->all();
@@ -75,10 +77,11 @@ class UserController extends Controller
 
 
     }
+
     ####End Register#####
 
 
-    public function login(LoginRequest $request){
+        public function login(LoginRequest $request){
 
         try{
 
@@ -99,24 +102,17 @@ class UserController extends Controller
         }
 
 
-        // $user = User::where('email', $request->email)->first();
 
-        // if (! $user || ! Hash::check($request->password, $user->password)) {
-        //     return response()->json(['error' => 'The provided credentials are incorrect.'] ,422);
-        // }
-        // $token =  $user->createToken($request->email)->plainTextToken;
-
-        // return response()->json('Logged in successfully', 200)->header('x-auth-token', $token);
 
     }
 
-    public function me(){
+        public function me(){
 
         return auth()->user();
     }
 
 
-    public function updateProfile(Request $request){
+        public function updateProfile(Request $request){
         try{
 
             $data = $request->all();
@@ -134,7 +130,7 @@ class UserController extends Controller
     }
 
 
-    public function changePassword(ResetRequest  $request){
+        public function changePassword(ResetRequest  $request){
 
         try{
 
@@ -157,73 +153,65 @@ class UserController extends Controller
 
 
     #####Forget Password#####
-    public function forgetPassword(ForgetRequest $request){
 
-        try{
+        public function forgetPassword(ForgetRequest $request){
 
-            $forget = ForgetService::sendToken($request->all());
-            if($forget){
+            try{
 
-                return  response()->json('Data has been saved.' , 200);
+                $forget = ForgetService::sendToken($request->all());
+                if($forget){
+
+                    return  response()->json('We have e-mailed your password reset link!' , 200);
+                }
+            }
+            catch (\Error $exception) {
+                return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+            }
+
+
+
+        }
+
+        public function resetPassword($token)
+        {
+
+            try{
+                $forget = ForgetService::resetPassword($token);
+                return $forget;
+            }
+            catch (\Error $exception) {
+                return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
             }
         }
-        catch (\Error $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
-        }
 
+        public function submitResetPassword(Request $request)
+        {
 
-
-    }
-
-    public function resetPassword($token)
-    {
-        try{
-
-            $forget = ForgetService::resetPassword($token);
-            return $forget;
-            if($forget){
-
-                return  response()->json('Data has been saved.' , 200);
+            try{
+                $data = $request->all();
+                $forget = ForgetService::submitResetPassword($data);
+                if($forget){
+                    return  response()->json('Password Updated Successfully' , 200);
+                }
             }
-        }
-        catch (\Error $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
-        }
-    }
-
-    public function submitResetPassword(ForgetRequest $request)
-    {
-        return 'hi';
-        try{
-            $data = $request->all();
-            $forget = ForgetService::submitResetPassword($data);
-            return $forget;
-            if($forget){
-
-                return  response()->json('Data has been saved.' , 200);
+            catch (\Error $exception) {
+                return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
             }
-        }
-        catch (\Error $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
-        }
 
 
-    }
+        }
+
     #####End Forgot Password######
 
 
-    public function trackOrder($id){
+        public function trackOrder($id){
 
-        $status = Order::where('order_number', $id)->first('status');
-        return $status;
+            $status = Order::where('order_number', $id)->first('status');
+            return $status;
 
-    }
+        }
 
-
-
-
-
-    public function logout()
+        public function logout()
     {
 
         dd(auth()->user());

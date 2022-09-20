@@ -49,22 +49,28 @@ class CartService
     public function incrementQty($data)
     {
 
+        try{
+            DB::beginTransaction();
+                $cart = Cart::where('id', $data['cart_id'])->first();
 
-        $cart = Cart::where('id', $data['cart_id'])->first();
+                $update['qty'] = $data['qty'];
+                $update['total'] = $data['qty'] * $cart['unit_price'];
+                $cartUpdate = Cart::where('id', $data['cart_id'])->update($update);
+                $cart = Cart::where('id', $data['cart_id'])->first();
+                $cartData = (new CartService)->cartDetail($cart);
+            DB::commit();
 
-        $update['qty'] = $data['qty'];
-        $update['total'] = $data['qty'] * $cart['unit_price'];
-        $cartUpdate = Cart::where('id', $data['cart_id'])->update($update);
-        $cart = Cart::where('id', $data['cart_id'])->first();
-        $cartData = (new CartService)->cartDetail($cart);
+                if ($cartData) {
 
+                    return response()->json($cartData, 200);
+                } else {
 
-        if ($cartData) {
+                    return response()->json('Something went wrong!', 404);
+                }
+        } catch (\Exception $e) {
 
-            return response()->json($cartData, 200);
-        } else {
-
-            return response()->json('Something went wrong!', 404);
+            DB::rollBack();
+            return response()->json(['Cart not updated.', 'stack' => $e], 500);
         }
     }
 
@@ -124,50 +130,70 @@ class CartService
         }
     }
 
+    public function removeCart($id){
+        try{
+            DB::beginTransaction();
+                $cart = Cart::where('id',$id)->first();
+                $cartCalc = CartCalculation::where('user_id',$cart['user_id'])->first();
+                $update['total'] =  $cartCalc['total'] - $cart['unit_price'];
+                $update['sub_total'] =  $cartCalc['sub_total'] - $cart['unit_price'];
+                $cart = CartCalculation::where('user_id',$cart['user_id'])->update($update);
+                Cart::where('id',$id)->delete();
+
+            DB::commit();
+            return $cart;
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+            return response()->json('Cart has been deleted.' , 200);
+        }
+
+    }
+
 
     public function guestCartToUserCart($guest_id, $user_id)
     {
-
-
         try {
-            //DB::beginTransaction();
-            $guestCart = GuestCart::where('user_id', $guest_id)->get();
-            foreach ($guestCart as $guest) {
-                // return $guest;
-                $cart =Cart::create([
-                    'user_id' => $user_id,
-                    'product_id' => $guest->product_id,
-                    'product_variation_id' => $guest->product_variation_id,
-                    'qty' => $guest->qty,
-                    'unit_price' => $guest->unit_price,
-                    'total' => $guest->total
+            DB::beginTransaction();
+                $guestCart = GuestCart::where('user_id', $guest_id)->get();
+                foreach ($guestCart as $guest) {
+                    // return $guest;
+                    $cart =Cart::create([
+                        'user_id' => $user_id,
+                        'product_id' => $guest->product_id,
+                        'product_variation_id' => $guest->product_variation_id,
+                        'qty' => $guest->qty,
+                        'unit_price' => $guest->unit_price,
+                        'total' => $guest->total
 
+                    ]);
+
+                    $guest->delete();
+                }
+
+                $guestCartCalculation = GuestCartCalculation::where('user_id', $guest_id)->firstOrFail();
+
+                CartCalculation::create([
+                    'user_id' => $user_id,
+                    'coupon' => $guestCartCalculation->coupon,
+                    'discounted_price' => $guestCartCalculation->discounted_price,
+                    'shipping_charges' => $guestCartCalculation->shipping_charges,
+                    'decimal_amount' => $guestCartCalculation->decimal_amount,
+                    'total' => $guestCartCalculation->total,
+                    'sub_total' => $guestCartCalculation->sub_total
                 ]);
 
-                $guest->delete();
-            }
+                // $guestCart->delete();
+               $guestCartCalculation->delete();
 
-            $guestCartCalculation = GuestCartCalculation::where('user_id', $guest_id)->firstOrFail();
-
-            CartCalculation::create([
-                'user_id' => $user_id,
-                'coupon' => $guestCartCalculation->coupon,
-                'discounted_price' => $guestCartCalculation->discounted_price,
-                'shipping_charges' => $guestCartCalculation->shipping_charges,
-                'decimal_amount' => $guestCartCalculation->decimal_amount,
-                'total' => $guestCartCalculation->total,
-                'sub_total' => $guestCartCalculation->sub_total
-            ]);
-
-            // $guestCart->delete();
-           $guestCartCalculation->delete();
-
-            //DB::commit();
-
+            DB::commit();
             return true;
+
         } catch (\Exception $e) {
-            // return response()->json($e, 400);
-            //DB::rollBack();
+
+             return response()->json($e, 400);
+            DB::rollBack();
             return false;
         }
     }

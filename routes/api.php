@@ -24,7 +24,6 @@ use Illuminate\Support\Facades\Route;
         Route::put('change-status/{id}' , 'ProductController@changeStatus')->middleware('auth:sanctum');
         Route::get('disable-products' , 'ProductController@disableProducts');
         Route::delete('delete-product-variation/{id}' , 'ProductController@deleteProductVariation')->middleware('auth:sanctum');
-        Route::put('clone-product-variation/{id}' , 'ProductController@cloneVariation')->middleware('auth:sanctum');
 
 
 
@@ -222,9 +221,7 @@ use Illuminate\Support\Facades\Route;
     #Product Detail
         Route::get('front-category/{route}', 'FrontProductController@category');
         Route::get('header-category', 'FrontProductController@headerCategory');
-
-        Route::get('top-selling-products/{id}', 'FrontProductController@topSellingProducts');
-        Route::get('top-selling-product', 'FrontProductController@topSellingProduct');
+        Route::get('top-selling-products', 'FrontProductController@topSellingProduct');
 
 
    #Guest Cart
@@ -260,7 +257,6 @@ use Illuminate\Support\Facades\Route;
 
     #Forgot Password
             Route::post('forget-password', 'UserController@forgetPassword');
-            Route::post('submit-reset-password', 'UserController@submitResetPassword');
 
     #Order Detail User
         Route::get('user-order-detail/{id}', 'UserOrderDetailController@userOrderDetail');

@@ -66,7 +66,6 @@ class PageController extends Controller
 
     public function show(Page $page)
     {
-    return $page;
         if(!$page){
 
             return response()->json('No Record Found.' , 404);

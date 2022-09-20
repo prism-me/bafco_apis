@@ -22,22 +22,22 @@ class ManagementController extends Controller
             return response()->json($management, 200);
         }
         catch (\Exception $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
     }
 
 
- 
+
     public function store(ManagementRequest $request)
     {
-      
+
         try{
             $data = [
                 'type' =>  $request->type ,
-                'content' => $request->content
+                'content' => $request->content,
             ];
 
-           if(Management::where('type', $request->type)->exists() OR Management::where('id', $request->id)->exists() ){ 
+           if(Management::where('type', $request->type)->exists() OR Management::where('id', $request->id)->exists() ){
             //update
                 $management = Management::where('type',$request->type)->update($data);
            }else{
@@ -53,19 +53,19 @@ class ManagementController extends Controller
             return response()->json(['ex_message'=>'Management Not found.' , 'line' =>$exception->getLine() ], 400);
         }
         catch (\Error $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
-        } 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
     }
 
- 
+
     public function show(Management $management)
     {
         if(!$management){
-            
+
             return response()->json([] , 200);
         }
-       
-        return response()->json($management , 200); 
+
+        return response()->json($management , 200);
     }
 
 

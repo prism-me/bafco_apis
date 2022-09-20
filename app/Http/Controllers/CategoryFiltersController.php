@@ -56,10 +56,13 @@ class CategoryFiltersController extends Controller
 
             return response()->json($products);
         } elseif ($min && $max !== null) {
+
+            //return 'hi';
             #Price Range
             $products = Category::with(['parentCategory'])
                 ->with(['products.productvariations' => function ($range) use ($min, $max) {
-                    $range->where('lower_price', '>=', $min)->where('upper_price', '<=', $max);
+                    $range->where('lower_price','>',$min)->where('lower_price','<',$max);
+
                 }])
                 ->whereHas('products.productvariations')
                 ->where('id', $category->id)
