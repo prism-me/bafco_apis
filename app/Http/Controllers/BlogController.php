@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Blog;
+use App\Services\CartService;
 use Illuminate\Http\Request;
 use Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -15,7 +16,7 @@ class BlogController extends Controller
     public function index()
     {
         try{
-            $blog = Blog::all();
+            $blog = Blog::get();
             if($blog->isEmpty()){
                  return response()->json([] , 200);
             }
@@ -31,37 +32,16 @@ class BlogController extends Controller
 
         try{
 
-            $data = [
-                    'title' =>  $request->title ,
-                    'sub_title' => $request->sub_title ,
-                    'description' =>  $request->description ,
-                    'short_description' =>  $request->short_description ,
-                    'tags' => $request->tags ,
-                    'posted_by' => $request->posted_by ,
-                    'featured_img' => $request->featured_img ,
-                    'banner_img' => $request->banner_img ,
-                    'route' => $request->route ,
-                    'seo' => $request->seo
-            ];
-
-
-                if(Blog::where('route', $request->route)->exists()  OR Blog::where('id', $request->id)->exists()){
-
-                    #update
-                    $blog = Blog::where('id', $request->id)->update($data);
-
-                }else{
-
-                    #create
-                    $blog = Blog::create($data);
-                }
-                if($blog){
-                    return  response()->json('Data has been saved.' , 200);
-                }
-
+            $data = $request->all();
+            $cart = BlogService::addBlog($data);
+            if($cart){
+                return response()->json($cart , 200);
+            }else{
+                return response()->json('Something went wrong!', 404);
+            }
         }
         catch (ModelNotFoundException  $exception) {
-            return response()->json(['ex_message'=>'Blog Not found.' , 'line' =>$exception->getLine() ], 400);
+            return response()->json(['ex_message'=>'Cart Value Not found.' , 'line' =>$exception->getLine() ], 400);
         }
         catch (\Error $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);

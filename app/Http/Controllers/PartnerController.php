@@ -11,7 +11,7 @@ use App\Http\Requests\partner\PartnerRequest;
 
 class PartnerController extends Controller
 {
-   
+
     public function index()
     {
         try{
@@ -22,16 +22,16 @@ class PartnerController extends Controller
             return response()->json($partner, 200);
         }
         catch (\Exception $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
     }
- 
-    
+
+
     public function store(PartnerRequest $request)
     {
         try{
 
-            $data = [  
+            $data = [
                 'name' => $request->name,
                 'image' =>  $request->image,
                 'route' =>  $request->route,
@@ -40,10 +40,10 @@ class PartnerController extends Controller
                 'link' =>  $request->link
             ];
 
-            if(Partner::where('route', $request->route)->exists() OR Partner::where('id', $request->id)->exists()){ 
+            if(Partner::where('route', $request->route)->exists() OR Partner::where('id', $request->id)->exists()){
 
                 #update
-                $partner = Partner::where('route',$request->route)->update($data);
+                $partner = Partner::where('id',$request->id)->update($data);
 
             }else{
 
@@ -60,18 +60,18 @@ class PartnerController extends Controller
             return response()->json(['ex_message'=>'Partner Not found.' , 'line' =>$exception->getLine() ], 400);
         }
         catch (\Error $exception) {
-            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400); 
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
     }
 
-   
+
     public function show(Partner $partner)
     {
         if(!$partner){
             return response()->json('No Record Found.' , 404);
         }
-       
-        return response()->json($partner , 200); 
+
+        return response()->json($partner , 200);
     }
 
     public function destroy(Partner $partner)

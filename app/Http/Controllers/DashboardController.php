@@ -20,37 +20,36 @@ class DashboardController extends Controller
     private $dispatch = "ORDERDISPATCHED";
     private $deliver = "ORDERDELIVERED";
 
-    public function allUsers(){
+        public function allUsers(){
 
-        $users = User::where('user_type' ,'!=', 'admin')->with('addressDetail', function($query){
-            $query->where('default', '=', 1);
-        })->get();
-        return response()->json($users);
+            $users = User::where('user_type' ,'!=', 'admin')->with('addressDetail', function($query){
+                $query->where('default', '=', 1);
+            })->get();
+            return response()->json($users);
 
-    }
+        }
 
-    public function allOrder(){
+        public function allOrder(){
 
-        $order = Order::with('order_details','userDetail')->get();
-        return response()->json($order);
+            $order = Order::with('order_details','userDetail')->get();
+            return response()->json($order);
 
-    }
+        }
 
-    public function orderDetail($id){
+        public function orderDetail($id){
 
-        $order = Order::where('id',$id)->with(['order_details'=> function ($query) {
-            $query->with('productDetail')->with('variationDetail');
-        }])
-            ->with('orderAddress','userDetail')->first();
-        return response()->json($order);
+            $order = Order::where('id',$id)->with(['order_details'=> function ($query) {
+                $query->with('productDetail')->with('variationDetail');
+            }])
+                ->with('orderAddress','userDetail')->first();
+            return response()->json($order);
 
 
-    }
+        }
 
-    public function changeOrderStatus(Request $request){
+        public function changeOrderStatus(Request $request){
 
         $order = Order::where('order_number',$request->order_number)->with('order_details.productDetail.productvariations','orderAddress','userDetail')->first();
-        return $order;
         $userData = [
                 'orderNumber' =>    $order['order_number'],
                 'name' =>    $order['userDetail']['name'],
@@ -120,42 +119,42 @@ class DashboardController extends Controller
 
     /*Product Report*/
 
-    public function productReportList(){
+        public function productReportList(){
 
-        $productId = OrderDetail::with('productDetail')->get();
-        $Id =  $productId->groupBy('product_id');
+            $productId = OrderDetail::with('productDetail')->get();
+            $Id =  $productId->groupBy('product_id');
 
-        $i = 0;
-        $collection = [];
-        foreach($Id as $key => $value)
-        {
-            $collection['productData'][$i] = OrderDetail::where('product_id',$key)->with('productDetail','variationDetail')->first();
-            $collection['productData'][$i]['total_purchase'] = OrderDetail::where('product_id',$key)->with('productDetail','variationDetail')->sum('qty');
-            $collection['productData'][$i]['total_amount'] = OrderDetail::where('product_id',$key)->with('productDetail','variationDetail')->sum('total');
+            $i = 0;
+            $collection = [];
+            foreach($Id as $key => $value)
+            {
+                $collection['productData'][$i] = OrderDetail::where('product_id',$key)->with('productDetail','variationDetail')->first();
+                $collection['productData'][$i]['total_purchase'] = OrderDetail::where('product_id',$key)->with('productDetail','variationDetail')->sum('qty');
+                $collection['productData'][$i]['total_amount'] = OrderDetail::where('product_id',$key)->with('productDetail','variationDetail')->sum('total');
 
-            $i++;
-        }
+                $i++;
+            }
 
-        return $collection;
-
-    }
-
-    public function productReportDetail($id){
-
-        $product['detail'] = OrderDetail::where('product_id' , $id)->with(['order','productDetail','variationDetail'])->get();
-        $i = 0;
-
-        foreach($product as $value){
-
-            $product['total_purchase'][$i] = $value->sum('qty');
-            $product['total_amount'][$i] = $value->sum('total');
-            $i ++;
+            return $collection;
 
         }
-        $product['productDetail'] = Product::where('id',$id)->first('name');
-        return  $product;
 
-    }
+        public function productReportDetail($id){
+
+            $product['detail'] = OrderDetail::where('product_id' , $id)->with(['order','productDetail','variationDetail'])->get();
+            $i = 0;
+
+            foreach($product as $value){
+
+                $product['total_purchase'][$i] = $value->sum('qty');
+                $product['total_amount'][$i] = $value->sum('total');
+                $i ++;
+
+            }
+            $product['productDetail'] = Product::where('id',$id)->first('name');
+            return  $product;
+
+        }
 
     /**/
 

@@ -20,14 +20,13 @@ Route::get('frontpage_category/{route}', 'CategoryController@frontpage_category'
 Route::get('sub-category', 'CategoryController@subCategory');
 
 
-#Products
-Route::get('products', 'ProductController@index');
-Route::post('products', 'ProductController@store')->middleware('auth:sanctum');
-Route::get('products/{id}', 'ProductController@show');
-Route::put('change-status/{id}', 'ProductController@changeStatus')->middleware('auth:sanctum');
-Route::get('disable-products', 'ProductController@disableProducts');
-Route::delete('delete-product-variation/{id}', 'ProductController@deleteProductVariation')->middleware('auth:sanctum');
-Route::put('clone-product-variation/{id}', 'ProductController@cloneVariation')->middleware('auth:sanctum');
+    #Products
+        Route::get('products' , 'ProductController@index');
+        Route::post('products' , 'ProductController@store')->middleware('auth:sanctum');
+        Route::get('products/{id}' , 'ProductController@show');
+        Route::put('change-status/{id}' , 'ProductController@changeStatus')->middleware('auth:sanctum');
+        Route::get('disable-products' , 'ProductController@disableProducts');
+        Route::delete('delete-product-variation/{id}' , 'ProductController@deleteProductVariation')->middleware('auth:sanctum');
 
 
 
@@ -222,12 +221,19 @@ Route::get('category-filters-list/{category}', 'CategoryFiltersController@Catego
 Route::post('category-list-filteration', 'CategoryFiltersController@CategoryListFilteration');
 
 
+<<<<<<< HEAD
 #Product Detail
 Route::get('front-category/{route}', 'FrontProductController@category');
 Route::get('header-category', 'FrontProductController@headerCategory');
 
 Route::get('top-selling-products/{id}', 'FrontProductController@topSellingProducts');
 Route::get('top-selling-product', 'FrontProductController@topSellingProduct');
+=======
+    #Product Detail
+        Route::get('front-category/{route}', 'FrontProductController@category');
+        Route::get('header-category', 'FrontProductController@headerCategory');
+        Route::get('top-selling-products', 'FrontProductController@topSellingProduct');
+>>>>>>> 7d9b5a9b0b17c722cdac85b93cc586e8bb75a5b3
 
 
 #Guest Cart
@@ -261,9 +267,14 @@ Route::delete('enquiries/{id}', 'EnquiryController@destroy');
 
 
 
+<<<<<<< HEAD
 #Forgot Password
 Route::post('forget-password', 'UserController@forgetPassword');
 Route::post('submit-reset-password', 'UserController@submitResetPassword');
+=======
+    #Forgot Password
+            Route::post('forget-password', 'UserController@forgetPassword');
+>>>>>>> 7d9b5a9b0b17c722cdac85b93cc586e8bb75a5b3
 
 #Order Detail User
 Route::get('user-order-detail/{id}', 'UserOrderDetailController@userOrderDetail');

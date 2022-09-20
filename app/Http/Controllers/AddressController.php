@@ -29,8 +29,6 @@ class AddressController extends Controller
     public function store(Request $request)
     {
         try{
-
-
             $address = AddressService::addAddress($request->all());
 
             //return $address;
@@ -72,10 +70,8 @@ class AddressController extends Controller
         try{
 
             $data = $request->all();
-
             $address = AddressService::setDefaultAddress($data,$id);
 
-//            /return $address;
             if($address){
 
                  return  response()->json('Address Updated Successfully.' , 200);

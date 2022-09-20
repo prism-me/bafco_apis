@@ -29,9 +29,7 @@ class ForgetService {
                     );
 
         $user =  $data['email'];
-
         event(new ForgetPasswordMail($userData));
-        // Mail::to($userEmail)->send(new ForgetMail($emailData));
         return json_encode(['message', 'We have e-mailed your password reset link!' ,'status' => 200]);
 
     }
@@ -56,11 +54,10 @@ class ForgetService {
         }
     }
 
-    public function submitResetPassword(Request $request)
+    public function submitResetPassword($data)
     {
 
-        return 'hi';
-        \Validator::validate($request->all(), [
+        \Validator::validate($data, [
             'password' => 'required|string|min:6',
             'password_confirmation' => 'required|same:password'
 
@@ -72,9 +69,9 @@ class ForgetService {
         ]);
 
         $error = 'Token Expired!';
-        $token = $request->token;
+        $token = $data['token'];
         $updatePassword = PasswordReset::where([
-            'token' => $request->token
+            'token' => $data['token']
         ])
             ->first();
 
@@ -83,13 +80,18 @@ class ForgetService {
         }
 
         $update = array(
-            'password' => bcrypt($request->password) ,
-            'password_confirmation'=> $request->password_confirmation
+            'password' => bcrypt($data['password'])
         );
         $user = User::where('email', $updatePassword['email'])->update($update);
-        PasswordReset::where('email', $updatePassword['email'])->delete();
-        $url = $updatePassword['redirect_url'];
-        return Redirect::away($url);
+
+        if($user){
+            PasswordReset::where('email', $updatePassword['email'])->delete();
+            $url = $updatePassword['redirect_url'];
+            return Redirect::away($url);
+        }else{
+            return view('reset-password', ['token' => $token] , compact('error'));
+        }
+
     }
 
 }

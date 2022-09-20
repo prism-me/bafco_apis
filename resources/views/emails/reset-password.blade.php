@@ -75,7 +75,8 @@ span.psw {
     @endif
     @if(!@$error)
     <h2>Reset Password</h2>
-    <form action="{{ route('submit-reset-password') }}" method="post" style="padding:2rem">
+    <form action="{{ route('submit-reset-password') }}" method="POST" style="padding:2rem">
+
         @csrf
                 <input type="hidden" name="token" value= "{{$token}}">
 

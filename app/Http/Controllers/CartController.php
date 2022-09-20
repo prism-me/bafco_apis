@@ -53,17 +53,11 @@ class CartController extends Controller
     public function store(Request $request)
     {
         try{
-
             $data = $request->all();
             $cart = CartService::addToCart($data);
-
-
             if($cart){
-
                 return response()->json($cart , 200);
-
             }else{
-
                 return response()->json('Something went wrong!', 404);
             }
         }
@@ -78,17 +72,21 @@ class CartController extends Controller
 
     public function removeCart($id)
     {
-        $cart = Cart::where('id',$id)->first();
-        $cartCalc = CartCalculation::where('user_id',$cart['user_id'])->first();
-
-        $update['total'] =  $cartCalc['total'] - $cart['unit_price'];
-        $update['sub_total'] =  $cartCalc['sub_total'] - $cart['unit_price'];
-        $cart = CartCalculation::where('user_id',$cart['user_id'])->update($update);
-        Cart::where('id',$id)->delete();
-
-        if($cart){
-            return response()->json('Cart has been deleted.' , 200);
+        try{
+            $cart = CartService::removeCart($id);
+            if($cart){
+                return response()->json($cart , 200);
+            }else{
+                return response()->json('Something went wrong!', 404);
+            }
         }
+        catch (ModelNotFoundException  $exception) {
+            return response()->json(['ex_message'=>'Cart Value Not found.' , 'line' =>$exception->getLine() ], 400);
+        }
+        catch (\Error $exception) {
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
+
     }
 
 
@@ -140,25 +138,33 @@ class CartController extends Controller
 
     public function cartTotal($id){
 
-        $cartTotal = CartCalculation::where('user_id',$id)->first();
-
-        if($cartTotal['sub_total'] > 2000){
-
-                $update['shipping_charges'] = "Free";
-                $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-                CartCalculation::where('user_id',$id)->update($update);
+        try {
+            DB::beginTransaction();
                 $cartTotal = CartCalculation::where('user_id',$id)->first();
+
+                if($cartTotal['sub_total'] > 2000){
+
+                        $update['shipping_charges'] = "Free";
+                        $update['decimal_amount'] = $cartTotal['total'] * 100.00;
+                        CartCalculation::where('user_id',$id)->update($update);
+                        $cartTotal = CartCalculation::where('user_id',$id)->first();
+
+                }else{
+
+                        $update['shipping_charges']  = 200;
+                        $update['total']  = $cartTotal['sub_total'] + 200;
+                        $update['decimal_amount'] = $cartTotal['total'] * 100.00;
+                        CartCalculation::where('user_id',$id)->update($update);
+                        $cartTotal = CartCalculation::where('user_id',$id)->first();
+
+
+                }
+            DB::commit();
                 return response()->json($cartTotal);
+        } catch (\Exception $e) {
 
-        }else{
-
-                $update['shipping_charges']  = 200;
-                $update['total']  = $cartTotal['sub_total'] + 200;
-                $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-                CartCalculation::where('user_id',$id)->update($update);
-                $cartTotal = CartCalculation::where('user_id',$id)->first();
-                return response()->json($cartTotal);
-
+            DB::rollBack();
+            return response()->json(['Cart not updated.', 'stack' => $e], 500);
         }
 
     }
@@ -171,7 +177,6 @@ class CartController extends Controller
         $user =  auth()->user();
         $user_id = $user['id'];
         if($status == true){
-
             $cart = CartService::guestCartToUserCart($guest_id,$user_id);
             return response()->json('success');
         }else{
