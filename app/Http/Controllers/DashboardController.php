@@ -49,7 +49,8 @@ class DashboardController extends Controller
 
     public function changeOrderStatus(Request $request){
 
-        $order = Order::where('id',$request->id)->with('order_details.productDetail.productvariations','orderAddress','userDetail')->first();
+        $order = Order::where('order_number',$request->order_number)->with('order_details.productDetail.productvariations','orderAddress','userDetail')->first();
+        return $order;
         $userData = [
                 'orderNumber' =>    $order['order_number'],
                 'name' =>    $order['userDetail']['name'],
@@ -71,6 +72,7 @@ class DashboardController extends Controller
                 'cancellationReson' => isset($request->message ) ? $request->message  : "",
             ];
 
+            return $userData;
 
         $i = 0 ;
         foreach($order['order_details'] as $value){
