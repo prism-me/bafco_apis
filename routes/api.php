@@ -221,19 +221,17 @@ Route::get('category-filters-list/{category}', 'CategoryFiltersController@Catego
 Route::post('category-list-filteration', 'CategoryFiltersController@CategoryListFilteration');
 
 
-<<<<<<< HEAD
 #Product Detail
 Route::get('front-category/{route}', 'FrontProductController@category');
 Route::get('header-category', 'FrontProductController@headerCategory');
 
 Route::get('top-selling-products/{id}', 'FrontProductController@topSellingProducts');
 Route::get('top-selling-product', 'FrontProductController@topSellingProduct');
-=======
+
     #Product Detail
         Route::get('front-category/{route}', 'FrontProductController@category');
         Route::get('header-category', 'FrontProductController@headerCategory');
         Route::get('top-selling-products', 'FrontProductController@topSellingProduct');
->>>>>>> 7d9b5a9b0b17c722cdac85b93cc586e8bb75a5b3
 
 
 #Guest Cart
@@ -267,14 +265,14 @@ Route::delete('enquiries/{id}', 'EnquiryController@destroy');
 
 
 
-<<<<<<< HEAD
+
 #Forgot Password
 Route::post('forget-password', 'UserController@forgetPassword');
 Route::post('submit-reset-password', 'UserController@submitResetPassword');
-=======
+
     #Forgot Password
             Route::post('forget-password', 'UserController@forgetPassword');
->>>>>>> 7d9b5a9b0b17c722cdac85b93cc586e8bb75a5b3
+
 
 #Order Detail User
 Route::get('user-order-detail/{id}', 'UserOrderDetailController@userOrderDetail');
