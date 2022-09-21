@@ -88,8 +88,11 @@ class ForgetService {
 
         if($user){
             PasswordReset::where('email', $updatePassword['email'])->delete();
+
             $url = $updatePassword['redirect_url'];
-            return Redirect::away($url);
+
+            return $url;
+
         }else{
             return view('reset-password', ['token' => $token] , compact('error'));
         }

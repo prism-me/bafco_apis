@@ -22,7 +22,11 @@ class FrontProductController extends Controller
         }
         else{
             //$productFilter = Category::with('products')->where('route',$route)->get()->take(4);
-            $productFilter = Category::with('products.variations.variation_items.variation_values')->where('route',$route)->get()->take(4);
+            $productFilter = Category::with('parentCategory')->with(['products' => function($q) {
+                    $q->where('status',1)
+                    ->with('productvariations.productVariationName.productVariationValues');
+                    }])
+                    ->where('route',$route)->get()->take(4);
             $data =  $productFilter;
         }
         return response()->json($data);
@@ -33,7 +37,11 @@ class FrontProductController extends Controller
     #Product Inner Category Listing
         public function frontProducts($route)
         {
-            $products = Category::with('parentCategory','products.productvariations.productVariationName.productVariationValues')->where('route',$route)->first(['id','route','name','parent_id']);
+            $products = Category::with('parentCategory')->with(['products' => function($q) {
+                    $q->where('status',1)
+                    ->with('productvariations.productVariationName.productVariationValues');
+                    }])
+                    ->where('route',$route)->first(['id','route','name','parent_id']);
             return response()->json($products);
         }
 
