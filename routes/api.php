@@ -27,6 +27,7 @@ Route::get('products/{id}', 'ProductController@show');
 Route::put('change-status/{id}', 'ProductController@changeStatus')->middleware('auth:sanctum');
 Route::get('disable-products', 'ProductController@disableProducts');
 Route::delete('delete-product-variation/{id}', 'ProductController@deleteProductVariation')->middleware('auth:sanctum');
+Route::put('clone-product-variation/{id}' , 'ProductController@cloneVariation')->middleware('auth:sanctum');
 
 
 

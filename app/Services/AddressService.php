@@ -2,6 +2,7 @@
 
 namespace App\Services;
 use App\Models\Address;
+use DB;
 
 class AddressService {
 

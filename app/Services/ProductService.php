@@ -5,6 +5,7 @@ use App\Models\Product;
 use App\Models\ProductPivotVariation;
 use App\Models\ProductVariation;
 use App\Models\VariationValues;
+use DB;
 
 class ProductService
 {
@@ -33,7 +34,7 @@ class ProductService
                     "footrest" => $data['footrest'],
                     "headrest" => $data['headrest'],
                     "seo" => $data['seo'],
-                    //"top_selling" => $data['top_selling'],
+                    "top_selling" => isset($data['top_selling']) ? $data['top_selling'] : 0,
 
                 ]);
 
@@ -94,7 +95,6 @@ class ProductService
         try {
             DB::beginTransaction();
                 #Updating Products Against That ID
-
                 $product = Product::where('id', $data['id'])->update([
                     "name" => $data['name'],
                     "featured_image" => $data['featured_image'],
@@ -110,8 +110,10 @@ class ProductService
                     "footrest" => $data['footrest'],
                     "headrest" => $data['headrest'],
                     "seo" => $data['seo'],
-                    //"top_selling" => $data['top_selling'],
+                    "top_selling" => isset($data['top_selling']) ? $data['top_selling'] : 0,
                 ]);
+
+
 
 
                 #Deleting ALl the  Items against that product_id from PivotTable for headrest , footrest and variation values

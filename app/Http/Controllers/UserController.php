@@ -161,7 +161,7 @@ class UserController extends Controller
                 $forget = ForgetService::sendToken($request->all());
                 if($forget){
 
-                    return  response()->json('We have e-mailed your password reset link!' , 200);
+                    return  response()->json('We have Emailed your password reset link!' , 200);
                 }
             }
             catch (\Error $exception) {
@@ -190,9 +190,8 @@ class UserController extends Controller
             try{
                 $data = $request->all();
                 $forget = ForgetService::submitResetPassword($data);
-                if($forget){
-                    return  response()->json('Password Updated Successfully' , 200);
-                }
+                return Redirect::away($forget);
+
             }
             catch (\Error $exception) {
                 return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
