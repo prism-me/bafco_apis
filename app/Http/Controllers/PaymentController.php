@@ -45,7 +45,7 @@ class PaymentController extends Controller
         if ($result['status'] == 200 && $result['order'] == true) {
             $result['order_id'] = 'OR40246684283';
             $order = Order::where('order_number', $result['order_id'])->with('order_details.productDetail.productvariations', 'orderAddress', 'userDetail')->first();
-            return response()->json($order);
+            
             $userData = [
                 'orderNumber' =>    $order['order_number'],
                 'name' =>    $order['userDetail']['name'],

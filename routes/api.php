@@ -248,9 +248,6 @@ use Illuminate\Support\Facades\Route;
         Route::delete('enquiries/{id}', 'EnquiryController@destroy');
 
 
-
-
-
     #Forgot Password
         Route::post('forget-password', 'UserController@forgetPassword');
 

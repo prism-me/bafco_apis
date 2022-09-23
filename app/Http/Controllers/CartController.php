@@ -147,31 +147,34 @@ class CartController extends Controller
                     
                         $update['shipping_charges'] = "Free";
                         $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-                        CartCalculation::where('user_id',$id)->update($update);
-                        $cartTotal = CartCalculation::where('user_id',$id)->first();
+                        $cartTotal->update($update);
                         if($discount != null){
                             $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
-                            CartCalculation::where('user_id',$id)->update($update);
-                            $cartTotal = CartCalculation::where('user_id',$id)->first();
+                            $cartTotal->update($update);
+                            
                         }
+                        $cartTotal = CartCalculation::where('user_id',$id)->first();
+                        return response()->json($cartTotal);
 
                 }else{
+                   
 
                         $update['shipping_charges']  = 200;
                         $update['total']  = $cartTotal['sub_total'] + 200;
                         $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-                        CartCalculation::where('user_id',$id)->update($update);
-                        $cartTotal = CartCalculation::where('user_id',$id)->first();
+                        $cartTotal->update($update);
                         if($discount != null){
                             $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
-                            CartCalculation::where('user_id',$id)->update($update);
-                            $cartTotal = CartCalculation::where('user_id',$id)->first();
+                            $cartTotal->update($update);
+                            
                         }
+                        $cartTotal = CartCalculation::where('user_id',$id)->first();
+                         return response()->json($cartTotal);
 
 
                 }
             DB::commit();
-                return response()->json($cartTotal);
+               
         } catch (\Exception $e) {
 
             DB::rollBack();

@@ -64,7 +64,7 @@ class Category extends Model
 
     public function products()
     {
-        return $this->hasMany(Product::class, 'category_id', 'id')->select('id', 'name', 'route',  'brand', 'category_id', 'featured_image');
+        return $this->hasMany(Product::class, 'category_id', 'id')->select('id', 'name', 'route',  'brand', 'category_id', 'featured_image','status');
     }
 
 

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\ProductPivotVariation;
 use App\Models\Variation;
-use App\Models\product;
+use App\Models\Product;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
@@ -36,7 +36,7 @@ class CategoryFiltersController extends Controller
                 $productId = ProductPivotVariation::whereIn('variation_value_id', $color)->pluck('product_id')->unique();
                 $products = Product::with('productCategory.parentCategory')
                     ->with(['productvariations' => function ($range) use ($min, $max) {
-                        $range->whereBetween('lower_price', [$min, $max]);
+                        $range->whereBetween('upper_price', [$min, $max])->where('in_stock',1);
                     }])
                     ->whereHas('productvariations')
                     ->where('id', $category->id)
@@ -75,7 +75,7 @@ class CategoryFiltersController extends Controller
         } elseif (isset($min) && $min !== null && $max !== null) {
 
                 $products =   Product::with('productCategory.parentCategory')->with(['productvariations' => function ($range) use ($min,$category, $max) {
-                    $range->whereBetween('lower_price' , [$min, $max]);
+                    $range->whereBetween('upper_price' , [$min, $max])->where('in_stock',1);
                 }])
                 ->whereHas('productvariations')->where('category_id',$category->id)
                 ->get();

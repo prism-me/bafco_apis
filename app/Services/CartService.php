@@ -139,6 +139,8 @@ class CartService
                 $cartCalc = CartCalculation::where('user_id',$userId)->first();
                 $update['total'] =  $cartCalc['total'] - $cart['unit_price'];
                 $update['sub_total'] =  $cartCalc['sub_total'] - $cart['unit_price'];
+                $update['decimal_amount'] =  $update['total'] * 100;
+
                     $cart = CartCalculation::where('user_id',$userId)->update($update);
                     $cartTotal = CartCalculation::where('user_id',$userId)->first();
                     if($cartTotal['sub_total'] == 0){
