@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\DB;
 class OrderService
 {
 
-    public function createOrder($orderData, $user_id)
+    public function createOrder($orderData, $user_id , $request)
     {
         try {
-            // dd($orderData);
+            // dd($request->address_id);
             $cartDeatils = CartCalculation::where('user_id', $user_id)->first();
             // dd($cartDeatils);
             DB::beginTransaction();
@@ -26,7 +26,7 @@ class OrderService
                 'payment_id' => 1,
                 'transaction_status' => 0,
                 'paid' => 0,
-                // 'coupon' => $orderData['promocode']->name ,
+                'address_id' => $request->address_id,
                 'coupon' => $orderData['promocode'],
                 'discount' => $cartDeatils['discount'],
                 'shipping_charges' => $cartDeatils['shipping_charges'],
@@ -35,7 +35,6 @@ class OrderService
                 'status' => 'ORDERPLACED',
                 'payment_date' => null,
             ]);
-
             foreach ($orderData['items'] as $item) {
                 $order->order_details()->create([
                     'product_id' => $item['product_id'],
@@ -47,8 +46,7 @@ class OrderService
 
                 ]);
             }
-
-
+            // dd( DB::getQueryLog());
             DB::commit();
             return true;
         } catch (\Exception $e) {

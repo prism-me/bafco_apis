@@ -40,11 +40,12 @@ class PaymentController extends Controller
     //capture for success response of payment
     public function successResponse(Request $request)
     {
-        //$result = $this->paymentService->capturePaymentDetails(new PostPayPaymentService(), $request);
+        $result = $this->paymentService->capturePaymentDetails(new PostPayPaymentService(), $request);
         //send email to user
-        // if ($result['status'] == 200 && $result['order'] == true) {
-            $result['order_id'] = 'OR538517458308';
+        if ($result['status'] == 200 && $result['order'] == true) {
+            $result['order_id'] = 'OR40246684283';
             $order = Order::where('order_number', $result['order_id'])->with('order_details.productDetail.productvariations', 'orderAddress', 'userDetail')->first();
+            return response()->json($order);
             $userData = [
                 'orderNumber' =>    $order['order_number'],
                 'name' =>    $order['userDetail']['name'],
@@ -66,9 +67,9 @@ class PaymentController extends Controller
             ];
             event(new OrderPlaceMail($userData));
             redirect()->away('https://bafco-next.herokuapp.com/checkout?status=success');
-        // } else {
-        //     return response()->json(['message' => 'Internal Error while payment.'], 404);
-        // }
+        } else {
+            return response()->json(['message' => 'Internal Error while payment.'], 404);
+        }
     }
 
     public function failedResponse(Request $request)

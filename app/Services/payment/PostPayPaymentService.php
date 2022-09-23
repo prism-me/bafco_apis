@@ -45,17 +45,20 @@ class PostPayPaymentService implements PaymentInterface
             if (isset($request->guest_id)) {
 
                 $user = (new UserService())->createUser($request);
-                // dd($user);
+
                 if (!empty($user)) {
-                    $user_id = $user;
-                    $cart = (new CartService())->guestCartToUserCart($request->guest_id, $user);
-                    // return $cart;
+                    $user_id = $user['user_id'];
+                    $request->address_id = $user['address_id'];
+                    $cart = (new CartService())->guestCartToUserCart($request->guest_id, $user_id);
                     if (!$cart) {
+
                         return response()->json('User does not have any item in cart.', 200);
                     }
                 }
             } else {
+                $address = (new UserService())->createAddress($request);
                 $user_id = $request->user_id;
+                $request->address_id = $address->id;
             }
             // exit;
             $cartList = Cart::where('user_id', $user_id)->get(['product_id', 'product_variation_id', 'qty', 'total', 'unit_price', 'user_id']);
@@ -79,8 +82,8 @@ class PostPayPaymentService implements PaymentInterface
 
             $mapedObject = $this->mapPaymentObject($request->all(), $cartList, $promoCode);
 
-            $order = (new OrderService())->createOrder($mapedObject, $user_id);
-
+            $order = (new OrderService())->createOrder($mapedObject, $user_id, $request);
+            
             if (!$order) throw new  \Exception("Error Processing Request", 1);
 
             $payment = $this->createPayment($request, $user_id);

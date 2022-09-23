@@ -92,7 +92,7 @@ class UserService
             $isExist = User::where('email', $user['customer']['email'])->first(['id']);
             $data = $user['billing_address'];
             $getId = $isExist;
-
+            $address_id = null;
             if (!$isExist) {
                 $getId = User::create([
                     'name' => $data['name'],
@@ -101,7 +101,7 @@ class UserService
                     'user_type' => 'user',
                 ]);
 
-                Address::create([
+                $address = Address::create([
                     'user_id' => $getId->id,
                     'name' => $data['name'],
                     'country' => $data['country'],
@@ -114,8 +114,9 @@ class UserService
                     'default' => 1,
                     'address_type' => 'billing'
                 ]);
+                $address_id = $address->id;
             } else {
-                Address::create([
+                $address =  Address::create([
                     'user_id' => $getId->id,
                     'name' => $data['name'],
                     'country' => $data['country'],
@@ -128,15 +129,47 @@ class UserService
                     'default' => 1,
                     'address_type' => 'billing'
                 ]);
+                $address_id = $address->id;
             }
 
             DB::commit();
-            return $getId->id;
+            return ['user_id' => $getId->id, 'address_id' => $address_id];
         } catch (\Exception $e) {
             dd('sdf');
             DB::rollBack();
             return false;
         }
+    }
+
+
+    public function createAddress($request)
+    {
+        // DB::enableQueryLog();    
+        $data = $request['billing_address'];
+
+        $address = Address::where('user_id', $request->user_id)
+            ->where('city', $data['city'])
+            ->where('state', $data['state'])
+            ->where('phone_number', $data['phone'])
+            ->where('address_line1', $data['line1'])
+            ->first();
+
+        if (!$address) {
+            $address = Address::create([
+                'user_id' => $request->user_id,
+                'name' => $data['name'],
+                'country' => $data['country'],
+                'state' => $data['state'],
+                'city' => $data['city'],
+                'address_line1' => $data['line1'],
+                'address_line2' => $data['line2'],
+                'postal_code' => $data['postal_code'],
+                'phone_number' => $data['phone'],
+                'default' => 1,
+                'address_type' => 'billing'
+            ]);
+        }
+        return $address;
     }
 }
 
