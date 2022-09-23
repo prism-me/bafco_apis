@@ -136,4 +136,35 @@ class GuestCartService {
 
     }
 
+    public function removeCart($id){
+        
+        try{
+            DB::beginTransaction();
+                $cart = GuestCart::where('id',$id)->first();
+                $userId = $cart['user_id'];
+                
+                $cartCalc = GuestCartCalculation::where('user_id',$userId)->first();
+                $update['total'] =  $cartCalc['total'] - $cart['unit_price'];
+                $update['sub_total'] =  $cartCalc['sub_total'] - $cart['unit_price'];
+                    $cart = GuestCartCalculation::where('user_id',$userId)->update($update);
+                    $cartTotal = GuestCartCalculation::where('user_id',$userId)->first();
+                    if($cartTotal['sub_total'] == 0){
+                       $cart = GuestCartCalculation::where('user_id',$userId)->delete();
+                    }
+
+                GuestCart::where('id',$id)->delete();
+               
+                
+
+            DB::commit();
+            return $cart;
+
+        } catch (\Exception $e) {
+
+            //DB::rollBack();
+            return response()->json('Cart has been deleted.' , 200);
+        }
+
+    }
+
 }

@@ -75,16 +75,20 @@ class GuestCartController extends Controller
 
     public function removeCart($id)
     {
-        $cart = GuestCart::where('id',$id)->first();
-        $cartCalc = GuestCartCalculation::where('user_id',$cart['user_id'])->first();
-
-        $update['total'] =  $cartCalc['total'] - $cart['unit_price'];
-        $update['sub_total'] =  $cartCalc['sub_total'] - $cart['unit_price'];
-        $cart = GuestCartCalculation::where('user_id',$cart['user_id'])->update($update);
-        GuestCart::where('id',$id)->delete();
-
-        if($cart){
-            return response()->json('Cart has been deleted.' , 200);
+        try{
+            
+            $cart = GuestCartService::removeCart($id);
+            if($cart){
+                return response()->json($cart , 200);
+            }else{
+                return response()->json('Something went wrong!', 404);
+            }
+        }
+        catch (ModelNotFoundException  $exception) {
+            return response()->json(['ex_message'=>'Cart Value Not found.' , 'line' =>$exception->getLine() ], 400);
+        }
+        catch (\Error $exception) {
+            return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
         }
     }
 
@@ -138,13 +142,18 @@ class GuestCartController extends Controller
     public function cartTotal($id){
 
         $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
-
+        $discount = $cartTotal['discounted_price'];
         if($cartTotal['sub_total'] > 2000){
 
                 $update['shipping_charges'] = "Free";
                 $update['decimal_amount'] = $cartTotal['total'] * 100.00;
                 GuestCartCalculation::where('user_id',$id)->update($update);
                 $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
+                if($discount != null){
+                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
+                            GuestCartCalculation::where('user_id',$id)->update($update);
+                            $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
+                }
                 return response()->json($cartTotal);
 
 
@@ -155,6 +164,11 @@ class GuestCartController extends Controller
                 $update['decimal_amount'] = $cartTotal['total'] * 100.00;
                 GuestCartCalculation::where('user_id',$id)->update($update);
                 $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
+                if($discount != null){
+                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
+                            GuestCartCalculation::where('user_id',$id)->update($update);
+                            $cartTotal = GuestCartCalculation::where('user_id',$id)->first();
+                }
                 return response()->json($cartTotal);
 
         }

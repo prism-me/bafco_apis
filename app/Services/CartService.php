@@ -134,18 +134,27 @@ class CartService
         try{
             DB::beginTransaction();
                 $cart = Cart::where('id',$id)->first();
-                $cartCalc = CartCalculation::where('user_id',$cart['user_id'])->first();
+                $userId = $cart['user_id'];
+                
+                $cartCalc = CartCalculation::where('user_id',$userId)->first();
                 $update['total'] =  $cartCalc['total'] - $cart['unit_price'];
                 $update['sub_total'] =  $cartCalc['sub_total'] - $cart['unit_price'];
-                $cart = CartCalculation::where('user_id',$cart['user_id'])->update($update);
+                    $cart = CartCalculation::where('user_id',$userId)->update($update);
+                    $cartTotal = CartCalculation::where('user_id',$userId)->first();
+                    if($cartTotal['sub_total'] == 0){
+                       $cart = CartCalculation::where('user_id',$userId)->delete();
+                    }
+
                 Cart::where('id',$id)->delete();
+               
+                
 
             DB::commit();
             return $cart;
 
         } catch (\Exception $e) {
 
-            DB::rollBack();
+            //DB::rollBack();
             return response()->json('Cart has been deleted.' , 200);
         }
 
