@@ -43,9 +43,8 @@ class PaymentController extends Controller
         //$result = $this->paymentService->capturePaymentDetails(new PostPayPaymentService(), $request);
         //send email to user
         // if ($result['status'] == 200 && $result['order'] == true) {
-            $result['order_id'] = 'OR40246684283';
+            $result['order_id'] = 'OR538517458308';
             $order = Order::where('order_number', $result['order_id'])->with('order_details.productDetail.productvariations', 'orderAddress', 'userDetail')->first();
-            // return response()->json($order);
             $userData = [
                 'orderNumber' =>    $order['order_number'],
                 'name' =>    $order['userDetail']['name'],
@@ -63,11 +62,9 @@ class PaymentController extends Controller
                 'address_line2' =>    $order['orderAddress']['address_line2'],
                 'postal_code' =>    $order['orderAddress']['postal_code'],
                 'phone_number' =>    $order['orderAddress']['phone_number'],
-                'orderDate' =>    $order['created_at'],
+                'orderDate' =>    $order['payment_date'],
             ];
-            return $userData;
             event(new OrderPlaceMail($userData));
-
             redirect()->away('https://bafco-next.herokuapp.com/checkout?status=success');
         // } else {
         //     return response()->json(['message' => 'Internal Error while payment.'], 404);

@@ -11,13 +11,14 @@ use App\Mail\OrderDeliverMail as DeliverMail;
 
 class NotifyDeliverCreated
 {
+
+
     public function handle(OrderDeliverMail $userData)
     {
+
         $email = $userData->userData['email'];
         Mail::to($email)->send(new DeliverMail($userData->userData));
     }
-
-
 
 
 }

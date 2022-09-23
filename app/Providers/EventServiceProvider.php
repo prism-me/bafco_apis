@@ -46,7 +46,7 @@ class EventServiceProvider extends ServiceProvider
             NotifyCancelCreated::class,
         ],
         OrderDeliverMail::class => [
-            NotifyCancelCreated::class,
+            NotifyDeliverCreated::class,
         ],
     ];
 

@@ -9,7 +9,7 @@ use Illuminate\Queue\SerializesModels;
 
 class OrderPlaceMail extends Mailable
 {
-    public $data;
+
 
     use Queueable, SerializesModels;
 
@@ -18,10 +18,10 @@ class OrderPlaceMail extends Mailable
      *
      * @return void
      */
-    public function __construct($user)
+    public function __construct($userData)
     {
 
-        $this->user = $user;
+        $this->userData = $userData;
     }
 
     /**
@@ -31,7 +31,7 @@ class OrderPlaceMail extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.orders.user.place')->with('user', $this->user);
+        return $this->view('orders.user.place')->with('userData', $this->userData);
 
     }
 }

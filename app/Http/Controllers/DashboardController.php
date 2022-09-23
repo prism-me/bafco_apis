@@ -67,11 +67,9 @@ class DashboardController extends Controller
                 'address_line2' =>    $order['orderAddress']['address_line2'],
                 'postal_code' =>    $order['orderAddress']['postal_code'],
                 'phone_number' =>    $order['orderAddress']['phone_number'],
-                'orderDate' =>    $order['created_at'],
-                'cancellationReson' => isset($request->message ) ? $request->message  : "",
+                'orderDate' =>    $order['payment_date'],
+                'cancellationReason' => isset($request->message ) ? $request->message  : "",
             ];
-
-            return $userData;
 
         $i = 0 ;
         foreach($order['order_details'] as $value){
@@ -81,10 +79,6 @@ class DashboardController extends Controller
             $userData['product_detail'][$i]['product_variation'] =  $value['productDetail']['productvariations']['images'];
             $i++;
         }
-
-
-
-
         if($request->status ==  "confirm")
         {
             $update['status'] = $this->confirm;
