@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Cart;
 use App\Models\CartCalculation;
+use App\Models\GuestCart;
+use App\Models\GuestCartCalculation;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\PaymentHistory;
@@ -42,7 +44,7 @@ class OrderService
                     'price' => $item['unit_price'],
                     'qty' => $item['qty'],
                     'discount' => 'discount',
-                    'total' => $item['unit_price'] * $item['qty']
+                    'total' => $item['total']
 
                 ]);
             }
@@ -76,9 +78,15 @@ class OrderService
             $payment->save();
 
             $cart = Cart::where('user_id', $order->user_id)->firstOrFail();
+            if(isset($cart->guest_id)){
+                GuestCart::where('guest_id', $cart->guest_id)->delete();
+            }
             $cart->delete();
 
             $cartCal = CartCalculation::where('user_id', $order->user_id)->firstOrFail();
+            if(isset($cartCal->guest_id)){
+                GuestCartCalculation::where('guest_id', $cart->guest_id)->delete();
+            }
             $cartCal->delete();
 
             DB::commit();

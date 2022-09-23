@@ -48,19 +48,18 @@ class PostPayPaymentService implements PaymentInterface
 
                 if (!empty($user)) {
                     $user_id = $user['user_id'];
-                    $request->address_id = $user['address_id'];
-                    $cart = (new CartService())->guestCartToUserCart($request->guest_id, $user_id);
-                    if (!$cart) {
 
-                        return response()->json('User does not have any item in cart.', 200);
-                    }
+                    $request->address_id = $user['address_id'];
+
+                    $cart = (new CartService())->guestCartToUserCart($request->guest_id, $user_id);
+
+                    if (!$cart) throw new  \Exception("User does not have any item in cart", 1);
                 }
             } else {
                 $address = (new UserService())->createAddress($request);
                 $user_id = $request->user_id;
                 $request->address_id = $address->id;
             }
-            // exit;
             $cartList = Cart::where('user_id', $user_id)->get(['product_id', 'product_variation_id', 'qty', 'total', 'unit_price', 'user_id']);
 
             foreach ($cartList as $cart) {
@@ -83,12 +82,12 @@ class PostPayPaymentService implements PaymentInterface
             $mapedObject = $this->mapPaymentObject($request->all(), $cartList, $promoCode);
 
             $order = (new OrderService())->createOrder($mapedObject, $user_id, $request);
-            
-            if (!$order) throw new  \Exception("Error Processing Request", 1);
+
+            if (!$order) throw new  \Exception("Error while processing order", 1);
 
             $payment = $this->createPayment($request, $user_id);
 
-            if (!$payment) throw new  \Exception("Error Processing Request", 1);
+            if (!$payment) throw new  \Exception("Error while processing order", 1);
 
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . $this->baseCode,

@@ -161,6 +161,7 @@ class CartService
                     // return $guest;
                     $cart =Cart::create([
                         'user_id' => $user_id,
+                        'guest_id' => $guest_id,
                         'product_id' => $guest->product_id,
                         'product_variation_id' => $guest->product_variation_id,
                         'qty' => $guest->qty,
@@ -169,13 +170,14 @@ class CartService
 
                     ]);
 
-                    $guest->delete();
+                   // $guest->delete();
                 }
 
                 $guestCartCalculation = GuestCartCalculation::where('user_id', $guest_id)->firstOrFail();
 
                 CartCalculation::create([
                     'user_id' => $user_id,
+                    'guest_id' => $guest_id,
                     'coupon' => $guestCartCalculation->coupon,
                     'discounted_price' => $guestCartCalculation->discounted_price,
                     'shipping_charges' => $guestCartCalculation->shipping_charges,
@@ -185,7 +187,7 @@ class CartService
                 ]);
 
                 // $guestCart->delete();
-               $guestCartCalculation->delete();
+              // $guestCartCalculation->delete();
 
             DB::commit();
             return true;
