@@ -141,13 +141,19 @@ class CartController extends Controller
         try {
             DB::beginTransaction();
                 $cartTotal = CartCalculation::where('user_id',$id)->first();
-
+                $discount = $cartTotal['discounted_price'];
+                
                 if($cartTotal['sub_total'] > 2000){
-
+                    
                         $update['shipping_charges'] = "Free";
                         $update['decimal_amount'] = $cartTotal['total'] * 100.00;
                         CartCalculation::where('user_id',$id)->update($update);
                         $cartTotal = CartCalculation::where('user_id',$id)->first();
+                        if($discount != null){
+                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
+                            CartCalculation::where('user_id',$id)->update($update);
+                            $cartTotal = CartCalculation::where('user_id',$id)->first();
+                        }
 
                 }else{
 
@@ -156,6 +162,11 @@ class CartController extends Controller
                         $update['decimal_amount'] = $cartTotal['total'] * 100.00;
                         CartCalculation::where('user_id',$id)->update($update);
                         $cartTotal = CartCalculation::where('user_id',$id)->first();
+                        if($discount != null){
+                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
+                            CartCalculation::where('user_id',$id)->update($update);
+                            $cartTotal = CartCalculation::where('user_id',$id)->first();
+                        }
 
 
                 }

@@ -16,10 +16,10 @@ class OrderDeliverMail extends Mailable
      *
      * @return void
      */
-    public function __construct($user)
+    public function __construct($userData)
     {
 
-        $this->user = $user;
+        $this->userData = $userData;
     }
 
     /**
@@ -29,7 +29,7 @@ class OrderDeliverMail extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.orders.user.deliver')->with('user', $this->user);
+        return $this->view('orders.user.deliver')->with('userData', $this->userData);
 
     }
 }

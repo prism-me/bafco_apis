@@ -225,6 +225,108 @@ class ProductService
     }
 
 
+     public function addProducts($data){
+
+         $product = Product::create([
+             "name" => $data['name'],
+             "featured_image" => $data['featured_image'],
+             "route" => $data['route'],
+             "long_description" => $data['long_description'],
+             "shiping_and_return" => $data['shiping_and_return'],
+             "category_id" => $data['category_id'],
+             "related_categories" => $data['related_categories'],
+             "brand" => $data['brand'],
+             "album" => $data['album'],
+             "download" => $data['download'],
+             "promotional_images" => $data['promotional_images'],
+             "footrest" => $data['footrest'],
+             "headrest" => $data['headrest'],
+             "seo" => $data['seo'],
+             "top_selling" => isset($data['top_selling']) ? $data['top_selling'] : 0,
+
+         ]);
+         return response()->json('Data has been saved.', 200);
+
+
+     }
+
+     public function updateProducts($data){
+
+         $product = Product::where('id', $data['id'])->update([
+             "name" => $data['name'],
+             "featured_image" => $data['featured_image'],
+             "route" => $data['route'],
+             "long_description" => $data['long_description'],
+             "shiping_and_return" => $data['shiping_and_return'],
+             "category_id" => $data['category_id'],
+             "related_categories" => $data['related_categories'],
+             "brand" => $data['brand'],
+             "album" => $data['album'],
+             "download" => $data['download'],
+             "promotional_images" => $data['promotional_images'],
+             "footrest" => $data['footrest'],
+             "headrest" => $data['headrest'],
+             "seo" => $data['seo'],
+             "top_selling" => isset($data['top_selling']) ? $data['top_selling'] : 0,
+         ]);
+        return response()->json('Data has been saved.', 200);
+
+
+    }
+
+
+    public function addVariation($variation){
+
+        $product_variation = ProductVariation::create([
+            "product_id" =>  $variation['product_id'],
+            "code" => $variation['code'],
+            "lc_code" => $variation['lc_code'],
+            "cbm" => $variation['cbm'],
+            "in_stock" => $variation['in_stock'],
+            "upper_price" => $variation['upper_price'],
+            "lower_price" => $variation['lower_price'],
+            "height" => $variation['height'],
+            "depth" => $variation['depth'],
+            "width" => $variation['width'],
+            "description" => $variation['description'],
+            "images" => $variation['images'],
+            "lead_img" => isset($variation['lead_img']) ?  $variation['lead_img'] : '',
+            "limit" => isset($variation['limit']) ?  $variation['limit'] : ''
+        ]);
+        return response()->json('Data has been saved.', 200);
+
+
+
+
+    }
+
+    public function updateVariation($variation){
+
+        $product_variation = ProductVariation::where('id',$variation['id'])->update([
+            "product_id" =>  $variation['product_id'],
+            "code" => $variation['code'],
+            "lc_code" => $variation['lc_code'],
+            "cbm" => $variation['cbm'],
+            "in_stock" => $variation['in_stock'],
+            "upper_price" => $variation['upper_price'],
+            "lower_price" => $variation['lower_price'],
+            "height" => $variation['height'],
+            "depth" => $variation['depth'],
+            "width" => $variation['width'],
+            "description" => $variation['description'],
+            "images" => $variation['images'],
+            "lead_img" => isset($variation['lead_img']) ?  $variation['lead_img'] : '',
+            "limit" => isset($variation['limit']) ?  $variation['limit'] : ''
+        ]);
+        return response()->json('Data has been saved.', 200);
+
+
+
+
+    }
+
+
+
 
 
 }

@@ -63,10 +63,9 @@ class PaymentController extends Controller
                 'address_line2' =>    $order['orderAddress']['address_line2'],
                 'postal_code' =>    $order['orderAddress']['postal_code'],
                 'phone_number' =>    $order['orderAddress']['phone_number'],
-                'orderDate' =>    $order['created_at'],
+                'orderDate' =>    $order['payment_date'],
             ];
             event(new OrderPlaceMail($userData));
-
             redirect()->away('https://bafco-next.herokuapp.com/checkout?status=success');
         } else {
             return response()->json(['message' => 'Internal Error while payment.'], 404);
