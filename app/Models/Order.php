@@ -24,6 +24,7 @@ class Order extends Model
         'sub_total',
         'status',
         'payment_date',
+        'address_id'
     ];
 
 
