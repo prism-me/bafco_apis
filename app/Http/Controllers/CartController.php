@@ -90,21 +90,13 @@ class CartController extends Controller
     }
 
 
-    public function clearAllCart($id)
-    {
-        $cart = Cart::where('user_id',$id)->delete();
-        if($cart){
-            return response()->json('Cart has been deleted.' , 200);
-        }
-    }
 
-
-    public function incrementQty(Request $request){
+    public function updateCart(Request $request){
 
         try{
 
             $data = $request->all();
-            $cart = CartService::incrementQty($data);
+            $cart = CartService::updateCart($data);
 
             if($cart){
 
@@ -139,41 +131,10 @@ class CartController extends Controller
     public function cartTotal($id){
 
         try {
-            DB::beginTransaction();
-                $cartTotal = CartCalculation::where('user_id',$id)->first();
-                $discount = $cartTotal['discounted_price'];
-                
-                if($cartTotal['sub_total'] > 2000){
-                    
-                        $update['shipping_charges'] = "Free";
-                        $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-                        $cartTotal->update($update);
-                        if($discount != null){
-                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
-                            $cartTotal->update($update);
-                            
-                        }
-                        $cartTotal = CartCalculation::where('user_id',$id)->first();
-                        return response()->json($cartTotal);
-
-                }else{
-                   
-
-                        $update['shipping_charges']  = 200;
-                        $update['total']  = $cartTotal['sub_total'] + 200;
-                        $update['decimal_amount'] = $cartTotal['total'] * 100.00;
-                        $cartTotal->update($update);
-                        if($discount != null){
-                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
-                            $cartTotal->update($update);
-                            
-                        }
-                        $cartTotal = CartCalculation::where('user_id',$id)->first();
-                         return response()->json($cartTotal);
-
-
-                }
-            DB::commit();
+            
+            $cartTotal = CartCalculation::where('user_id',$id)->first();
+            return $cartTotal;
+          
                
         } catch (\Exception $e) {
 

@@ -32,7 +32,7 @@ class RegisterService {
             $userData['email'] = $data['email'];
             $userData['password'] = $data['password'];
             $userData['isActive'] = 0;
-            $fourRandomDigit = rand(10000,99999);
+            $fourRandomDigit = rand(1000,9999);
             $userData['code'] = $fourRandomDigit;
             $userCreate = TempUser::create($userData);
             event(new RegisterMail($userData));

@@ -7,6 +7,7 @@ use App\Services\payment\PostPayPaymentService;
 use Illuminate\Http\Request;
 use App\Events\OrderPlaceMail;
 use App\Models\Order;
+use App\Services\OrderService;
 
 class PaymentController extends Controller
 {
@@ -43,9 +44,8 @@ class PaymentController extends Controller
         $result = $this->paymentService->capturePaymentDetails(new PostPayPaymentService(), $request);
         //send email to user
         if ($result['status'] == 200 && $result['order'] == true) {
-            $result['order_id'] = 'OR40246684283';
-            $order = Order::where('order_number', $result['order_id'])->with('order_details.productDetail.productvariations', 'orderAddress', 'userDetail')->first();
             
+            $order = Order::where('order_number', $result['order_id'])->with('order_details.productDetail.productvariations', 'orderAddress', 'userDetail')->first();
             $userData = [
                 'orderNumber' =>    $order['order_number'],
                 'name' =>    $order['userDetail']['name'],
@@ -65,6 +65,15 @@ class PaymentController extends Controller
                 'phone_number' =>    $order['orderAddress']['phone_number'],
                 'orderDate' =>    $order['payment_date'],
             ];
+             $i = 0 ;
+            foreach($order['order_details'] as $value){
+                $userData['product_detail'][$i]['qty'] = $value['qty'];
+                $userData['product_detail'][$i]['price'] = $value['total'];
+                $userData['product_detail'][$i]['product_name'] = $value['productDetail']['name'];
+                $userData['product_detail'][$i]['product_variation'] =  $value['productDetail']['productvariations']['images'];
+                $i++;
+            }
+
             event(new OrderPlaceMail($userData));
             redirect()->away('https://bafco-next.herokuapp.com/checkout?status=success');
         } else {
@@ -74,6 +83,9 @@ class PaymentController extends Controller
 
     public function failedResponse(Request $request)
     {
-        return $request->all();
+
+        $order = (new OrderService())->payment_failed($request->order_id, $request->status);
+        
+        redirect()->away('https://bafco-next.herokuapp.com/checkout?status=cancelled'); 
     }
 }

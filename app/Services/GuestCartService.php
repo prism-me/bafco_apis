@@ -24,8 +24,6 @@ class GuestCartService {
         if( $cartValue){
 
             $create['qty'] = $cartValue['qty'] + 1;
-            $create['total'] = $create['qty'] * $cartValue['unit_price'];
-
             $cartUpdate = $cartValue->update($create);
             $cart = GuestCart::where('id',$cartValue->id)->first();
             $cartData = (new GuestCartService)->cartDetail($cart);
@@ -47,91 +45,164 @@ class GuestCartService {
 
     }
 
-    public function incrementQty($data){
+    public function updateCart($data)
+    {
 
+        try{
+            DB::beginTransaction();
+                $i = 0;
+                
+                foreach($data as $value){
 
-        $cart = GuestCart::where('id',$data['cart_id'])->first();
+                
+                    $cart = Cart::where('id', $value['cart_id'])->first();
 
-        $update['qty'] = $data['qty'];
-        $update['total'] = $data['qty'] * $cart['unit_price'];
-        $cartUpdate = GuestCart::where('id',$data['cart_id'])->update($update);
-        $cart = GuestCart::where('id',$data['cart_id'])->first();
-        $cartData = (new GuestCartService)->cartDetail($cart);
+                    $update['qty'] = $value['qty'];
+                    $cartUpdate = Cart::where('id', $value['cart_id'])->update($update);
+                    $cart = Cart::where('id', $value['cart_id'])->first();
+                    $cartData = (new CartService)->cartDetail($cart);
 
+                }
+            DB::commit();
 
-        if($cartData){
+                if ($cartData) {
 
-            return response()->json($cartData , 200);
+                    return response()->json($cartData, 200);
+                } else {
 
-        }else{
+                    return response()->json('Something went wrong!', 404);
+                }
+        } catch (\Exception $e) {
 
-            return response()->json('Something went wrong!', 404);
+            DB::rollBack();
+            return response()->json(['Cart not updated.', 'stack' => $e], 500);
         }
-
     }
 
     public function cartDetail($cart){
 
-        try {
+       try {
+           DB::beginTransaction();
 
-            DB::beginTransaction();
-                $productDetail = Product::where('id',$cart->product_id)->with('cartCategory.parentCategory' )->first(['name','featured_image','route','category_id']);
-                $productVariant = ProductVariation::where('id',$cart->product_variation_id)->with('productVariationName.productVariationValues.variant')->first(['id','code','lower_price','upper_price','limit']);
-                $quantity =  $cart->qty;
+            $productDetail = Product::where('id', $cart->product_id)->with('cartCategory.parentCategory')->first(['name', 'featured_image', 'route', 'category_id']);
+            $productVariant = ProductVariation::where('id', $cart->product_variation_id)->with('productVariationName.productVariationValues.variant')->first(['id', 'code', 'lower_price', 'upper_price', 'limit']);
+            $quantity =  $cart->qty;
+
+            #Check Limit For upper Price and Lower Price
                 $limit = $productVariant['limit'];
-                if($quantity > $limit){
+                if ($quantity > $limit) {
 
                     $price = $productVariant['lower_price'];
                     $updateCart['unit_price'] = $productVariant['lower_price'];
-
-                }else{
+                } else {
 
                     $price = $productVariant['upper_price'];
                     $updateCart['unit_price'] = $productVariant['upper_price'];
                 }
 
+            $updateCart['total'] = $quantity * $price;
+            $cartUpdated = GuestCart::where('id', $cart->id)->update($updateCart);
 
-
-                $updateCart['total'] = $quantity * $price;
-                $cartUpdated = GuestCart::where('id', $cart->id)->update($updateCart);
+            #Creating Final Amount 
                 $cartPrice = GuestCart::where('user_id', $cart->user_id)->pluck('total');
                 $finalAmount = $cartPrice->sum();
 
+            
+            $cartCalculation =   [
+                'user_id' => $cart->user_id,
+                'total' => $finalAmount,
+                'sub_total' =>  $finalAmount,
+                'decimal_amount' =>  $finalAmount * 100
 
-                $cartCalculation =   [
-                    'user_id' => $cart->user_id ,
-                    'total' => $finalAmount,
-                    'sub_total' =>  $finalAmount,
-                    'decimal_amount' =>  $finalAmount * 100
+            ];
 
-                ];
+            if ($cartcal = GuestCartCalculation::where('user_id', $cart->user_id)->exists()) {
 
+                GuestCartCalculation::where('user_id', $cart->user_id)->update($cartCalculation);
 
-                if($cartcal = GuestCartCalculation::where('user_id',$cart->user_id)->exists()){
-
-                    GuestCartCalculation::where('user_id',$cart->user_id)->update($cartCalculation);
+                $cartTotal = GuestCartCalculation::where('user_id', $cart->user_id)->first();
+                $discount = $cartTotal['discounted_price'];
+                
+                if($cartTotal['sub_total'] > 2000){
+                    
+                        $update['shipping_charges'] = "Free";
+                        $update['decimal_amount'] = $cartTotal['total'] * 100.00;
+                        $cartTotal->update($update);
+                        if($discount != null){
+                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
+                            $cartTotal->update($update);
+                            
+                        }
+                        $cartTotal = GuestCartCalculation::where('user_id',$cart->user_id)->first();
+                        return response()->json($cartTotal);
 
                 }else{
+                   
 
+                        $update['shipping_charges']  = 200;
+                        $update['total']  = $cartTotal['sub_total'] + 200;
+                        $update['decimal_amount'] = $cartTotal['total'] * 100.00;
+                        $cartTotal->update($update);
+                        if($discount != null){
+                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
+                            $cartTotal->update($update);
+                            
+                        }
+                        $cartTotal = GuestCartCalculation::where('user_id',$cart->user_id)->first();
+                         return response()->json($cartTotal);
 
-                    $cartCalculation = GuestCartCalculation::create($cartCalculation);
 
                 }
+            } else {
+
+
+                $cartTotal = GuestCartCalculation::firstOrcreate($cartCalculation);
+                $discount = $cartTotal['discounted_price'];
+                
+                if($cartTotal['sub_total'] > 2000){
+                    
+                        $update['shipping_charges'] = "Free";
+                        $update['decimal_amount'] = $cartTotal['total'] * 100.00;
+                        $cartTotal->update($update);
+                        if($discount != null){
+                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
+                            $cartTotal->update($update);
+                            
+                        }
+                        $cartTotal = GuestCartCalculation::where('user_id',$cart->user_id)->first();
+                        return response()->json($cartTotal);
+
+                }else{
+                   
+
+                        $update['shipping_charges']  = 200;
+                        $update['total']  = $cartTotal['sub_total'] + 200;
+                        $update['decimal_amount'] = $cartTotal['total'] * 100.00;
+                        $cartTotal->update($update);
+                        if($discount != null){
+                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
+                            $cartTotal->update($update);
+                            
+                        }
+                        $cartTotal = GuestCartCalculation::where('user_id',$cart->user_id)->first();
+                         return response()->json($cartTotal);
+
+
+                }
+            }
 
             DB::commit();
-                $data['products'] = $productDetail;
-                $data['variation'] = $productVariant;
-                $data['quantity'] = $quantity;
-                $data['total'] = $finalAmount;
+            $data['products'] = $productDetail;
+            $data['variation'] = $productVariant;
+            $data['quantity'] = $quantity;
+            $data['total'] = $finalAmount;
 
-                return $data;
-
+            return $data;
         } catch (\Exception $e) {
 
-            DB::rollBack();
-                return response()->json(['Cart not updated.', 'stack' => $e], 500);
+            //DB::rollBack();
+            return response()->json(['Cart not updated.', 'stack' => $e], 500);
         }
-
 
 
     }

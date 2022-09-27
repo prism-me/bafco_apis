@@ -30,7 +30,6 @@ class CartService
         if ($cartValue) {
 
             $create['qty'] = $cartValue['qty'] + 1;
-            $create['total'] = $create['qty'] * $cartValue['unit_price'];
             $cartUpdate = $cartValue->update($create);
             $cart = Cart::where('id', $cartValue->id)->first();
             $cartData = (new CartService)->cartDetail($cart);
@@ -46,18 +45,24 @@ class CartService
         }
     }
 
-    public function incrementQty($data)
+    public function updateCart($data)
     {
 
         try{
             DB::beginTransaction();
-                $cart = Cart::where('id', $data['cart_id'])->first();
+                $i = 0;
+                
+                foreach($data as $value){
 
-                $update['qty'] = $data['qty'];
-                $update['total'] = $data['qty'] * $cart['unit_price'];
-                $cartUpdate = Cart::where('id', $data['cart_id'])->update($update);
-                $cart = Cart::where('id', $data['cart_id'])->first();
-                $cartData = (new CartService)->cartDetail($cart);
+                
+                    $cart = Cart::where('id', $value['cart_id'])->first();
+
+                    $update['qty'] = $value['qty'];
+                    $cartUpdate = Cart::where('id', $value['cart_id'])->update($update);
+                    $cart = Cart::where('id', $value['cart_id'])->first();
+                    $cartData = (new CartService)->cartDetail($cart);
+
+                }
             DB::commit();
 
                 if ($cartData) {
@@ -78,28 +83,32 @@ class CartService
     {
 
         try {
-            DB::beginTransaction();
+           DB::beginTransaction();
 
             $productDetail = Product::where('id', $cart->product_id)->with('cartCategory.parentCategory')->first(['name', 'featured_image', 'route', 'category_id']);
             $productVariant = ProductVariation::where('id', $cart->product_variation_id)->with('productVariationName.productVariationValues.variant')->first(['id', 'code', 'lower_price', 'upper_price', 'limit']);
             $quantity =  $cart->qty;
-            $limit = $productVariant['limit'];
-            if ($quantity > $limit) {
 
-                $price = $productVariant['lower_price'];
-                $updateCart['unit_price'] = $productVariant['lower_price'];
-            } else {
+            #Check Limit For upper Price and Lower Price
+                $limit = $productVariant['limit'];
+                if ($quantity > $limit) {
 
-                $price = $productVariant['upper_price'];
-                $updateCart['unit_price'] = $productVariant['upper_price'];
-            }
+                    $price = $productVariant['lower_price'];
+                    $updateCart['unit_price'] = $productVariant['lower_price'];
+                } else {
+
+                    $price = $productVariant['upper_price'];
+                    $updateCart['unit_price'] = $productVariant['upper_price'];
+                }
 
             $updateCart['total'] = $quantity * $price;
             $cartUpdated = Cart::where('id', $cart->id)->update($updateCart);
-            $cartPrice = Cart::where('user_id', $cart->user_id)->pluck('total');
-            $finalAmount = $cartPrice->sum();
 
+            #Creating Final Amount 
+                $cartPrice = Cart::where('user_id', $cart->user_id)->pluck('total');
+                $finalAmount = $cartPrice->sum();
 
+            
             $cartCalculation =   [
                 'user_id' => $cart->user_id,
                 'total' => $finalAmount,
@@ -107,13 +116,79 @@ class CartService
                 'decimal_amount' =>  $finalAmount * 100
 
             ];
-            if ($cartcal = CartCalculation::where('user_id', $cart->user_id)->exists()) {
 
+            if ($cartcal = CartCalculation::where('user_id', $cart->user_id)->exists()) {
                 CartCalculation::where('user_id', $cart->user_id)->update($cartCalculation);
+
+                $cartTotal = CartCalculation::where('user_id', $cart->user_id)->first();
+                $discount = $cartTotal['discounted_price'];
+                
+                if($cartTotal['sub_total'] > 2000){
+                    
+                        $update['shipping_charges'] = "Free";
+                        $update['decimal_amount'] = $cartTotal['total'] * 100.00;
+                        $cartTotal->update($update);
+                        if($discount != null){
+                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
+                            $cartTotal->update($update);
+                            
+                        }
+                        $cartTotal = CartCalculation::where('user_id',$cart->user_id)->first();
+                        return response()->json($cartTotal);
+
+                }else{
+                   
+
+                        $update['shipping_charges']  = 200;
+                        $update['total']  = $cartTotal['sub_total'] + 200;
+                        $update['decimal_amount'] = $cartTotal['total'] * 100.00;
+                        $cartTotal->update($update);
+                        if($discount != null){
+                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
+                            $cartTotal->update($update);
+                            
+                        }
+                        $cartTotal = CartCalculation::where('user_id',$cart->user_id)->first();
+                         return response()->json($cartTotal);
+
+
+                }
             } else {
 
 
-                $cartCalculation = CartCalculation::create($cartCalculation);
+                $cartTotal = CartCalculation::firstOrcreate($cartCalculation);
+                $discount = $cartTotal['discounted_price'];
+                
+                if($cartTotal['sub_total'] > 2000){
+                    
+                        $update['shipping_charges'] = "Free";
+                        $update['decimal_amount'] = $cartTotal['total'] * 100.00;
+                        $cartTotal->update($update);
+                        if($discount != null){
+                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
+                            $cartTotal->update($update);
+                            
+                        }
+                        $cartTotal = CartCalculation::where('user_id',$cart->user_id)->first();
+                        return response()->json($cartTotal);
+
+                }else{
+                   
+
+                        $update['shipping_charges']  = 200;
+                        $update['total']  = $cartTotal['sub_total'] + 200;
+                        $update['decimal_amount'] = $cartTotal['total'] * 100.00;
+                        $cartTotal->update($update);
+                        if($discount != null){
+                            $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
+                            $cartTotal->update($update);
+                            
+                        }
+                        $cartTotal = CartCalculation::where('user_id',$cart->user_id)->first();
+                         return response()->json($cartTotal);
+
+
+                }
             }
 
             DB::commit();
@@ -131,6 +206,8 @@ class CartService
     }
 
     public function removeCart($id){
+
+
         try{
             DB::beginTransaction();
                 $cart = Cart::where('id',$id)->first();
@@ -143,6 +220,7 @@ class CartService
 
                     $cart = CartCalculation::where('user_id',$userId)->update($update);
                     $cartTotal = CartCalculation::where('user_id',$userId)->first();
+
                     if($cartTotal['sub_total'] == 0){
                        $cart = CartCalculation::where('user_id',$userId)->delete();
                     }

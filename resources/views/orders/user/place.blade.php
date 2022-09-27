@@ -1,7 +1,4 @@
 <table class="table table-bordered" align="center" style="width:605px;margin:2rem auto;" cellspacing="0" cellpadding="0">
-    <style>
-        td {vertical-align: top !important;}
-    </style>
     <thead>
     <tr>
         <th colspan="3" style="border-bottom:0px !important;position: relative;line-height: 0px;">
@@ -16,17 +13,23 @@
         <td colspan="3"
             style="background-color:#008482;text-align:center;color:white;font-weight:bold;font-size:18px; height:56px;">
             ORDER PLACED</td>
-    </tr><br />
+    </tr><br /> <br />
     <tr>
-        <div style="display: flex;">
-            <img src="https://bafco.b-cdn.net/images/email.png" alt="logo" style="margin: 1px auto;" height="90">
-        </div>
-        <td  colspan="3">
-            <p style="text-align:center; color: #f44336"><b>{{ ucfirst($userData['name'])}} Your Order has been Placed.</b></p>
+        {{-- <td >
+            
+            
+        </td> --}}
+       <td colspan="3">
+            <div style="display: flex;">
+                <img src="https://bafco.b-cdn.net/images/email.png" alt="logo" style="margin: 1px auto;" height="90">
+            </div>
+            <h2 style=" text-align: center; color:#008482;">{{ ucfirst( $userData['name'])}} Your Order Has Been Placed.!</h2>
         </td>
     </tr>
+
+    <br/>
     <tr>
-        <td colspan="2">
+        <td colspan="2" style="vertical-align: baseline !important;"">
             <h2><strong>Shipping Address</strong></h2>
             {{ $userData['address_name'] }} {{ $userData['address_country']  }} {{ $userData['address_state'] }} {{  $userData['address_city'] }} <br />
             {{$userData['address_line1'] }} {{ $userData['address_line2'] }} < {{ $userData['postal_code'] }} > {{ $userData['phone_number'] }}

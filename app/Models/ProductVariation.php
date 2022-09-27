@@ -75,6 +75,8 @@ class ProductVariation extends Model
         return $this->hasManyThrough(ProductPivotVariation::class, ProductVariation::class , 'product_id','product_variation_id','id','id');
     }
 
+    
+
 
 
 }
