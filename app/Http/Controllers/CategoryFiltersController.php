@@ -9,6 +9,7 @@ use App\Models\Product;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
+
 class CategoryFiltersController extends Controller
 {
 
@@ -16,8 +17,10 @@ class CategoryFiltersController extends Controller
     {
 
         $variations =  DB::select("CALL CategoryFilterList('" . $category->route . "')");
-        return response()->json($variations, 200);
 
+        $categories = Category::where('parent_id', $category->parent_id)->withCount('products')->get(['name', 'route', 'products_count']);
+        // return $categories;
+        return response()->json(['categories' => $categories, 'variations' => $variations], 200);
     }
 
     public function CategoryListFilteration(Request $request)
@@ -30,10 +33,6 @@ class CategoryFiltersController extends Controller
        
         
         $category = Category::where('route', $route)->first();
-        if(!empty($color) ){
-
-        }
-    
 
         $products = Product::with('productCategory.parentCategory')
                             ->when(!empty($request->brand), function($q) use ($brand,$category) {

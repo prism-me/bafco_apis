@@ -82,7 +82,7 @@ class PostPayPaymentService implements PaymentInterface
             $mapedObject = $this->mapPaymentObject($request->all(), $cartList, $promoCode);
 
             $order = (new OrderService())->createOrder($mapedObject, $user_id, $request);
-
+            dd($order);
             if (!$order) throw new  \Exception("Error while processing order", 1);
 
             $payment = $this->createPayment($request, $user_id);
@@ -127,6 +127,7 @@ class PostPayPaymentService implements PaymentInterface
         $data['merchant']['cancel_url'] = $this->failed_url;
         $data['merchant']['confirmation_url'] = $this->success_url;
         $data['promocode'] = $promoCode ? $promoCode : null;
+        $data['num_instalments'] = 1;
         return $data;
     }
 
@@ -179,4 +180,6 @@ class PostPayPaymentService implements PaymentInterface
             return response()->json(['ex_message' => $e->getMessage(), 'error' => $e->getErrorCode(), 'line' => $e->getLine()]);
         }
     }
+
+    
 }

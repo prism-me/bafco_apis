@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\PaymentController;
+use App\Models\Cart;
+use App\Services\OrderService;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
 
@@ -9,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 #});
 
 #search
-    Route::get('/search', [\App\Http\Controllers\SearchController::class, 'search']);
+Route::get('/search', [\App\Http\Controllers\SearchController::class, 'search']);
 
 #Categories
     Route::get('categories', 'CategoryController@index');
