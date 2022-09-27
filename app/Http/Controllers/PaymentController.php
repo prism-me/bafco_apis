@@ -7,6 +7,7 @@ use App\Services\payment\PostPayPaymentService;
 use Illuminate\Http\Request;
 use App\Events\OrderPlaceMail;
 use App\Models\Order;
+use App\Services\OrderService;
 
 class PaymentController extends Controller
 {
@@ -45,7 +46,6 @@ class PaymentController extends Controller
         if ($result['status'] == 200 && $result['order'] == true) {
             $result['order_id'] = 'OR40246684283';
             $order = Order::where('order_number', $result['order_id'])->with('order_details.productDetail.productvariations', 'orderAddress', 'userDetail')->first();
-            return response()->json($order);
             $userData = [
                 'orderNumber' =>    $order['order_number'],
                 'name' =>    $order['userDetail']['name'],
@@ -65,7 +65,9 @@ class PaymentController extends Controller
                 'phone_number' =>    $order['orderAddress']['phone_number'],
                 'orderDate' =>    $order['payment_date'],
             ];
+
             event(new OrderPlaceMail($userData));
+
             redirect()->away('https://bafco-next.herokuapp.com/checkout?status=success');
         } else {
             return response()->json(['message' => 'Internal Error while payment.'], 404);
@@ -74,6 +76,9 @@ class PaymentController extends Controller
 
     public function failedResponse(Request $request)
     {
-        return $request->all();
+
+        $order = (new OrderService())->payment_failed($request->order_id, $request->status);
+        
+        redirect()->away('https://bafco-next.herokuapp.com/checkout?status=cancelled'); 
     }
 }

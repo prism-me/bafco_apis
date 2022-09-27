@@ -77,15 +77,20 @@ class OrderService
             $payment->status = $status;
             $payment->save();
 
-            $cart = Cart::where('user_id', $order->user_id)->firstOrFail();
-            if(isset($cart->guest_id)){
-                GuestCart::where('guest_id', $cart->guest_id)->delete();
+            $cart = Cart::where('user_id', $order->user_id)->pluck('id');
+            $guestIds = Cart::where('user_id', $order->user_id)->pluck('guest_id');
+
+            if (!empty($guestIds)) {
+                $guestCartIds = GuestCart::whereIn('user_id', $guestIds)->pluck('id');
+                GuestCart::destroy($guestCartIds);
             }
-            $cart->delete();
+            Cart::destroy($cart);
+
 
             $cartCal = CartCalculation::where('user_id', $order->user_id)->firstOrFail();
-            if(isset($cartCal->guest_id)){
-                GuestCartCalculation::where('guest_id', $cart->guest_id)->delete();
+            if (!empty($cartCal->guest_id)) {
+                $guestCartCalculation = GuestCartCalculation::where('user_id', $cartCal->guest_id)->firstOrFail();
+                $guestCartCalculation->delete();
             }
             $cartCal->delete();
 
@@ -95,6 +100,33 @@ class OrderService
         } catch (\Exception $e) {
 
             // DB::rollBack();
+            return false;
+        }
+    }
+
+
+    public function payment_failed($orderData, $status) {
+        try {
+            DB::beginTransaction();
+            $order = Order::where('order_number', $orderData)->first();
+            $order->transaction_status = 0;
+            $order->status = $status;
+            $order->paid = 0;
+            $order->save();
+
+
+            $payment = PaymentHistory::where('order_id', $orderData)->first();;
+            $payment->captured =  false;
+            $payment->status =  $status;
+            $payment->save();
+
+            DB::commit();
+
+            return true;
+            
+        } catch (\Exception $e) {
+
+            DB::rollBack();
             return false;
         }
     }
