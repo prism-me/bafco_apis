@@ -82,7 +82,7 @@ class PostPayPaymentService implements PaymentInterface
             $mapedObject = $this->mapPaymentObject($request->all(), $cartList, $promoCode);
 
             $order = (new OrderService())->createOrder($mapedObject, $user_id, $request);
-            dd($order);
+            
             if (!$order) throw new  \Exception("Error while processing order", 1);
 
             $payment = $this->createPayment($request, $user_id);
@@ -180,6 +180,4 @@ class PostPayPaymentService implements PaymentInterface
             return response()->json(['ex_message' => $e->getMessage(), 'error' => $e->getErrorCode(), 'line' => $e->getLine()]);
         }
     }
-
-    
 }

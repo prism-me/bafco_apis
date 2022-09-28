@@ -44,7 +44,7 @@ class PaymentController extends Controller
         $result = $this->paymentService->capturePaymentDetails(new PostPayPaymentService(), $request);
         //send email to user
         if ($result['status'] == 200 && $result['order'] == true) {
-            $result['order_id'] = 'OR40246684283';
+            
             $order = Order::where('order_number', $result['order_id'])->with('order_details.productDetail.productvariations', 'orderAddress', 'userDetail')->first();
             $userData = [
                 'orderNumber' =>    $order['order_number'],
