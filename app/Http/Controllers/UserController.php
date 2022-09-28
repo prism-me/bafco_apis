@@ -52,8 +52,9 @@ class UserController extends Controller
             $data = $request->all();
 
             $user =  RegisterService::tokenVerify($data);
+           
 
-            if($user){
+            if(!empty($user)){
 
                 if (!Auth::attempt(['email'=>$user['email'], 'password'=>$user['password']])) {
 
@@ -63,11 +64,11 @@ class UserController extends Controller
 
                 $token = auth()->user()->createToken('API_Token')->plainTextToken;
 
-                return response()->json('Logged in successfully', 200)->header('x_auth_token', $token)->header('access-control-expose-headers' , 'x_auth_token');
+                return response()->json(['success'=> 'Logged in successfully', 200])->header('x_auth_token', $token)->header('access-control-expose-headers' , 'x_auth_token');
 
             }else{
 
-                return response()->json('Something Went Wrong!', 200);
+                return response()->json(['error'=> 'Invalid Token', 200]);
             }
         }
         catch (\Error $exception) {
@@ -93,11 +94,11 @@ class UserController extends Controller
 
             $token = auth()->user()->createToken('API_Token')->plainTextToken;
 
-            return response()->json('Logged in successfully', 200)->header('x_auth_token', $token)->header('access-control-expose-headers' , 'x_auth_token');
+            return response()->json(['success'=> 'Logged in successfully', 200])->header('x_auth_token', $token)->header('access-control-expose-headers' , 'x_auth_token');
 
         } catch(BadMethodCallException $e){
 
-            return response()->json('Email/Password is invalid.', 404);
+            return response()->json(['error'=> 'Email/Password is invalid.' ,404]);
 
         }
 

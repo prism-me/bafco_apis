@@ -82,8 +82,8 @@ class CartService
     public function cartDetail($cart)
     {
 
-        try {
-           DB::beginTransaction();
+        // try {
+           //DB::beginTransaction();
 
             $productDetail = Product::where('id', $cart->product_id)->with('cartCategory.parentCategory')->first(['name', 'featured_image', 'route', 'category_id']);
             $productVariant = ProductVariation::where('id', $cart->product_variation_id)->with('productVariationName.productVariationValues.variant')->first(['id', 'code', 'lower_price', 'upper_price', 'limit']);
@@ -191,18 +191,18 @@ class CartService
                 }
             }
 
-            DB::commit();
+            //DB::commit();
             $data['products'] = $productDetail;
             $data['variation'] = $productVariant;
             $data['quantity'] = $quantity;
             $data['total'] = $finalAmount;
 
             return $data;
-        } catch (\Exception $e) {
+        // } catch (\Exception $e) {
 
-            DB::rollBack();
-            return response()->json(['Cart not updated.', 'stack' => $e], 500);
-        }
+        //     //DB::rollBack();
+        //     return response()->json(['Cart not updated.', 'stack' => $e], 500);
+        // }
     }
 
     public function removeCart($id){

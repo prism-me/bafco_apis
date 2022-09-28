@@ -93,6 +93,8 @@ class CartController extends Controller
 
     public function updateCart(Request $request){
 
+        
+
         try{
 
             $data = $request->all();

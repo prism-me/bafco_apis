@@ -44,7 +44,7 @@ class CategoryFiltersController extends Controller
 
                                     $q->with('productvariations', function($q)  use ($min, $max) {
 
-                                        $q->whereBetween('upper_price', [$min, $max])->where('in_stock',1);
+                                        $q->whereBetween('upper_price', [$min, $max]);
                                     });
                                 })
 

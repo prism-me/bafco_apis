@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
 
+
+
+
+
 #Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 #     return $request->user();
 #});
@@ -235,7 +239,7 @@ Route::get('/search', [\App\Http\Controllers\SearchController::class, 'search'])
     Route::post('guest-cart', 'GuestCartController@store');
     Route::delete('guest-remove-cart/{id}', 'GuestCartController@removeCart');
     Route::delete('guest-clear-all-cart/{id}', 'GuestCartController@clearAllCart');
-    Route::post('guest-cart-qty', 'GuestCartController@incrementQty');
+    Route::post('update-cart', 'GuestCartController@updateCart');
     Route::get('guest-cart-detail/{id}', 'GuestCartController@show');
     Route::get('guest-cart-total/{id}', 'GuestCartController@cartTotal');
 
@@ -268,6 +272,10 @@ Route::get('/search', [\App\Http\Controllers\SearchController::class, 'search'])
 
 #Order Detail User
     Route::get('user-order-detail/{id}', 'UserOrderDetailController@userOrderDetail');
+
+
+
+
 
 
 Route::group(['prefix' => 'auth'], function ($router) {

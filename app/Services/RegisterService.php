@@ -43,31 +43,36 @@ class RegisterService {
 
     public function tokenVerify($code){
 
+        
+
           $user = TempUser::where('code',$code)->first();
-          if($user){
+          
+          
+            if($user){
 
-            $timeLimit = strtotime($user['created_at']) + 1800;
-            if(time() > $timeLimit){
-                $user->delete();
-                return response()->json(['error' =>'Token Expired',400]);
+                $timeLimit = strtotime($user['created_at']) + 1800;
+                if(time() > $timeLimit){
+                    $user->delete();
+                    return response()->json(['error' =>'Token Expired',400]);
+                }else{
+
+                    $create = [
+                            'name' => $user->name,
+                            'email' => $user->email,
+                            'password' => bcrypt($user->password)
+                    ];
+
+
+                    $userCreate =  User::firstOrcreate($create);
+                    $usersDetail  = $user;
+                    $user->delete();
+                    return $usersDetail;
+                }
             }else{
+                   return $user;
 
-                $create = [
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'password' => bcrypt($user->password)
-                ];
-
-
-                $userCreate =  User::firstOrcreate($create);
-                $usersDetail  = $user;
-                $user->delete();
-                return $usersDetail;
             }
-          }else{
-                  return response()->json(['error' => 'Invalid Token!',400]);
-
-           }
+       
     }
 
 

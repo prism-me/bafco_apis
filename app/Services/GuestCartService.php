@@ -82,7 +82,7 @@ class GuestCartService {
     public function cartDetail($cart){
 
        try {
-           DB::beginTransaction();
+           //DB::beginTransaction();
 
             $productDetail = Product::where('id', $cart->product_id)->with('cartCategory.parentCategory')->first(['name', 'featured_image', 'route', 'category_id']);
             $productVariant = ProductVariation::where('id', $cart->product_variation_id)->with('productVariationName.productVariationValues.variant')->first(['id', 'code', 'lower_price', 'upper_price', 'limit']);
@@ -191,7 +191,7 @@ class GuestCartService {
                 }
             }
 
-            DB::commit();
+            //DB::commit();
             $data['products'] = $productDetail;
             $data['variation'] = $productVariant;
             $data['quantity'] = $quantity;
