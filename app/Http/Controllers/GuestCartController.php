@@ -102,12 +102,12 @@ class GuestCartController extends Controller
     }
 
 
-    public function incrementQty(Request $request){
+    public function updateCart(Request $request){
 
         try{
 
             $data = $request->all();
-            $cart = GuestCartService::incrementQty($data);
+            $cart = CartService::updateCart($data);
 
             if($cart){
 
@@ -126,6 +126,7 @@ class GuestCartController extends Controller
         }
 
     }
+
 
 
     public function show($id){

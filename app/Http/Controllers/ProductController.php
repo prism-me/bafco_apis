@@ -19,7 +19,7 @@ class ProductController extends Controller
     public function index()
     {
         try{
-            return Product::with('variations','category','variations.variation_items')->where('status', 1)->get();
+            return Product::with('category')->where('status', 1)->get();
         }
         catch (\Exception $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
@@ -28,6 +28,8 @@ class ProductController extends Controller
 
     public function store(ProductRequest $request)
     {
+
+       
 
         try{
 
@@ -46,7 +48,7 @@ class ProductController extends Controller
                 }else{
 
                     #create
-                    $product = ProductService::insertProduct($request->all());
+                    $product = ProductService::addProduct($request->all());
                     return $product;
                 }
 
@@ -101,6 +103,74 @@ class ProductController extends Controller
     }
 
 
+
+    public function productVariation($id){
+
+        $productVariation = ProductVariation::where('product_id',$id)->get();
+        if($productVariation){
+
+            return response()->json($productVariation);
+
+        }else{
+            
+            return response()->json('No variation found');
+
+
+        }
+
+    }
+
+    public function singleVariation($id){
+
+        $productVariation =  ProductVariation::where('id',$id)->first();
+        $productVariation['variationItems'] = ProductPivotVariation::where('product_variation_id',$id)->pluck('variation_value_id');
+        if($productVariation){
+            return response()->json($productVariation);
+
+        }else{
+            
+            return response()->json('No variation found');
+
+
+        }
+
+
+
+
+    }
+
+
+    public function addVariation(Request $request){
+
+         try{
+
+            if(ProductVariation::where('id',$request->id)->exists()){
+
+                    #create
+                    $variation = ProductService::updateVariation($request->all());
+                    return $variation;
+
+            }else{
+
+               
+                    #create
+                    $variation = ProductService::addVariation($request->all());
+                    return $variation;
+               
+
+
+            }
+
+        }
+         catch (\Error $exception) {
+             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
+
+
+    }
+
+
+    
     public function deleteProductVariation($id){
 
         ProductVariation::where('id',$id)->delete();
@@ -111,45 +181,22 @@ class ProductController extends Controller
 
     public function cloneVariation($id){
 
-        $variation = Productvariation::where('id',$id)->first();
+         try{
 
-        $variantCreate = [
-            "product_id" => $variation['product_id'],
-            "code" => $variation['code'],
-            "lc_code" => $variation['lc_code'],
-            "cbm" => $variation['cbm'],
-            "in_stock" => $variation['in_stock'],
-            "upper_price" => $variation['upper_price'],
-            "lower_price" => $variation['lower_price'],
-            "height" => $variation['height'],
-            "depth" => $variation['depth'],
-            "width" => $variation['width'],
-            "description" => $variation['description'],
-            "images" => $variation['images'],
-            "lead_img" => isset($variation['lead_img']) ?  $variation['lead_img'] : '',
-            "limit" => isset($variation['limit']) ?  $variation['limit'] : ''
-        ];
-
-        $variation = Productvariation::firstOrcreate($variantCreate);
-
-        $variationValueId = ProductPivotVariation::where('product_variation_id',$id)->get();
-        foreach ($variationValueId as $values) {
-
-            $productVariationId = VariationValues::select('id', 'variation_id')->where('id', $values['variation_value_id'])->first();
-            ProductPivotVariation::create([
-                "product_id" => $values->product_id,
-                "product_variation_id" => $variation->id,
-                "variation_id" => $productVariationId->variation_id,
-                "variation_value_id" => $values['variation_value_id'],
-            ]);
+            #Clone Variation
+            $product = ProductService::cloneVariation($id);
+            return response()->json('Variation Cloned successfully!');
 
         }
-        $productVariation = ProductVariation::where('id',$variation['id'])->with('variation_items')->first();
-
-        return response()->json($productVariation);
-
+         catch (\Error $exception) {
+             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
+        
 
     }
+
+   
+
 
 
 

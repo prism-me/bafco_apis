@@ -36,7 +36,8 @@ class ProductService
 
     }
 
-    public function addProduct($data){
+
+     public function addProduct($data){
 
         $product = Product::create([
                 "name" => $data['name'],
@@ -81,6 +82,7 @@ class ProductService
 
 
     }
+
 
     public function addVariation($variation){
 
