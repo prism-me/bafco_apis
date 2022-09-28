@@ -36,8 +36,7 @@ class ProductService
 
     }
 
-
-     public function addProduct($data){
+    public function addProduct($data){
 
         $product = Product::create([
                 "name" => $data['name'],
@@ -82,7 +81,6 @@ class ProductService
 
 
     }
-
 
     public function addVariation($variation){
 
@@ -197,9 +195,11 @@ class ProductService
             ]);
 
         }
-        $productVariation = ProductVariation::where('id',$variation['id'])->with('variation_items')->first();
+        return response()->json('Variation Cloned successfully!');
 
-        return $productVariation;
+        //$productVariation = ProductVariation::where('id',$variation['id'])->with('variation_items')->first();
+
+        //return $productVariation;
 
 
     }

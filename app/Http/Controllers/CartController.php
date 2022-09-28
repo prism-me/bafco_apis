@@ -91,12 +91,12 @@ class CartController extends Controller
 
 
 
-    public function updateCart(Request $request){
+    public function incrementQty(Request $request){
 
         try{
 
             $data = $request->all();
-            $cart = CartService::updateCart($data);
+            $cart = CartService::incrementQty($data);
 
             if($cart){
 

@@ -45,24 +45,19 @@ class GuestCartService {
 
     }
 
-    public function updateCart($data)
-    {
+    public function incrementQty($data){
+
 
         try{
             DB::beginTransaction();
-                $i = 0;
-                
-                foreach($data as $value){
+                $cart = GuestCart::where('id', $data['cart_id'])->first();
 
-                
-                    $cart = Cart::where('id', $value['cart_id'])->first();
+                $update['qty'] = $data['qty'];
+                $update['total'] = $data['qty'] * $cart['unit_price'];
+                $cartUpdate = GuestCart::where('id', $data['cart_id'])->update($update);
+                $cart = GuestCart::where('id', $data['cart_id'])->first();
+                $cartData = (new GuestCartService)->cartDetail($cart);
 
-                    $update['qty'] = $value['qty'];
-                    $cartUpdate = Cart::where('id', $value['cart_id'])->update($update);
-                    $cart = Cart::where('id', $value['cart_id'])->first();
-                    $cartData = (new CartService)->cartDetail($cart);
-
-                }
             DB::commit();
 
                 if ($cartData) {
@@ -77,6 +72,7 @@ class GuestCartService {
             DB::rollBack();
             return response()->json(['Cart not updated.', 'stack' => $e], 500);
         }
+
     }
 
     public function cartDetail($cart){
