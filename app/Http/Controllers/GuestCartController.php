@@ -107,7 +107,7 @@ class GuestCartController extends Controller
         try{
 
             $data = $request->all();
-            $cart = CartService::updateCart($data);
+            $cart = GuestCartService::updateCart($data);
 
             if($cart){
 

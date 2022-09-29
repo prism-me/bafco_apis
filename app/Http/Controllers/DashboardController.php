@@ -50,6 +50,7 @@ class DashboardController extends Controller
         public function changeOrderStatus(Request $request){
 
         $order = Order::where('order_number',$request->order_number)->with('order_details.productDetail.productvariations','orderAddress','userDetail')->first();
+        
         $userData = [
                 'orderNumber' =>    $order['order_number'],
                 'name' =>    $order['userDetail']['name'],
@@ -104,7 +105,7 @@ class DashboardController extends Controller
 
         }
 
-        $updateOrder = Order::where('id',$request->id)->update($update);
+        $updateOrder = Order::where('order_number',$request->order_number)->update($update);
         return response()->json('Status Updated Successfully');
 
     }

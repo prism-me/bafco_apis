@@ -55,12 +55,12 @@ class GuestCartService {
                 foreach($data as $value){
 
                 
-                    $cart = Cart::where('id', $value['cart_id'])->first();
+                    $cart = GuestCart::where('id', $value['cart_id'])->first();
 
                     $update['qty'] = $value['qty'];
-                    $cartUpdate = Cart::where('id', $value['cart_id'])->update($update);
-                    $cart = Cart::where('id', $value['cart_id'])->first();
-                    $cartData = (new CartService)->cartDetail($cart);
+                    $cartUpdate = GuestCart::where('id', $value['cart_id'])->update($update);
+                    $cart = GuestCart::where('id', $value['cart_id'])->first();
+                    $cartData = (new GuestCartService)->cartDetail($cart);
 
                 }
             DB::commit();
@@ -210,13 +210,13 @@ class GuestCartService {
     public function removeCart($id){
 
         try{
-            DB::beginTransaction();
+            //DB::beginTransaction();
                 $cart = GuestCart::where('id',$id)->first();
                 $userId = $cart['user_id'];
                 
                 $cartCalc = GuestCartCalculation::where('user_id',$userId)->first();
-                $update['total'] =  $cartCalc['total'] - $cart['unit_price'];
-                $update['sub_total'] =  $cartCalc['sub_total'] - $cart['unit_price'];
+                $update['total'] =  $cartCalc['total'] - $cart['total'];
+                $update['sub_total'] =  $cartCalc['sub_total'] - $cart['total'];
                 $update['decimal_amount'] =  $update['total'] * 100;
 
                     $cart = GuestCartCalculation::where('user_id',$userId)->update($update);
@@ -229,7 +229,7 @@ class GuestCartService {
                
                 
 
-            DB::commit();
+            //DB::commit();
             return $cart;
 
         } catch (\Exception $e) {

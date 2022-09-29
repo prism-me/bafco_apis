@@ -208,14 +208,14 @@ class CartService
     public function removeCart($id){
 
 
-        try{
-            DB::beginTransaction();
+       try{
+            //DB::beginTransaction();
                 $cart = Cart::where('id',$id)->first();
                 $userId = $cart['user_id'];
                 
                 $cartCalc = CartCalculation::where('user_id',$userId)->first();
-                $update['total'] =  $cartCalc['total'] - $cart['unit_price'];
-                $update['sub_total'] =  $cartCalc['sub_total'] - $cart['unit_price'];
+                $update['total'] =  $cartCalc['total'] - $cart['total'];
+                $update['sub_total'] =  $cartCalc['sub_total'] - $cart['total'];
                 $update['decimal_amount'] =  $update['total'] * 100;
 
                     $cart = CartCalculation::where('user_id',$userId)->update($update);
@@ -229,7 +229,7 @@ class CartService
                
                 
 
-            DB::commit();
+            //DB::commit();
             return $cart;
 
         } catch (\Exception $e) {

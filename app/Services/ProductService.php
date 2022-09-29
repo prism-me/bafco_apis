@@ -55,6 +55,7 @@ class ProductService
                 "headrest" => $data['headrest'],
                 "seo" => $data['seo'],
                 "top_selling" => isset($data['top_selling']) ? $data['top_selling'] : 0,
+                "banner_img" => isset($data['banner_img']) ? $data['banner_img'] : 0,
             ]);
         return response()->json('Data has been saved.', 200);
     }
@@ -77,6 +78,7 @@ class ProductService
              "headrest" => $data['headrest'],
              "seo" => $data['seo'],
              "top_selling" => isset($data['top_selling']) ? $data['top_selling'] : 0,
+             "banner_img" => isset($data['banner_img']) ? $data['banner_img'] : 0,
          ]);
         return response()->json('Data has been saved.', 200);
 

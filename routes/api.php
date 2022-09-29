@@ -239,7 +239,7 @@ Route::get('/search', [\App\Http\Controllers\SearchController::class, 'search'])
     Route::post('guest-cart', 'GuestCartController@store');
     Route::delete('guest-remove-cart/{id}', 'GuestCartController@removeCart');
     Route::delete('guest-clear-all-cart/{id}', 'GuestCartController@clearAllCart');
-    Route::post('update-cart', 'GuestCartController@updateCart');
+    Route::post('guest-update-cart', 'GuestCartController@updateCart');
     Route::get('guest-cart-detail/{id}', 'GuestCartController@show');
     Route::get('guest-cart-total/{id}', 'GuestCartController@cartTotal');
 
