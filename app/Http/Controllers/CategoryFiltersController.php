@@ -33,6 +33,7 @@ class CategoryFiltersController extends Controller
        
         
         $category = Category::where('route', $route)->first();
+      
 
         $products = Product::with('productCategory.parentCategory')
                             ->when(!empty($request->brand), function($q) use ($brand,$category) {
@@ -56,6 +57,7 @@ class CategoryFiltersController extends Controller
                             
                             ->whereHas('productvariations')
                             ->where('category_id',$category->id)
+                            ->where('status',1)
                             ->when( count( $request->all()) === 0, function($q){
                                 return response()->json([]);
                             })->get();
@@ -85,4 +87,6 @@ class CategoryFiltersController extends Controller
 
                             }
     }
+
+ 
 }

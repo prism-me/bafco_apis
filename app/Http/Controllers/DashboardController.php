@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\PaymentHistory;
 use App\Models\Product;
+use App\Models\ProductVariation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -49,7 +50,7 @@ class DashboardController extends Controller
 
         public function changeOrderStatus(Request $request){
 
-        $order = Order::where('order_number',$request->order_number)->with('order_details.productDetail.productvariations','orderAddress','userDetail')->first();
+        $order = Order::where('order_number',$request->order_number)->with('order_details.productDetail','orderAddress','userDetail')->first();
         
         $userData = [
                 'orderNumber' =>    $order['order_number'],
@@ -71,15 +72,26 @@ class DashboardController extends Controller
                 'orderDate' =>    $order['payment_date'],
                 'cancellationReason' => isset($request->message ) ? $request->message  : "",
             ];
-
+        
+        
         $i = 0 ;
+        $j =0 ;
+
+    
         foreach($order['order_details'] as $value){
+
+
+            $productVariation[$j] = ProductVariation::where('id', $value['product_variation'])->first();
             $userData['product_detail'][$i]['qty'] = $value['qty'];
             $userData['product_detail'][$i]['price'] = $value['total'];
             $userData['product_detail'][$i]['product_name'] = $value['productDetail']['name'];
-            $userData['product_detail'][$i]['product_variation'] =  $value['productDetail']['productvariations']['images'];
+            $userData['product_detail'][$j]['product_variation'] = $productVariation[$j]['images'];
             $i++;
+            $j++;
         }
+
+        
+         
         if($request->status ==  "confirm")
         {
             $update['status'] = $this->confirm;

@@ -211,5 +211,73 @@ class ProductService
 
 
 
+    public function cloneProduct($id){
+
+
+        $oldProduct = Product::where('id',$id)->first();
+        $oldProductVariation = ProductVariation::where('product_id',$id)->get();
+        $generateRoute = rand(1,10);
+        $newProduct = Product::firstOrCreate([
+                "name" => $oldProduct['name'],
+                "featured_image" => $oldProduct['featured_image'],
+                "route" => $oldProduct['route'] . $generateRoute,
+                "long_description" => $oldProduct['long_description'],
+                "shiping_and_return" => $oldProduct['shiping_and_return'],
+                "category_id" => $oldProduct['category_id'],
+                "related_categories" => $oldProduct['related_categories'],
+                "brand" => $oldProduct['brand'],
+                "album" => $oldProduct['album'],
+                "download" => $oldProduct['download'],
+                "promotional_images" => $oldProduct['promotional_images'],
+                "footrest" => $oldProduct['footrest'],
+                "headrest" => $oldProduct['headrest'],
+                "seo" => $oldProduct['seo'],
+                "top_selling" => isset($oldProduct['top_selling']) ? $oldProduct['top_selling'] : 0,
+                "banner_img" => isset($oldProduct['banner_img']) ? $oldProduct['banner_img'] : 0,
+        ]);
+        $productId = $newProduct['id'];
+        //$i = 0; 
+        foreach ($oldProductVariation as $variationvalues) {
+            $newProductVariation = ProductVariation::firstOrCreate([
+                "product_id" =>  $productId,
+                "code" => $variationvalues['code'],
+                "lc_code" => $variationvalues['lc_code'],
+                "cbm" => $variationvalues['cbm'],
+                "in_stock" => $variationvalues['in_stock'],
+                "upper_price" => $variationvalues['upper_price'],
+                "lower_price" => $variationvalues['lower_price'],
+                "height" => $variationvalues['height'],
+                "depth" => $variationvalues['depth'],
+                "width" => $variationvalues['width'],
+                "description" => $variationvalues['description'],
+                "images" => $variationvalues['images'],
+                "lead_img" => isset($variationvalues['lead_img']) ?  $variationvalues['lead_img'] : '',
+                "limit" => isset($variationvalues['limit']) ?  $variationvalues['limit'] : ''
+            ]);
+            
+         
+            $pivotValue = ProductPivotVariation::where('product_variation_id' , $variationvalues['id'])->get();
+
+            foreach ($pivotValue as $pivotvalues) {
+                
+                                    ProductPivotVariation::create([
+                                        "product_id" => $productId,
+                                        "product_variation_id" => $newProductVariation['id'],
+                                        "variation_id" => $pivotvalues['variation_id'],
+                                        "variation_value_id" =>  $pivotvalues['variation_value_id']
+                                    ]);
+
+            }
+            //$i ++;
+        }
+
+         return response()->json('Product Cloned successfully!');
+
+
+    }
+
+
+
+
 
 }

@@ -8,7 +8,10 @@ use App\Mail\OrderPlaced;
 use App\Models\Cart;
 use App\Models\PaymentHistory;
 use App\Models\Product;
+use App\Models\PromoUser;
 use App\Models\User;
+use App\Models\Order;
+use App\Models\CartCalculation;
 use App\Services\CartService;
 use App\Services\OrderService;
 use App\Services\UserService;
@@ -26,10 +29,10 @@ class PostPayPaymentService implements PaymentInterface
     public $baseCode;
     public $promoValidity = 1;
     public $order_number;
-    public $success_url = 'http://localhost:8000/v1/api/paymentSuccess';
-    // public $success_url = 'https://prismcloudhosting.com/BAFCO_APIs/public/v1/api/paymentSuccess';
-    public $failed_url = 'http://localhost:8000/v1/api/paymentFailed';
-    // public $failed_url = 'https://prismcloudhosting.com/BAFCO_APIs/public/v1/api/paymentFailed';
+    //public $success_url = 'http://localhost:8000/v1/api/paymentSuccess';
+    public $success_url = 'https://prismcloudhosting.com/BAFCO_APIs/public/v1/api/paymentSuccess';
+    //public $failed_url = 'http://localhost:8000/v1/api/paymentFailed';
+     public $failed_url = 'https://prismcloudhosting.com/BAFCO_APIs/public/v1/api/paymentFailed';
 
     public function __construct()
     {
@@ -68,19 +71,20 @@ class PostPayPaymentService implements PaymentInterface
                 $cart['reference'] = $cart->product_id;
                 $cart['unit_price'] = $cart->unit_price;
             }
+           
 
-            if (isset($request->coupon_code)) {
+            if (isset($request->discounts[0]['name'])) {
 
-                $promoCode = $this->promoCodeCheck($request->coupon_code);
+                $promoCode = $this->promoCodeCheck($request->discounts[0]['name']);
                 // if (!$promoCode) return response()->json('promo code is expired.', 400);
             } else {
-                $promoCode = 'test';
+                $promoCode = 'TEST';
             }
 
             $this->order_number = 'OR' . rand(999, 888888999999);
 
             $mapedObject = $this->mapPaymentObject($request->all(), $cartList, $promoCode);
-
+            
             $order = (new OrderService())->createOrder($mapedObject, $user_id, $request);
             
             if (!$order) throw new  \Exception("Error while processing order", 1);
@@ -95,16 +99,16 @@ class PostPayPaymentService implements PaymentInterface
 
             $data = $response->json();
 
-            DB::commit();
+           DB::commit();
 
-            return ($response->getStatusCode() == 200 && !empty($data->token)) ? $data->redirect_url :  $data;
+           return ($response->getStatusCode() == 200 && !empty($data->token)) ? $data->redirect_url :  $data;
         } catch (RESTfulException $e) {
 
             DB::rollBack();
-            return response()->json(['ex_message' => $e->getMessage(), 'error' => $e->getErrorCode(), 'line' => $e->getLine()]);
+         return response()->json(['ex_message' => $e->getMessage(), 'error' => $e->getErrorCode(), 'line' => $e->getLine()]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['ex_message' => $e->getMessage(), 'line' => $e->getLine()]);
+        return response()->json(['ex_message' => $e->getMessage(), 'line' => $e->getLine()]);
         }
     }
 
@@ -122,25 +126,38 @@ class PostPayPaymentService implements PaymentInterface
     public function mapPaymentObject($data, $cartList, $promoCode)
     {
 
+        $cartAmount = CartCalculation::where('user_id',$data['user_id'])->first();
+        $updateAmount['coupon'] =  $data['discounts'][0]['name'];
+        $updateAmount['discounted_price'] = $data['discounts'][0]['code'];
+        $updateAmount['total'] = $cartAmount['total'] - $data['discounts'][0]['code'];
+        $updateAmount['decimal_amount'] =  $updateAmount['total'] * 100;
+        CartCalculation::where('user_id', $data['user_id'])->update($updateAmount);
+        PromoUser::create([
+            "user_id" => $data['user_id'],
+            "promo_code_id" => $data['discounts'][0]['name']
+        ]);
+        $updatedAmount = CartCalculation::where('user_id',$data['user_id'])->first();
         $data['order_id'] = $this->order_number;
         $data['items'] = $cartList;
         $data['merchant']['cancel_url'] = $this->failed_url;
         $data['merchant']['confirmation_url'] = $this->success_url;
         $data['promocode'] = $promoCode ? $promoCode : null;
-        $data['num_instalments'] = 1;
+        $data['num_instalments'] = $data['num_instalments'];
+        $data['total_amount'] = $updatedAmount['decimal_amount'];
         return $data;
     }
 
     public function createPayment($data, $user_id)
     {
-        //rest payment status will be updated in updateOrderAfterPayment function of OrderService Class
+
+        $order = Order::where('order_number',$this->order_number)->first();
         $payment = PaymentHistory::create([
             'user_id' =>  $user_id,
             'user_email' => $data['customer']['email'],
             'order_id' => $this->order_number,
             'reference_number' => Null,
             'captured' => false,
-            'amount' => $data['total_amount'],
+            'amount' => $order['total'],
             'status' => 'pending'
         ]);
         return $payment ? true : false;

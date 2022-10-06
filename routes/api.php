@@ -32,6 +32,9 @@ Route::get('/search', [\App\Http\Controllers\SearchController::class, 'search'])
     Route::get('products', 'ProductController@index');
     Route::post('products', 'ProductController@store')->middleware('auth:sanctum');
 
+    Route::put('clone-product/{id}', 'ProductController@cloneProduct')->middleware('auth:sanctum');
+
+
     Route::post('add-product-variation', 'ProductController@addVariation')->middleware('auth:sanctum');
     Route::get('product-all-variation/{id}', 'ProductController@productVariation');
     Route::get('single-variation/{id}', 'ProductController@singleVariation');
@@ -90,9 +93,9 @@ Route::get('/search', [\App\Http\Controllers\SearchController::class, 'search'])
 
 #Contact Us
     Route::post('form-submit', 'ContactUsController@store');
-    Route::get('contact-us', 'ContactUsController@index');
-    Route::get('contact-us/{contactUs}', 'ContactUsController@show');
-    Route::delete('contact-us/{contactUs}', 'ContactUsController@destroy')->middleware('auth:sanctum');
+    Route::get('contacts', 'ContactUsController@index');
+    Route::get('contacts/{contacts}', 'ContactUsController@show');
+    Route::delete('contacts/{contacts}', 'ContactUsController@destroy')->middleware('auth:sanctum');
 
 #Management
     Route::get('managements', 'ManagementController@index');

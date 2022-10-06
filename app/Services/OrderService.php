@@ -7,6 +7,7 @@ use App\Models\CartCalculation;
 use App\Models\GuestCart;
 use App\Models\GuestCartCalculation;
 use App\Models\Order;
+use App\Models\PromoUser;
 use App\Models\OrderDetail;
 use App\Models\PaymentHistory;
 use Illuminate\Support\Facades\DB;
@@ -17,10 +18,9 @@ class OrderService
 
     public function createOrder($orderData, $user_id , $request)
     {
+        
         try {
-            // dd($request->address_id);
-            $cartDeatils = CartCalculation::where('user_id', $user_id)->first();
-            // dd($cartDeatils);
+            $cartDetails = CartCalculation::where('user_id',$user_id)->first();
             DB::beginTransaction();
             $order = Order::create([
                 'user_id' => $user_id,
@@ -29,11 +29,11 @@ class OrderService
                 'transaction_status' => 0,
                 'paid' => 0,
                 'address_id' => $request->address_id,
-                'coupon' => $orderData['promocode'],
-                'discount' => $cartDeatils['discount'],
-                'shipping_charges' => $cartDeatils['shipping_charges'],
-                'total' => $cartDeatils['total'],
-                'sub_total' => $cartDeatils['sub_total'],
+                'coupon' => $orderData['discounts'][0]['name'],
+                'discount' => $orderData['discounts'][0]['code'],
+                'shipping_charges' => $cartDetails['shipping_charges'],
+                'total' => $cartDetails['total'],
+                'sub_total' => $cartDetails['sub_total'],
                 'status' => 'ORDERPLACED',
                 'payment_date' => null,
             ]);
@@ -48,8 +48,8 @@ class OrderService
 
                 ]);
             }
-            // dd( DB::getQueryLog());
-            DB::commit();
+
+           DB::commit();
             return true;
         } catch (\Exception $e) {
 
@@ -99,13 +99,14 @@ class OrderService
             return true;
         } catch (\Exception $e) {
 
-            // DB::rollBack();
+            DB::rollBack();
             return false;
         }
     }
 
 
-    public function payment_failed($orderData, $status) {
+    public function payment_failed($orderData, $status) 
+    {
         try {
             DB::beginTransaction();
             $order = Order::where('order_number', $orderData)->first();
@@ -119,6 +120,20 @@ class OrderService
             $payment->captured =  false;
             $payment->status =  $status;
             $payment->save();
+
+
+            $cartCalculation = CartCalculation::where('user_id',$order['user_id'])->first();
+            $sub_total = $cartCalculation['discounted_price'] + $cartCalculation['total'];
+            $decimal_amount = $sub_total * 100;
+            $cartCalculation->coupon = NULL;
+            $cartCalculation->discounted_price = NULL;
+            $cartCalculation->sub_total = $sub_total;
+            $cartCalculation->decimal_amount = $decimal_amount;
+            $cartCalculation->save();
+
+
+            $promoUser = PromoUser::where('user_id',$order['user_id'])->first();
+            $promoUser->destroy();
 
             DB::commit();
 

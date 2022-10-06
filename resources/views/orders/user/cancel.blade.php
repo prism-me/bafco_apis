@@ -33,14 +33,14 @@
                     <h2><strong>Order Summary</strong></h2>
                     <b>Order No:</b> {{ $userData['orderDate'] }} <br />
                     <b>Order Date: </b>{{ date('Y-m-d') }}<br />
-                        @if(!blank($userData['coupon']) ) <b>Coupon:</b>&nbsp;&nbsp;{{ $userData['coupon'] }} <br /> <b>Discount:&nbsp;</b>{{ $userData['discount'] }}%<br />&nbsp; <b>Sub Total:</b>&nbsp;&nbsp;AED {{ $userData['sub_total'] }}&nbsp;<br />@endif <br />
+                        @if($userData['coupon'] != "BAFCOTest" ) <b>Coupon:</b>&nbsp;&nbsp;{{ $userData['coupon'] }} <br /> <b>Discount:&nbsp;</b>{{ $userData['discount'] }}<br />@endif <br />
                     &nbsp; <b>Sub Total:</b>&nbsp;&nbsp; AED {{ $userData['sub_total'] }} <br />
                     &nbsp; <b>Shpping Charges:</b>&nbsp;&nbsp; {{ $userData['shipping_charges'] }}<br />
                     &nbsp; <b>Total:&nbsp;</b>&nbsp; AED {{ $userData['total'] }}<br />
                 </td>
             </tr>
         <br/>
-            @foreach($userData['product_detail'] as $value)<tr><td colspan="1" align="center" ><img  src="{{ $value['product_variation'][0]['avatar'] }}}" alt="" height="130"/></td><td colspan="2" style="line-height:23px;">{{ $value['product_name'] }}<br/>
+            @foreach($userData['product_detail'] as $value)<tr><td colspan="1" align="center" ><img  src="{{ $value['product_variation'][0]['avatar'] }}" alt="" height="130"/></td><td colspan="2" style="line-height:23px;">{{ $value['product_name'] }}<br/>
                 Quantity: &nbsp; &nbsp;{{ $value['qty']}}<br /> Price:&nbsp; &nbsp; AED&nbsp;{{ $value['price'] }}<br />@endforeach
         <br/><br/>
             <tr>
