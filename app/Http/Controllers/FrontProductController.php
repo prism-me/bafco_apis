@@ -122,7 +122,7 @@ class FrontProductController extends Controller
 
         public function category($route){
 
-            $category = Category::where('route' , $route)->with('subcategoryProducts')->get(['id','name','route','featured_image','banner_image','description']);
+            $category = Category::where('route' , $route)->with('subcategoryProducts')->get(['id','name','route','featured_image','banner_image','description','seo']);
             return response()->json($category);
         }
 
