@@ -150,14 +150,14 @@ class PostPayPaymentService implements PaymentInterface
     public function createPayment($data, $user_id)
     {
 
-        $order = Order::where('order_number',$this->order_number)->first();
+        $order = Order::where('order_number',$this->order_number)->pluck('total');
         $payment = PaymentHistory::create([
             'user_id' =>  $user_id,
             'user_email' => $data['customer']['email'],
             'order_id' => $this->order_number,
             'reference_number' => Null,
             'captured' => false,
-            'amount' => $order['total'],
+            'amount' => $order,
             'status' => 'pending'
         ]);
         return $payment ? true : false;

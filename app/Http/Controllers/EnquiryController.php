@@ -28,6 +28,7 @@ class EnquiryController extends Controller
         Mail::to($clientEmail)->send(new ClientEnquiryMail($data));
         Mail::to($userMail)->send(new UserEnquiryMail($data));
 
+
         if($create){
 
             return response()->json('Data saved Successfully');

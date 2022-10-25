@@ -38,7 +38,9 @@ class ProductService
 
 
      public function addProduct($data){
-
+         
+        $max =  DB::table('products')->select('*')->max('currentIndex');
+        $currentIndex = $max + 1;
         $product = Product::create([
                 "name" => $data['name'],
                 "featured_image" => $data['featured_image'],
@@ -56,12 +58,15 @@ class ProductService
                 "seo" => $data['seo'],
                 "top_selling" => isset($data['top_selling']) ? $data['top_selling'] : 0,
                 "banner_img" => isset($data['banner_img']) ? $data['banner_img'] : 0,
+                "currentIndex" => isset($currentIndex) ? $currentIndex : 0,
             ]);
+
         return response()->json('Data has been saved.', 200);
     }
 
     public function updateProduct($data){
-
+        $max =  DB::table('products')->select('*')->max('currentIndex');
+        $currentIndex = $max + 1;
          $product = Product::where('id', $data['id'])->update([
              "name" => $data['name'],
              "featured_image" => $data['featured_image'],
@@ -79,6 +84,7 @@ class ProductService
              "seo" => $data['seo'],
              "top_selling" => isset($data['top_selling']) ? $data['top_selling'] : 0,
              "banner_img" => isset($data['banner_img']) ? $data['banner_img'] : 0,
+             "currentIndex" => isset($currentIndex) ? $currentIndex : 0,
          ]);
         return response()->json('Data has been saved.', 200);
 
@@ -102,7 +108,9 @@ class ProductService
             "description" => $variation['description'],
             "images" => $variation['images'],
             "lead_img" => isset($variation['lead_img']) ?  $variation['lead_img'] : '',
-            "limit" => isset($variation['limit']) ?  $variation['limit'] : ''
+            "limit" => isset($variation['limit']) ?  $variation['limit'] : '',
+            "original_upper_price" => isset($variation['original_upper_price']) ?  $variation['original_upper_price'] : '',
+            "original_lower_price" => isset($variation['original_lower_price']) ?  $variation['original_lower_price'] : ''
         ]);
 
 
@@ -142,7 +150,9 @@ class ProductService
             "description" => $variation['description'],
             "images" => $variation['images'],
             "lead_img" => isset($variation['lead_img']) ?  $variation['lead_img'] : '',
-            "limit" => isset($variation['limit']) ?  $variation['limit'] : ''
+            "limit" => isset($variation['limit']) ?  $variation['limit'] : '',
+            "original_upper_price" => isset($variation['original_upper_price']) ?  $variation['original_upper_price'] : '',
+            "original_lower_price" => isset($variation['original_lower_price']) ?  $variation['original_lower_price'] : ''
         ]);
         ProductPivotVariation::where('product_variation_id', $variation['id'])->delete();
         $item = $variation['variationItems'];
@@ -182,7 +192,9 @@ class ProductService
             "description" => $variation['description'],
             "images" => $variation['images'],
             "lead_img" => isset($variation['lead_img']) ?  $variation['lead_img'] : '',
-            "limit" => isset($variation['limit']) ?  $variation['limit'] : ''
+            "limit" => isset($variation['limit']) ?  $variation['limit'] : '',
+            "original_upper_price" => isset($variation['original_upper_price']) ?  $variation['original_upper_price'] : '',
+            "original_lower_price" => isset($variation['original_lower_price']) ?  $variation['original_lower_price'] : ''
         ];
 
         $variation = Productvariation::firstOrcreate($variantCreate);
@@ -213,7 +225,8 @@ class ProductService
 
     public function cloneProduct($id){
 
-
+        $max =  DB::table('products')->select('*')->max('currentIndex');
+        $currentIndex = $max + 1;
         $oldProduct = Product::where('id',$id)->first();
         $oldProductVariation = ProductVariation::where('product_id',$id)->get();
         $generateRoute = rand(1,10);
@@ -234,6 +247,8 @@ class ProductService
                 "seo" => $oldProduct['seo'],
                 "top_selling" => isset($oldProduct['top_selling']) ? $oldProduct['top_selling'] : 0,
                 "banner_img" => isset($oldProduct['banner_img']) ? $oldProduct['banner_img'] : 0,
+                "currentIndex" => isset($currentIndex) ? $currentIndex : 0,
+
         ]);
         $productId = $newProduct['id'];
         //$i = 0; 
@@ -252,7 +267,9 @@ class ProductService
                 "description" => $variationvalues['description'],
                 "images" => $variationvalues['images'],
                 "lead_img" => isset($variationvalues['lead_img']) ?  $variationvalues['lead_img'] : '',
-                "limit" => isset($variationvalues['limit']) ?  $variationvalues['limit'] : ''
+                "limit" => isset($variationvalues['limit']) ?  $variationvalues['limit'] : '',
+                "original_upper_price" => isset($variationvalues['original_upper_price']) ?  $variationvalues['original_upper_price'] : '',
+                "original_lower_price" => isset($variationvalues['original_lower_price']) ?  $variationvalues['original_lower_price'] : ''
             ]);
             
          

@@ -23,7 +23,7 @@ class GuestCartService {
         $cartValue = GuestCart::where('product_id', $data['product_id'])->where('product_variation_id', $data['product_variation_id'])->where('user_id',$data['user_id'])->first();
         if( $cartValue){
 
-            $create['qty'] = $cartValue['qty'] + 1;
+            $create['qty'] = $data['qty'];
             $cartUpdate = $cartValue->update($create);
             $cart = GuestCart::where('id',$cartValue->id)->first();
             $cartData = (new GuestCartService)->cartDetail($cart);

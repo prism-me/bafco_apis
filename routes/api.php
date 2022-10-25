@@ -31,6 +31,7 @@ Route::get('/search', [\App\Http\Controllers\SearchController::class, 'search'])
 #Products
     Route::get('products', 'ProductController@index');
     Route::post('products', 'ProductController@store')->middleware('auth:sanctum');
+    Route::post('product-indexing', 'ProductController@productIndexing')->middleware('auth:sanctum');
 
     Route::put('clone-product/{id}', 'ProductController@cloneProduct')->middleware('auth:sanctum');
 

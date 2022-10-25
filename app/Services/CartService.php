@@ -29,7 +29,7 @@ class CartService
         $cartValue = Cart::where('product_id', $data['product_id'])->where('product_variation_id', $data['product_variation_id'])->where('user_id', $data['user_id'])->first();
         if ($cartValue) {
 
-            $create['qty'] = $cartValue['qty'] + 1;
+            $create['qty'] =  $data['qty'];
             $cartUpdate = $cartValue->update($create);
             $cart = Cart::where('id', $cartValue->id)->first();
             $cartData = (new CartService)->cartDetail($cart);
@@ -117,11 +117,6 @@ class CartService
                     $update['shipping_charges'] = "Free";
                     $update['decimal_amount'] = $cartTotal['total'] * 100.00;
                     $cartTotal->update($update);
-                    // if($discount != null){
-                    //     $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
-                    //     $cartTotal->update($update);
-                        
-                    // }
                     $cartTotal = CartCalculation::where('user_id',$cart->user_id)->first();
                     return response()->json($cartTotal);
 
@@ -132,11 +127,6 @@ class CartService
                     $update['total']  = $cartTotal['sub_total'] + 200;
                     $update['decimal_amount'] = $update['total'] * 100.00;
                     $cartTotal->update($update);
-                    // if($discount != null){
-                    //     $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
-                    //     $cartTotal->update($update);
-                        
-                    // }
                     $cartTotal = CartCalculation::where('user_id',$cart->user_id)->first();
                         return response()->json($cartTotal);
 
@@ -154,11 +144,6 @@ class CartService
                     $update['shipping_charges'] = "Free";
                     $update['decimal_amount'] = $cartTotal['total'] * 100.00;
                     $cartTotal->update($update);
-                    // if($discount != null){
-                    //     $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
-                    //     $cartTotal->update($update);
-                        
-                    // }
                     $cartTotal = CartCalculation::where('user_id',$cart->user_id)->first();
                     return response()->json($cartTotal);
 
@@ -169,11 +154,6 @@ class CartService
                     $update['total']  = $cartTotal['sub_total'] + 200;
                     $update['decimal_amount'] = $update['total'] * 100.00;
                     $cartTotal->update($update);
-                    // if($discount != null){
-                    //     $update['total']  = $cartTotal['total'] - $cartTotal['discounted_price'];
-                    //     $cartTotal->update($update);
-                        
-                    // }
                     $cartTotal = CartCalculation::where('user_id',$cart->user_id)->first();
                         return response()->json($cartTotal);
 
@@ -214,12 +194,6 @@ class CartService
 
                 $update['shipping_charges'] = "Free";
                 $cartTotal = CartCalculation::where('user_id',$cart->user_id)->update($update);
-                // if($discount != null){
-                //     $update['total']  = $cartCalculation['total'] - $cartCalculation['discounted_price'];
-                //     $cartTotal = CartCalculation::where('user_id',$cart->user_id)->update($update);
-                    
-                // }
-
                 Cart::where('id',$id)->delete();
                 return response()->json('Cart Value Removed');
 
@@ -229,13 +203,6 @@ class CartService
                 $update['total']  = $cartCalculation['sub_total'] + 200;
                 $update['decimal_amount'] = $update['total'] * 100.00;
                 $cartTotal = CartCalculation::where('user_id',$cart->user_id)->update($update);
-                // if($discount != null){
-                //     $update['total']  = $cartCalculation['total'] - $cartCalculation['discounted_price'];
-                //     $cartTotal = CartCalculation::where('user_id',$cart->user_id)->update($update);
-                //     //$cartTotal = CartCalculation::where('user_id',$cart->user_id)->first();
-                    
-                // }
-
                 Cart::where('id',$id)->delete();
                 return response()->json('Cart Value Removed');
 

@@ -35,7 +35,7 @@
                 </tr>
                 <tr>
                     <td>Attachment</td>
-                    <td>{{ $data->attachment }}</td>
+                    <td>{{$data->attachment }}</td>
                 </tr>
             </tbody>
                 <tr>

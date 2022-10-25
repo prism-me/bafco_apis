@@ -210,6 +210,27 @@ class ProductController extends Controller
         
 
     }
+    
+    public function productIndexing(Request $request){
+        
+        
+        $data = $request->product_data;
+        
+        
+        
+        foreach($data as $single){
+            
+                        
+            $product = Product::where('id' , $single['id'])->update(['currentIndex' => $single['currentIndex']]);
+            
+            
+        }
+        
+        
+        return ['data'=>'product order has been updated.','status'=>200];
+        
+        
+    }
 
    
 

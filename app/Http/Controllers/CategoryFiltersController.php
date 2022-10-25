@@ -17,10 +17,18 @@ class CategoryFiltersController extends Controller
     {
 
         $variations =  DB::select("CALL CategoryFilterList('" . $category->route . "')");
+        // DB::enableQueryLog();
 
-        $categories = Category::where('parent_id', $category->parent_id)->withCount('products')->get(['name', 'route', 'products_count']);
-        // return $categories;
-        return response()->json(['categories' => $categories, 'variations' => $variations], 200);
+        $categories = Category::where('parent_id', $category->parent_id)->withCount(['products' => function($q){
+            $q->where('status', 1);
+        }])->get();
+        // ->filter(function($category) { return $category['products']['status'] > 0; });
+
+        //   return DB::getQueryLog();
+
+        $brands = Product::distinct()->select('brand','category_id')->where('category_id',$category->id)->get();
+
+        return response()->json(['categories' => $categories, 'variations' => $variations , 'brands' => $brands], 200);
     }
 
     public function CategoryListFilteration(Request $request)
@@ -30,15 +38,15 @@ class CategoryFiltersController extends Controller
         $max =  $request->max ;
         $min =   $request->min;
         $color  = $request->color;
-       
-        
+
+
         $category = Category::where('route', $route)->first();
-      
+
 
         $products = Product::with('productCategory.parentCategory')
                             ->when(!empty($request->brand), function($q) use ($brand,$category) {
                                 $q->whereIn('brand', $brand);
-                                
+
                             })
 
                             ->when(($request->min == 0 || $request->min > 0 ) &&  !empty($request->max) , function ($q) use ($min,$max) {
@@ -54,14 +62,14 @@ class CategoryFiltersController extends Controller
                                 $q->whereIn('id', $productId);
 
                             })
-                            
+
                             ->whereHas('productvariations')
                             ->where('category_id',$category->id)
                             ->where('status',1)
                             ->when( count( $request->all()) === 0, function($q){
                                 return response()->json([]);
                             })->get();
-                            
+
                             if($products->count() > 0){
 
                                 if(!empty($products)){
@@ -88,5 +96,5 @@ class CategoryFiltersController extends Controller
                             }
     }
 
- 
+
 }

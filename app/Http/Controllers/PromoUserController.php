@@ -26,10 +26,14 @@ class PromoUserController extends Controller
 
             $Code = PromoCode::where('name',$code)->first();
 
+
+
+
             if($Code){
 
                 $limit  = $Code['usage'];
                 $promoCount = PromoUser::where('promo_code_id',$code)->count();
+
 
                 if($promoCount < $limit){
 
@@ -61,7 +65,7 @@ class PromoUserController extends Controller
 
             }else{
 
-                return json_encode(['status'=>400,'message' => 'Promo Code Does not Exist']);
+            return json_encode(['status'=>400,'message' => 'Promo Code Does not Exist']);
 
             }
         }    catch (\Exception $e) {
