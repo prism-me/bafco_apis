@@ -61,7 +61,7 @@ class CartService
            
 
         }
-         return  $cartData;
+        return  $cartData;
 
         if ($cartData) {
 
@@ -179,7 +179,6 @@ class CartService
         $userId = $cart['user_id'];
         
         $cartTotal = CartCalculation::where('user_id',$userId)->first();
-        $discount = $cartTotal['discounted_price'];
         $update['total'] =  $cartTotal['total'] - $cart['total'];
         $update['sub_total'] =  $cartTotal['sub_total'] - $cart['total'];
         $update['decimal_amount'] =  $update['total'] * 100;
@@ -230,36 +229,24 @@ class CartService
             DB::beginTransaction();
                 $guestCart = GuestCart::where('user_id', $guest_id)->get();
                 foreach ($guestCart as $guest) {
-                    // return $guest;
-                    $cart =Cart::create([
+            
+                    $cartCreate =Cart::firstOrCreate([
                         'user_id' => $user_id,
                         'guest_id' => $guest_id,
                         'product_id' => $guest->product_id,
                         'product_variation_id' => $guest->product_variation_id,
                         'qty' => $guest->qty,
-                        'unit_price' => $guest->unit_price,
-                        'total' => $guest->total
-
                     ]);
 
-                   // $guest->delete();
+                    $cart = Cart::where('id', $cartCreate->id)->first();
+                    $cartData = (new CartService)->cartDetail($cart);
+                   
+
+                    $guest->delete();
+                    GuestCartCalculation::where('user_id',$user_id)->delete();
                 }
 
-                $guestCartCalculation = GuestCartCalculation::where('user_id', $guest_id)->firstOrFail();
-
-                CartCalculation::create([
-                    'user_id' => $user_id,
-                    'guest_id' => $guest_id,
-                    'coupon' => $guestCartCalculation->coupon,
-                    'discounted_price' => $guestCartCalculation->discounted_price,
-                    'shipping_charges' => $guestCartCalculation->shipping_charges,
-                    'decimal_amount' => $guestCartCalculation->decimal_amount,
-                    'total' => $guestCartCalculation->total,
-                    'sub_total' => $guestCartCalculation->sub_total
-                ]);
-
-                // $guestCart->delete();
-              // $guestCartCalculation->delete();
+            
 
             DB::commit();
             return true;

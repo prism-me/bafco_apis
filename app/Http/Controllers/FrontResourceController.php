@@ -224,15 +224,32 @@ class FrontResourceController extends Controller
             $data = $request->all();
             $materialId = $data['material_id'];
             $finishesId = $data['finishes_id'];
-            $finishes = FinishesValue::where('material_id',$materialId)->where('finishes_id',$finishesId)->first();
-            $finishesParent = Finishes::where('id',  $finishesId)->with('parent')->first();
-            $ID =  $finishesParent['parent']['id'];
-            $finishesData = Finishes::where('id', $ID)->with(['childValue' => function($q) use ($finishesId){
-                    $q->where('id',$finishesId)->with('value');
-            }])->get();
-            $data = [
-                'finishesData' => $finishesData,
-            ];
+            $i = 0;
+            if(@$data['color_code'] != null){
+                $finishesData = FinishesValue::where('material_id',$materialId)->where('color_code',$data['color_code'])->get();
+                //$finishesData = [];
+                $i = 0;
+                foreach($finishesData as $id){
+
+                    $finishesData[$i]['finishes'] = Finishes::where('id', $id['finishes_id'])->first('name');
+                    $i++;
+
+                }
+                return response()->json($finishesData);
+                  
+            }else{
+
+                $finishes = FinishesValue::where('material_id',$materialId)->where('finishes_id',$finishesId)->first();
+                $finishesParent = Finishes::where('id',  $finishesId)->with('parent')->first();
+                $ID =  $finishesParent['parent']['id'];
+                $finishesData = Finishes::where('id', $ID)->with(['childValue' => function($q) use ($finishesId){
+                        $q->where('id',$finishesId)->with('value');
+                }])->get();
+                $data = [
+                    'finishesData' => $finishesData,
+                ];
+
+            }
                 
             return response()->json($data);
 

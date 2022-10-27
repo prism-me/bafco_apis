@@ -196,12 +196,8 @@ class GuestCartService {
 
        
         $cart = GuestCart::where('id',$id)->first();
-
-        
         $userId = $cart['user_id'];
-        
         $cartTotal = GuestCartCalculation::where('user_id',$userId)->first();
-        $discount = $cartTotal['discounted_price'];
         $update['total'] =  $cartTotal['total'] - $cart['total'];
         $update['sub_total'] =  $cartTotal['sub_total'] - $cart['total'];
         $update['decimal_amount'] =  $update['total'] * 100;
