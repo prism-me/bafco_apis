@@ -36,7 +36,7 @@
         </td>
         <td colspan="2">
             <h2><strong>Order Summary</strong></h2>
-            <b>Order No:</b> {{ $userData['orderDate'] }} <br />
+            <b>Order No:</b> {{ $userData['orderNumber'] }} <br />
             <b>Order Date: </b>{{ date('Y-m-d') }}<br />
             @if($userData['coupon'] != "BAFCOTest" ) <b>Coupon:</b>&nbsp;&nbsp;{{ $userData['coupon'] }} <br /> <b>Discount:&nbsp;</b>{{ $userData['discount'] }}<br />@endif <br />
             &nbsp; <b>Sub Total:</b>&nbsp;&nbsp; AED {{ $userData['sub_total'] }} <br />

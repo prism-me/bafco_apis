@@ -226,16 +226,18 @@ class FrontResourceController extends Controller
             $finishesId = $data['finishes_id'];
             $i = 0;
             if(@$data['color_code'] != null){
-                $finishesData = FinishesValue::where('material_id',$materialId)->where('color_code',$data['color_code'])->get();
-                //$finishesData = [];
+                $finishesData['child_value'] = FinishesValue::where('material_id',$materialId)->where('color_code',$data['color_code'])->get();
+                
                 $i = 0;
-                foreach($finishesData as $id){
+                foreach($finishesData['child_value'] as $id){
 
-                    $finishesData[$i]['finishes'] = Finishes::where('id', $id['finishes_id'])->first('name');
+                    $finishesData['child_value'][$i]['finishes'] = Finishes::where('id', $id['finishes_id'])->first('name');
                     $i++;
 
                 }
-                return response()->json($finishesData);
+                $data = [
+                    'finishesData' => $finishesData,
+                ];
                   
             }else{
 
