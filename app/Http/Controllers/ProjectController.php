@@ -118,7 +118,7 @@ class ProjectController extends Controller
 
     public function projectProduct(){
 
-        $product = Product::get(['id','name']);
+        $product = Product::orderBy('name','ASC')->get(['id','name']);
         return response()->json($product);
 
     }

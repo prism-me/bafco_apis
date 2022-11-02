@@ -22,7 +22,7 @@ class SubscriberController extends Controller
     {
         $data = $request->all();
         $create = Subscriber::create($data);
-        $clientEmail = "devteam5@prism-me.com";
+        $clientEmail = "Hello@bafco.com";
         $userMail = $data['email'];
         Mail::to($clientEmail)->send(new ClientSubscriberMail($data));
         Mail::to($userMail)->send(new UserSubscriberMail($data));
@@ -30,7 +30,7 @@ class SubscriberController extends Controller
 
         if($create){
 
-            return response()->json('Data saved Successfully');
+            return response()->json('Subscribed Succseffully');
 
         }else{
             return response()->json('Something went wrong');

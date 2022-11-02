@@ -29,7 +29,7 @@ class ClientEnquiryMail extends Mailable
      */
     public function build()
     {
-        return $this->from('prism.marketing786@gmail.com')->markdown('enquiry.client')->with('data', $this->data);
+        return $this->from('web@bafco.com','Bafco')->markdown('enquiry.client')->with('data', $this->data);
     }
 
 

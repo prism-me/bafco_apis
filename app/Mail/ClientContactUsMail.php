@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ClientSubscriberMail extends Mailable
+class ClientContactUsMail extends Mailable
 {
     use Queueable, SerializesModels ;
     public $data;
@@ -29,7 +29,7 @@ class ClientSubscriberMail extends Mailable
      */
     public function build()
     {
-        return $this->from('web@bafco.com','Bafco')->markdown('subscriber.client')->with('data', $this->data);
+        return $this->from('web@bafco.com','Bafco')->markdown('contacts.client')->with('data', $this->data);
     }
 
 
