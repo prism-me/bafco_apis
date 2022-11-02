@@ -17,10 +17,18 @@ class CategoryFiltersController extends Controller
     {
 
         $variations =  DB::select("CALL CategoryFilterList('" . $category->route . "')");
+        // DB::enableQueryLog(); 
+        
+        $categories = Category::where('parent_id', $category->parent_id)->withCount(['products' => function($q){
+            $q->where('status', 1);
+        }])->get();
+        // ->filter(function($category) { return $category['products']['status'] > 0; });
+        
+    //   return DB::getQueryLog();
+        
+        $brands = Product::distinct()->select('brand','category_id')->where('category_id',$category->id)->get();
 
-        $categories = Category::where('parent_id', $category->parent_id)->withCount('products')->get(['name', 'route', 'products_count']);
-        // return $categories;
-        return response()->json(['categories' => $categories, 'variations' => $variations], 200);
+        return response()->json(['categories' => $categories, 'variations' => $variations , 'brands' => $brands], 200);
     }
 
     public function CategoryListFilteration(Request $request)

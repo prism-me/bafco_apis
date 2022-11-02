@@ -166,6 +166,7 @@ class CartService
         try {
             DB::beginTransaction();
                 $guestCart = GuestCart::where('user_id', $guest_id)->get();
+                
                 foreach ($guestCart as $guest) {
                     // return $guest;
                     $cart =Cart::create([
@@ -202,8 +203,6 @@ class CartService
             return true;
 
         } catch (\Exception $e) {
-
-             return response()->json($e, 400);
             DB::rollBack();
             return false;
         }

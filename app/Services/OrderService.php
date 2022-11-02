@@ -106,6 +106,9 @@ class OrderService
 
 
     public function payment_failed($orderData, $status) {
+
+        //we have to delete the order
+
         try {
             DB::beginTransaction();
             $order = Order::where('order_number', $orderData)->first();

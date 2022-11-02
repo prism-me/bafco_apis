@@ -60,6 +60,9 @@ class PostPayPaymentService implements PaymentInterface
                 $user_id = $request->user_id;
                 $request->address_id = $address->id;
             }
+
+
+
             $cartList = Cart::where('user_id', $user_id)->get(['product_id', 'product_variation_id', 'qty', 'total', 'unit_price', 'user_id']);
 
             foreach ($cartList as $cart) {
