@@ -39,6 +39,7 @@ class OrderService
                 'sub_total' => $cartDetails['sub_total'],
                 'status' => 'ORDERPLACED',
                 'payment_date' => null,
+                'num_instalments' => $orderData['total_amount'] !== 3 ? 0 : 1 
             ]);
             foreach ($orderData['items'] as $item) {
                 $order->order_details()->create([

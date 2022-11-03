@@ -179,7 +179,8 @@ class PostPayPaymentService implements PaymentInterface
             'reference_number' => Null,
             'captured' => false,
             'amount' => $order,
-            'status' => 'pending'
+            'status' => 'pending',
+            'num_instalments' => $data['total_amount'] !== 3 ? 0 : 1 
         ]);
         return $payment ? true : false;
     }
