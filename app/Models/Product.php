@@ -33,7 +33,8 @@ class Product extends Model
        "headrest",
        "type",
        'top_selling',
-       'banner_img'
+       'banner_img',
+       'currentIndex'
 
    ];
 

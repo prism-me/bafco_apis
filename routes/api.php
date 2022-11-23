@@ -31,6 +31,10 @@ Route::get('/search', [\App\Http\Controllers\SearchController::class, 'search'])
 #Products
     Route::get('products', 'ProductController@index');
     Route::post('products', 'ProductController@store')->middleware('auth:sanctum');
+    Route::post('product-indexing', 'ProductController@productIndexing')->middleware('auth:sanctum');
+
+    Route::put('clone-product/{id}', 'ProductController@cloneProduct')->middleware('auth:sanctum');
+
 
     Route::post('add-product-variation', 'ProductController@addVariation')->middleware('auth:sanctum');
     Route::get('product-all-variation/{id}', 'ProductController@productVariation');
@@ -90,9 +94,9 @@ Route::get('/search', [\App\Http\Controllers\SearchController::class, 'search'])
 
 #Contact Us
     Route::post('form-submit', 'ContactUsController@store');
-    Route::get('contact-us', 'ContactUsController@index');
-    Route::get('contact-us/{contactUs}', 'ContactUsController@show');
-    Route::delete('contact-us/{contactUs}', 'ContactUsController@destroy')->middleware('auth:sanctum');
+    Route::get('contacts', 'ContactUsController@index');
+    Route::get('contacts/{contacts}', 'ContactUsController@show');
+    Route::delete('contacts/{contacts}', 'ContactUsController@destroy')->middleware('auth:sanctum');
 
 #Management
     Route::get('managements', 'ManagementController@index');
@@ -289,6 +293,7 @@ Route::group(['prefix' => 'auth'], function ($router) {
         Route::post('/update-profile', 'UserController@updateProfile')->middleware('auth:sanctum');
         Route::post('/change-password', 'UserController@changePassword')->middleware('auth:sanctum');
         Route::get('/track-order/{id}', 'UserController@trackOrder')->middleware('auth:sanctum');
+        Route::post('/cancel-order', 'UserOrderDetailController@cancelOrder')->middleware('auth:sanctum');
 
     #Wishlist
         Route::get('wishlists/{id}', 'WishlistController@index')->middleware('auth:sanctum');
@@ -316,6 +321,7 @@ Route::group(['prefix' => 'auth'], function ($router) {
         Route::get('all-users', 'DashboardController@allUsers');
         Route::get('all-orders', 'DashboardController@allOrder');
         Route::get('order-detail/{id}', 'DashboardController@orderDetail');
+        Route::post('order-filter', 'DashboardController@orderFilter');
         Route::post('change-order-status', 'DashboardController@changeOrderStatus');
         Route::get('product-report-list', 'DashboardController@productReportList');
         Route::get('product-report-detail/{id}', 'DashboardController@productReportDetail');
@@ -323,6 +329,8 @@ Route::group(['prefix' => 'auth'], function ($router) {
         Route::post('transaction-filter', 'DashboardController@transactionFilter');
         Route::get('sales-list', 'DashboardController@salesList');
         Route::get('sales-count', 'DashboardController@salesCount');
+        Route::post('sales-list-filter','DashboardController@salesListFilter');
+
 
     #Todo
         Route::get('todos', 'TodoController@index')->middleware('auth:sanctum');

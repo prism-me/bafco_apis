@@ -195,6 +195,43 @@ class ProductController extends Controller
 
     }
 
+
+    public function cloneProduct($id){
+        try{
+
+            #Clone Variation
+            $product = ProductService::cloneProduct($id);
+            return response()->json('Product Cloned successfully!');
+
+        }
+         catch (\Error $exception) {
+             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
+        
+
+    }
+    
+    public function productIndexing(Request $request){
+        
+        
+        $data = $request->product_data;
+        
+        
+        
+        foreach($data as $single){
+            
+                        
+            $product = Product::where('id' , $single['id'])->update(['currentIndex' => $single['currentIndex']]);
+            
+            
+        }
+        
+        
+        return ['data'=>'product order has been updated.','status'=>200];
+        
+        
+    }
+
    
 
 

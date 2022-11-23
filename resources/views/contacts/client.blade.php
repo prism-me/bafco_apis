@@ -9,8 +9,34 @@
     </tr>
     </thead>
     <tbody>
-        <h3 style="text-align:center;">You have a new subscriber with the email address {{ $data['email'] }} </h3>
+        <h3 style="text-align:center;">{{ ucfirst( $data->name )}} Trying to contact Bafco Team. </h3>
+
         <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <td>Name</td>
+                    <td>{{$data->name }}</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>{{$data->email }}</td>
+                </tr>
+                <tr>
+                    <td>Subject</td>
+                    <td>{{$data->subject }}</td>
+                </tr>
+                <tr>
+                    <td>Message</td>
+                    <td>{{$data->message }}</td>
+                </tr>
+                <tr>
+                    <td>Type</td>
+                    <td>{{$data->form_type }}</td>
+                </tr>
+                <tr>
+                    <td>Attachment</td>
+                    <td><img src="{{ $data->attachment }}" height="150" widht="150"></td>
+                </tr>
                 <tr>
                     <td height="100"><br>&nbsp;
                         <table class="footer" align="center"  height="100" width="570" role="presentation" style="background: #f2f2f2;margin: 0px; width:100%">

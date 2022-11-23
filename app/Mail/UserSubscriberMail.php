@@ -29,7 +29,7 @@ class UserSubscriberMail extends Mailable
      */
     public function build()
     {
-        return $this->from('prism.marketing786@gmail.com')->markdown('subscriber.user')->with('data', $this->data);
+        return $this->from('web@bafco.com','Bafco')->markdown('subscriber.user')->with('data', $this->data);
     }
 
 
