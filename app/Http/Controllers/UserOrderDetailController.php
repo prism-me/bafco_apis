@@ -73,7 +73,7 @@ class UserOrderDetailController extends Controller
             $j++;
         }
 
-        $userData['client_email'] = array('bilal@prism-me.com','devteam5@prism-me.com');
+        $userData['client_email'] = array('bilal@prism-me.com','devteam5@prism-me.com','Hello@bafco.com');
         event(new ClientOrderCancelMail($userData));
         $update['status'] = "ORDERCANCELLLATIONREQUEST";
         $order = Order::where('order_number',$request->order_number)->update($update);

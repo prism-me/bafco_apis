@@ -136,7 +136,7 @@ class DashboardController extends Controller
             }elseif($request->status ==  "deliver")
             {
                 $update['status'] = $this->deliver;
-                $userData['client_email'] = array('bilal@prism-me.com','devteam5@prism-me.com');
+                $userData['client_email'] = array('bilal@prism-me.com','devteam5@prism-me.com','Hello@bafco.com');
                 event(new ClientOrderDeliverMail($userData));
                 event(new OrderDeliverMail($userData));
 
