@@ -99,13 +99,13 @@ class PostPayPaymentService implements PaymentInterface
 
             $data = $response->json();
 
-            DB::commit();
+           DB::commit();
 
            return ($response->getStatusCode() == 200 && !empty($data->token)) ? $data->redirect_url :  $data;
         } catch (RESTfulException $e) {
 
             DB::rollBack();
-            return response()->json(['ex_message' => $e->getMessage(), 'error' => $e->getErrorCode(), 'line' => $e->getLine()]);
+         return response()->json(['ex_message' => $e->getMessage(), 'error' => $e->getErrorCode(), 'line' => $e->getLine()]);
         } catch (\Exception $e) {
             DB::rollBack();
             

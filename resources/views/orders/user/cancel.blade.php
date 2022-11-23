@@ -40,9 +40,14 @@
                 </td>
             </tr>
         <br/>
+<<<<<<< HEAD
             @foreach($userData['product_detail'] as $value)<tr><td colspan="1" align="center" ><img  src="{{ $value['product_image'][0]['avatar'] }}" alt="" height="130"/></td><td colspan="2" style="line-height:23px;"><b>Name:</b> &nbsp; &nbsp;{{ $value['product_name'] }}<br/><b>Quantity: </b>&nbsp; &nbsp;{{ $value['qty']}}<br /> <b>Price:</b>&nbsp; &nbsp; AED&nbsp;{{ $value['price'] }}<br />
             @foreach($value['product_variation'] as $variation) <b>{{ $variation['variation_name']['name'] }}: </b> &nbsp; &nbsp;{{ $variation['variation_values']['name']  }}<br />@endforeach</tr></td>
             @endforeach
+=======
+            @foreach($userData['product_detail'] as $value)<tr><td colspan="1" align="center" ><img  src="{{ $value['product_variation'][0]['avatar'] }}" alt="" height="130"/></td><td colspan="2" style="line-height:23px;">{{ $value['product_name'] }}<br/>
+                Quantity: &nbsp; &nbsp;{{ $value['qty']}}<br /> Price:&nbsp; &nbsp; AED&nbsp;{{ $value['price'] }}<br />@endforeach
+>>>>>>> 66ec4f264f7db44c1085aeb421af420636d47bab
         <br/><br/>
             <tr>
                 <td height="100" colspan="3"><br>&nbsp;

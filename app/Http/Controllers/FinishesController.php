@@ -40,18 +40,12 @@ class FinishesController extends Controller
                 "material_id" => isset($data['material_id']) ? $data['material_id'] : '',
                 "featured_img" => isset($data['featured_img']) ? $data['featured_img'] : '',
                 "code" => isset($data['code']) ? $data['code'] : '',
+                "color_code" => isset($data['color_code']) ? $data['color_code'] : '',
 
             ];
             $FinishesValue = FinishesValue::where('finishes_id',$request->id)->where('material_id',$data['material_id'])->first();
             $FinishesValue->update($finishesValueCreate);
-            $finishesValuePivotCreate = [
-               'material_id' => $data['material_id'],
-               'finishes_id' => $data['id'],
-               'finishes_value_id' => isset($FinishesValue['id']) ? $FinishesValue['id'] : '',
-            ];
-            $finishesValuePivot = FinishesValuePivot::where('finishes_id',$request->id)->where('material_id',$data['material_id'])->first();
-            $finishesValuePivot->update($finishesValuePivotCreate);
-
+            
         }else {
 
                 #create
@@ -69,16 +63,11 @@ class FinishesController extends Controller
                         "finishes_id" => $finishesCreated->id,
                         "featured_img" => isset($data['featured_img']) ? $data['featured_img'] : '',
                         "code" => isset($data['code']) ? $data['code'] : '',
+                        "color_code" => isset($data['color_code']) ? $data['color_code'] : '',
 
                     ];
                     $FinishesValue = FinishesValue::firstOrCreate($finishesValueCreate);
 
-                    $finishesValuePivotCreate = [
-                        'material_id' => $data['material_id'],
-                        'finishes_id' => isset($finishesCreated->id) ? $finishesCreated->id : '' ,
-                        'finishes_value_id' => isset($FinishesValue->id) ? $FinishesValue->id : '',
-                    ];
-                    $finishesValuePivot = FinishesValuePivot::create($finishesValuePivotCreate);
 
         }
 
