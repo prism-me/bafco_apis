@@ -25,6 +25,9 @@ use App\Events\ClientOrderPlaceMail;
 use App\Listeners\NotifyClientDeliverCreated;
 use App\Events\ClientOrderDeliverMail;
 
+use App\Listeners\NotifyOrderCancelRequestCreated;
+use App\Events\UserOrderCancelRequestMail;
+
 
 
 
@@ -64,6 +67,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         ClientOrderDeliverMail::class => [
             NotifyClientDeliverCreated::class,
+        ],
+        UserOrderCancelRequestMail::class => [
+            NotifyOrderCancelRequestCreated::class,
         ],
     ];
 

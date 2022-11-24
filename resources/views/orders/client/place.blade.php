@@ -45,9 +45,9 @@
         </td>
     </tr>
     <br/>
-        @foreach($userData['product_detail'] as $value)<tr><td colspan="1" align="center" ><img  src="{{ $value['product_image'][0]['avatar'] }}" alt="" height="130"/></td><td colspan="2" style="line-height:23px;"><b>Name:</b> &nbsp; &nbsp;{{ $value['product_name'] }}<br/><b>Quantity: </b>&nbsp; &nbsp;{{ $value['qty']}}<br /> <b>Price:</b>&nbsp; &nbsp; AED&nbsp;{{ $value['price'] }}<br />
-        @foreach($value['product_variation'] as $variation) <b>{{ $variation['variation_name']['name'] }}: </b> &nbsp; &nbsp;{{ $variation['variation_values']['name']  }}<br />@endforeach</tr></td>
-        @endforeach
+            @foreach($userData['product_detail'] as $value)<tr><td colspan="1" align="center" ><img  src="{{ $value['product_image'][0]['avatar'] }}" alt="" height="130"/></td><td colspan="3" style="line-height:23px;"><b>&nbsp;&nbsp;Name:</b> &nbsp; &nbsp;{{ $value['product_name'] }}<br/><b>&nbsp;&nbsp;Quantity: </b>&nbsp; &nbsp;{{ $value['qty']}}<br /> <b>&nbsp;&nbsp;Price:</b>&nbsp; &nbsp; AED&nbsp;{{ $value['price'] }}<br /> @if($value['in_stock'] == 1)<b> &nbsp;&nbsp;Stock: </b>In Stock @else Out of stock @endif </b> <br />
+            @foreach($value['product_variation'] as $variation) <b>{{ $variation['variation_name']['name'] }}: </b> &nbsp; &nbsp;{{ $variation['variation_values']['name']  }}<br />@endforeach</tr></td><br />
+            @endforeach
     <tr>
         <td height="100" colspan="3"><br>&nbsp;
             <table class="footer" align="center"  height="100" width="570" role="presentation" style="padding: 15px 0px 9px 0px; background: #f2f2f2;margin: 0px; width:100%">

@@ -78,6 +78,8 @@ class PaymentController extends Controller
                 $userData['product_detail'][$i]['product_name'] = $value['productDetail']['name'];
                 $userData['product_detail'][$j]['product_image'] = $productVariation[$j]['images'];
                 $userData['product_detail'][$j]['product_variation'] = $productVariation[$j]['variation_items'];
+                $userData['product_detail'][$j]['in_stock'] = $productVariation[$j]['in_stock'];
+
                 $i++;
                 $j++;
             }

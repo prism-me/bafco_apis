@@ -14,6 +14,7 @@ use App\Events\OrderCancelMail;
 use App\Events\ClientOrderCancelMail;
 use App\Events\OrderDeliverMail;
 use App\Events\ClientOrderDeliverMail;
+use App\Events\UserOrderCancelRequestMail;
 
 
 
@@ -35,7 +36,7 @@ class DashboardController extends Controller
         public function allOrder(){
 
             $order = Order::with('userDetail')->orderBy('id', 'desc')->get();
-            return response()->json($order);
+            return response()->json(['data' => $order]);
 
         }
 
@@ -66,10 +67,10 @@ class DashboardController extends Controller
             })
             ->when(count($request->all()) === 0, function($q){
                 return ['data'=>'No record found.','status'=>404];
-            })->get();
+            })->with('userDetail')->get();
             
             if($results->count() > 0){
-                return response($results , 200);
+               return response()->json(['data'=>$results]);
             }else{
                 return ['data'=>'No record found.','status'=>404];
             }
@@ -115,9 +116,13 @@ class DashboardController extends Controller
                 $userData['product_detail'][$i]['product_name'] = $value['productDetail']['name'];
                 $userData['product_detail'][$j]['product_image'] = $productVariation[$j]['images'];
                 $userData['product_detail'][$j]['product_variation'] = $productVariation[$j]['variation_items'];
+                $userData['product_detail'][$j]['in_stock'] = $productVariation[$j]['in_stock'];
                 $i++;
                 $j++;
             }
+                
+            
+
             
             if($request->status ==  "confirm")
             {
@@ -140,6 +145,11 @@ class DashboardController extends Controller
                 event(new ClientOrderDeliverMail($userData));
                 event(new OrderDeliverMail($userData));
 
+            }elseif($request->status ==  "disapprove"){
+                //$userData['client_email'] = array('bilal@prism-me.com','devteam5@prism-me.com','Hello@bafco.com');
+                event(new UserOrderCancelRequestMail($userData));
+                $update['status']=  $this->confirm;
+                
             }else{
 
             return response()->json('Something went Wrong');
