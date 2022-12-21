@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Address;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Models\User;
 use App\Models\VariationValues;
 use App\Models\Wishlist;
 use App\Services\WishlistService;
 use DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-
 
 class WishlistController extends Controller
 {
@@ -88,7 +89,52 @@ class WishlistController extends Controller
 
     }
 
+    // public function list()
+    // {
+
+    //     $wishlist = Wishlist::all();
+
+    //     if (!blank($wishlist)) {
+
+    //         $i = 0;
+    //         foreach ($wishlist as $wishlistValue) {
+    //             // $data[$i]['wishlist'] = Wishlist::where('id', $wishlistValue->id)->get('id');
+    //             $data[$i]['productData'] = Product::where('id', $wishlistValue->product_id)->with('productCategory.parentCategory')->get(['name', 'id', 'route', 'category_id']);
+    //             $data[$i]['variation'] = ProductVariation::where('id', $wishlistValue->product_variation_id)->with('productVariationName.productVariationValues.variant')->get(['id', 'product_id', 'in_stock', 'upper_price', 'images']);
+    //             $i++;
+    //         }
+
+    //         return $data;
+    //     }
+    // }
 
 
+
+    public function list()
+    {
+
+        $user_ids = Wishlist::pluck('user_id');
+
+        $users = User::whereIn('id', $user_ids)->with('wishlist')->with('addressDetail:user_id,phone_number')->get();
+
+        if (!blank($users)) {
+
+            $wish = [];
+            $r = 0;
+            foreach ($users as $user) {
+
+                $i = 0;
+                foreach ($user['wishlist'] as $wish) {
+                    // $data[$i]['wishlist'] = Wishlist::where('id', $wishlistValue->id)->get('id');
+                    $users[$r]['wishlist'][$i]['productData'] = Product::where('id', $wish->product_id)->with('productCategory.parentCategory')->get(['name', 'id', 'route', 'category_id']);
+                    $users[$r]['wishlist'][$i]['variation'] = ProductVariation::where('id', $wish->product_variation_id)->with('productVariationName.productVariationValues.variant')->get(['id', 'product_id', 'in_stock', 'upper_price', 'images']);
+                    $i++;
+                }
+                $r++;
+            }
+
+            return $users;
+        }
+    }
 
 }

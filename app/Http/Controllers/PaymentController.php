@@ -6,7 +6,9 @@ use App\Services\payment\PaymentService;
 use App\Services\payment\PostPayPaymentService;
 use Illuminate\Http\Request;
 use App\Events\OrderPlaceMail;
+use App\Events\ClientOrderPlaceMail;
 use App\Models\Order;
+use App\Models\ProductVariation;
 use App\Services\OrderService;
 
 class PaymentController extends Controller
@@ -34,6 +36,8 @@ class PaymentController extends Controller
     //Logged in users checkout
     public function authCheckout(Request $request)
     {
+
+        
         $result = $this->paymentService->authCheckoutService(new PostPayPaymentService(), $request);
         return $result;
     }
@@ -66,17 +70,24 @@ class PaymentController extends Controller
                 'orderDate' =>    $order['payment_date'],
             ];
              $i = 0 ;
+             $j = 0;
             foreach($order['order_details'] as $value){
+                $productVariation[$j] = ProductVariation::where('id', $value['product_variation'])->with('variation_items.variation_name')->with('variation_items.variation_values')->first();
                 $userData['product_detail'][$i]['qty'] = $value['qty'];
                 $userData['product_detail'][$i]['price'] = $value['total'];
                 $userData['product_detail'][$i]['product_name'] = $value['productDetail']['name'];
-                $userData['product_detail'][$i]['product_variation'] =  $value['productDetail']['productvariations']['images'];
+                $userData['product_detail'][$j]['product_image'] = $productVariation[$j]['images'];
+                $userData['product_detail'][$j]['product_variation'] = $productVariation[$j]['variation_items'];
+                $userData['product_detail'][$j]['in_stock'] = $productVariation[$j]['in_stock'];
+
                 $i++;
+                $j++;
             }
-
+            $userData['client_email'] = array('bilal@prism-me.com','devteam5@prism-me.com','Hello@bafco.com');
             event(new OrderPlaceMail($userData));
+            event(new ClientOrderPlaceMail($userData));
 
-            redirect()->away('https://bafco-next.herokuapp.com/checkout?status=success');
+            return redirect()->away('https://bafco.com/checkout?status=success');
         } else {
             return response()->json(['message' => 'Internal Error while payment.'], 404);
         }
@@ -87,6 +98,6 @@ class PaymentController extends Controller
 
         $order = (new OrderService())->payment_failed($request->order_id, $request->status);
         
-        redirect()->away('https://bafco-next.herokuapp.com/checkout?status=cancelled'); 
+        return redirect()->away('https://bafco.com/checkout?status=cancelled'); 
     }
 }

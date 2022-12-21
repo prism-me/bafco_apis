@@ -23,7 +23,7 @@ class EnquiryController extends Controller
     {
         $data = $request->all();
         $create = Enquiry::create($data);
-        $clientEmail = "devteam5@prism-me.com";
+        $clientEmail = "Hello@bafco.com";
         $userMail = $data['email'];
         Mail::to($clientEmail)->send(new ClientEnquiryMail($data));
         Mail::to($userMail)->send(new UserEnquiryMail($data));

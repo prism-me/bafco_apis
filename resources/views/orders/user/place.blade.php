@@ -29,25 +29,25 @@
 
     <br/>
     <tr>
-        <td colspan="2" style="vertical-align: baseline !important;"">
+         <td colspan="2">
             <h2><strong>Shipping Address</strong></h2>
-            {{ $userData['address_name'] }} {{ $userData['address_country']  }} {{ $userData['address_state'] }} {{  $userData['address_city'] }} <br />
-            {{$userData['address_line1'] }} {{ $userData['address_line2'] }} < {{ $userData['postal_code'] }} > {{ $userData['phone_number'] }}
+            {{ $userData['address_name'] }} <br />{{ $userData['address_country']  }}  {{ $userData['address_state'] }} {{  $userData['address_city'] }} <br />
+            {{$userData['address_line1'] }} {{ $userData['address_line2'] }}  < {{ $userData['postal_code'] }} > <br /> {{ $userData['phone_number'] }}
         </td>
         <td colspan="2">
             <h2><strong>Order Summary</strong></h2>
-            <b>Order No:</b> {{ $userData['orderDate'] }} <br />
+            <b>Order No:</b> {{ $userData['orderNumber'] }} <br />
             <b>Order Date: </b>{{ date('Y-m-d') }}<br />
-            @if(!blank($userData['coupon']) ) <b>Coupon:</b>&nbsp;&nbsp;{{ $userData['coupon'] }} <br /> <b>Discount:&nbsp;</b>{{ $userData['discount'] }}%<br />&nbsp; <b>Sub Total:</b>&nbsp;&nbsp;AED {{ $userData['sub_total'] }}&nbsp;<br />@endif <br />
+            @if($userData['coupon'] != "BAFCOTest" ) <b>Coupon:</b>&nbsp;&nbsp;{{ $userData['coupon'] }} <br /> <b>Discount:&nbsp;</b>{{ $userData['discount'] }}<br />@endif <br />
             &nbsp; <b>Sub Total:</b>&nbsp;&nbsp; AED {{ $userData['sub_total'] }} <br />
             &nbsp; <b>Shpping Charges:</b>&nbsp;&nbsp; {{ $userData['shipping_charges'] }}<br />
             &nbsp; <b>Total:&nbsp;</b>&nbsp; AED {{ $userData['total'] }}<br />
         </td>
     </tr>
     <br/>
-    @foreach($userData['product_detail'] as $value)<tr><td colspan="1" align="center" ><img  src="{{ $value['product_variation'][0]['avatar'] }}}" alt="" height="130"/></td><td colspan="2" style="line-height:23px;">{{ $value['product_name'] }}<br/>
-            Quantity: &nbsp; &nbsp;{{ $value['qty']}}<br /> Price:&nbsp; &nbsp; AED&nbsp;{{ $value['price'] }}<br />@endforeach
-            <br/><br/>
+            @foreach($userData['product_detail'] as $value)<tr><td colspan="1" align="center" ><img  src="{{ $value['product_image'][0]['avatar'] }}" alt="" height="130"/></td><td colspan="3" style="line-height:23px;"><b>&nbsp;&nbsp;Name:</b> &nbsp; &nbsp;{{ $value['product_name'] }}<br/><b>&nbsp;&nbsp;Quantity: </b>&nbsp; &nbsp;{{ $value['qty']}}<br /> <b>&nbsp;&nbsp;Price:</b>&nbsp; &nbsp; AED&nbsp;{{ $value['price'] }}<br /> @if($value['in_stock'] == 1)<b> &nbsp;&nbsp;Stock: </b>In Stock @else Out of stock @endif </b> <br />
+            @foreach($value['product_variation'] as $variation) <b>{{ $variation['variation_name']['name'] }}: </b> &nbsp; &nbsp;{{ $variation['variation_values']['name']  }}<br />@endforeach</tr></td><br />
+            @endforeach
     <tr>
         <td height="100" colspan="3"><br>&nbsp;
             <table class="footer" align="center"  height="100" width="570" role="presentation" style="padding: 15px 0px 9px 0px; background: #f2f2f2;margin: 0px; width:100%">

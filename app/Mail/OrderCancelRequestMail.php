@@ -7,19 +7,19 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ClientSubscriberMail extends Mailable
+class OrderCancelRequestMail extends Mailable
 {
-    use Queueable, SerializesModels ;
-    public $data;
+    use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($data)
+    public function __construct($userData)
     {
-        $this->data = $data;
+
+        $this->userData = $userData;
     }
 
     /**
@@ -29,8 +29,7 @@ class ClientSubscriberMail extends Mailable
      */
     public function build()
     {
-        return $this->from('web@bafco.com','Bafco')->markdown('subscriber.client')->with('data', $this->data);
+        return $this->view('orders.user.disapprove')->with('userData', $this->userData);
+
     }
-
-
 }

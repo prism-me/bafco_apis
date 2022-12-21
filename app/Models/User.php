@@ -44,4 +44,8 @@ class User extends Authenticatable
     public function addressDetail(){
         return $this->hasmany(Address::class , 'user_id','id');
     }
+        public function wishlist()
+    {
+        return $this->hasmany(Wishlist::class, 'user_id', 'id');
+    }
 }

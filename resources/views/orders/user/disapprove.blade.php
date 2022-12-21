@@ -15,11 +15,11 @@
             <tr>
                 <td colspan="3"
                     style="background-color:#008482;text-align:center;color:white;font-weight:bold;font-size:18px; height:56px;">
-                    ORDER CANCELLATION</td>
+                    ORDER REQUEST DISAPPROVED</td>
             </tr><br />
             <tr>
                 <td  colspan="3">
-                    <p style="text-align:center; color: #f44336"><b>{{ ucfirst($userData['name'])}} Your Order Has Been Cancelled.</b></p>
+                    <p style="text-align:center; color: #f44336"><b>Hi,{{  ucfirst($userData['name'])}}, your order cancellation request couldn’t be processed with order number  {{ $userData['orderNumber'] }} </b></p>
                     <p style="text-align:center; color: #008482;"> {{  $userData['cancellationReason'] }}</p>
                 </td>
             </tr>
