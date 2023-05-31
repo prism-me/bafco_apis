@@ -224,6 +224,14 @@ Route::get('front-category/{route}', 'FrontProductController@category');
 Route::get('header-category', 'FrontProductController@headerCategory');
 Route::get('top-selling-products', 'FrontProductController@topSellingProduct');
 
+Route::get('top-selling-products/{id}', 'FrontProductController@topSellingProducts');
+Route::get('top-selling-product', 'FrontProductController@topSellingProduct');
+
+#Product Detail
+Route::get('front-category/{route}', 'FrontProductController@category');
+Route::get('header-category', 'FrontProductController@headerCategory');
+Route::get('top-selling-products', 'FrontProductController@topSellingProduct');
+
 
 #Guest Cart
 Route::get('guest-cart/{id}', 'GuestCartController@index');
@@ -255,8 +263,14 @@ Route::delete('enquiries/{id}', 'EnquiryController@destroy');
 
 
 
+
 #Forgot Password
 Route::post('forget-password', 'UserController@forgetPassword');
+Route::post('submit-reset-password', 'UserController@submitResetPassword');
+
+#Forgot Password
+Route::post('forget-password', 'UserController@forgetPassword');
+
 
 #Order Detail User
 Route::get('user-order-detail/{id}', 'UserOrderDetailController@userOrderDetail');
@@ -326,4 +340,3 @@ Route::fallback(function () {
 //     $d =(new OrderService)->updateOrderAfterPayment();
 
 // });
-
