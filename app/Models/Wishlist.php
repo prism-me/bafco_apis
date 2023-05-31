@@ -8,12 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class Wishlist extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id','product_id','product_variation_id', 'variation_value_id'];
+    protected $fillable = ['user_id', 'product_id', 'product_variation_id', 'variation_value_id'];
 
 
-    public function wishlistProduct(){
-        return $this->belongsTo(Product::class ,'product_id','id')->select('id','name','featured_image','category_id');
+    public function wishlistProduct()
+    {
+        return $this->belongsTo(Product::class, 'product_id', 'id')->select('id', 'name', 'featured_image', 'category_id');
     }
 
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 
 }

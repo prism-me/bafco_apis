@@ -30,7 +30,7 @@ class ProductRequest extends FormRequest
             "category_id" => "required",
             "brand" => "required",
             // "download" => "required",
-            "variations" => "required",
+            // "variations" => "required",
             // "dimentions" => "required",
             "route" => "required",
             //"seo" => "required"

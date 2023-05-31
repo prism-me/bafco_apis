@@ -41,7 +41,17 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function addressDetail(){
-        return $this->hasmany(Address::class , 'user_id','id');
+    public function addressDetail()
+    {
+        return $this->hasmany(Address::class, 'user_id', 'id');
+    }
+    public function getPhoneNumberDetail()
+    {
+        return $this->has(Address::class, 'user_id', 'id');
+    }
+
+    public function wishlist()
+    {
+        return $this->hasmany(Wishlist::class, 'user_id', 'id');
     }
 }

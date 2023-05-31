@@ -133,7 +133,8 @@ class CategoryController extends Controller
     public function subCategory()
     {
         try{
-            $categories = Category::where('parent_id' , '!=', 'null')->get();
+            $categories = Category::where('parent_id' , '!=', 'null')->orderBy('name', 'ASC')->get();
+
             if($categories->isEmpty()){
                 return response()->json([] , 200);
             }

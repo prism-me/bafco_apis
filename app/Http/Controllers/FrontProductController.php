@@ -41,7 +41,7 @@ class FrontProductController extends Controller
                     $q->where('status',1)
                     ->with('productvariations.productVariationName.productVariationValues');
                     }])
-                    ->where('route',$route)->first(['id','route','name','parent_id']);
+                    ->where('route',$route)->first(['id','route','name','parent_id','banner_image','seo']);
             return response()->json($products);
         }
 
@@ -81,15 +81,16 @@ class FrontProductController extends Controller
 
             }
 
-            $dropDownValue  = ProductPivotVariation::where('product_id',$productDetails['id'])->get(['product_variation_id','product_id','variation_id','variation_value_id']);
-
+            $dropDownValue  = ProductPivotVariation::where('product_id',$productDetails['id'])->orderBy('product_variation_id','ASC')->get(['product_variation_id','product_id','variation_id','variation_value_id']);
+         
             $j = 0;
             foreach ($dropDownValue as $value){
-
                 $dropDown[$j] = VariationValues::where('id', $value['variation_value_id'])->with('variant')->first(['id','variation_id','name','route','type' , 'type_value']);
                 $dropDown[$j]['product_variation_id'] = $value['product_variation_id'];
                 $j++;
             }
+            
+           
 
             if($id == null){
 
@@ -121,7 +122,7 @@ class FrontProductController extends Controller
 
         public function category($route){
 
-            $category = Category::where('route' , $route)->with('subcategoryProducts')->get(['id','name','route','featured_image','description']);
+            $category = Category::where('route' , $route)->with('subcategoryProducts')->get(['id','name','route','featured_image','banner_image','description','seo']);
             return response()->json($category);
         }
 
