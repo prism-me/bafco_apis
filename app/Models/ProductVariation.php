@@ -25,7 +25,9 @@ class ProductVariation extends Model
         "images",
         "variation_combination",
         "lead_img",
-        "limit"
+        "limit",
+        "original_upper_price",
+        "original_lower_price"
     ];
 
 
@@ -74,6 +76,8 @@ class ProductVariation extends Model
 
         return $this->hasManyThrough(ProductPivotVariation::class, ProductVariation::class , 'product_id','product_variation_id','id','id');
     }
+
+    
 
 
 

@@ -19,7 +19,7 @@ class ProductController extends Controller
     public function index()
     {
         try{
-            return Product::with('variations','category','variations.variation_items')->where('status', 1)->get();
+            return Product::with('category')->where('status', 1)->get();
         }
         catch (\Exception $exception) {
             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
@@ -29,23 +29,26 @@ class ProductController extends Controller
     public function store(ProductRequest $request)
     {
 
+       
+
         try{
 
             if(Product::where('id',$request->id)->exists()){
 
-                $product = ProductService::updateProduct($request->all());
-                return $product;
+                    #create
+                    $product = ProductService::updateProduct($request->all());
+                    return $product;
 
             }else{
 
                 if(Product::where('route',$request->route)->exists())
                 {
-                    return response()->json('Route Already Exist');
+                    return response()->json(['error'=>'Route Already Exist']);
 
                 }else{
 
                     #create
-                    $product = ProductService::insertProduct($request->all());
+                    $product = ProductService::addProduct($request->all());
                     return $product;
                 }
 
@@ -100,6 +103,74 @@ class ProductController extends Controller
     }
 
 
+
+    public function productVariation($id){
+
+        $productVariation = ProductVariation::where('product_id',$id)->get();
+        if($productVariation){
+
+            return response()->json($productVariation);
+
+        }else{
+            
+            return response()->json('No variation found');
+
+
+        }
+
+    }
+
+    public function singleVariation($id){
+
+        $productVariation =  ProductVariation::where('id',$id)->first();
+        $productVariation['variationItems'] = ProductPivotVariation::where('product_variation_id',$id)->pluck('variation_value_id');
+        if($productVariation){
+            return response()->json($productVariation);
+
+        }else{
+            
+            return response()->json('No variation found');
+
+
+        }
+
+
+
+
+    }
+
+
+    public function addVariation(Request $request){
+
+         try{
+
+            if(ProductVariation::where('id',$request->id)->exists()){
+
+                    #create
+                    $variation = ProductService::updateVariation($request->all());
+                    return $variation;
+
+            }else{
+
+               
+                    #create
+                    $variation = ProductService::addVariation($request->all());
+                    return $variation;
+               
+
+
+            }
+
+        }
+         catch (\Error $exception) {
+             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
+
+
+    }
+
+
+    
     public function deleteProductVariation($id){
 
         ProductVariation::where('id',$id)->delete();
@@ -107,6 +178,61 @@ class ProductController extends Controller
         return response()->json('Variation Deleted Successfully!', 200);
 
     }
+
+    public function cloneVariation($id){
+
+         try{
+
+            #Clone Variation
+            $product = ProductService::cloneVariation($id);
+            return response()->json('Variation Cloned successfully!');
+
+        }
+         catch (\Error $exception) {
+             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
+        
+
+    }
+
+
+    public function cloneProduct($id){
+        try{
+
+            #Clone Variation
+            $product = ProductService::cloneProduct($id);
+            return response()->json('Product Cloned successfully!');
+
+        }
+         catch (\Error $exception) {
+             return response()->json(['ex_message'=> $exception->getMessage() , 'line' =>$exception->getLine()], 400);
+        }
+        
+
+    }
+    
+    public function productIndexing(Request $request){
+        
+        
+        $data = $request->product_data;
+        
+        
+        
+        foreach($data as $single){
+            
+                        
+            $product = Product::where('id' , $single['id'])->update(['currentIndex' => $single['currentIndex']]);
+            
+            
+        }
+        
+        
+        return ['data'=>'product order has been updated.','status'=>200];
+        
+        
+    }
+
+   
 
 
 

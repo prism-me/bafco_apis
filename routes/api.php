@@ -1,7 +1,15 @@
 <?php
 
 use App\Http\Controllers\PaymentController;
+use App\Models\Cart;
+use App\Services\OrderService;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
+
+
+
+
 
 
 #Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -20,13 +28,23 @@ Route::get('frontpage_category/{route}', 'CategoryController@frontpage_category'
 Route::get('sub-category', 'CategoryController@subCategory');
 
 
-    #Products
-        Route::get('products' , 'ProductController@index');
-        Route::post('products' , 'ProductController@store')->middleware('auth:sanctum');
-        Route::get('products/{id}' , 'ProductController@show');
-        Route::put('change-status/{id}' , 'ProductController@changeStatus')->middleware('auth:sanctum');
-        Route::get('disable-products' , 'ProductController@disableProducts');
-        Route::delete('delete-product-variation/{id}' , 'ProductController@deleteProductVariation')->middleware('auth:sanctum');
+#Products
+Route::get('products', 'ProductController@index');
+Route::post('products', 'ProductController@store')->middleware('auth:sanctum');
+Route::post('product-indexing', 'ProductController@productIndexing')->middleware('auth:sanctum');
+
+Route::put('clone-product/{id}', 'ProductController@cloneProduct')->middleware('auth:sanctum');
+
+
+Route::post('add-product-variation', 'ProductController@addVariation')->middleware('auth:sanctum');
+Route::get('product-all-variation/{id}', 'ProductController@productVariation');
+Route::get('single-variation/{id}', 'ProductController@singleVariation');
+
+Route::get('products/{id}', 'ProductController@show');
+Route::put('change-status/{id}', 'ProductController@changeStatus')->middleware('auth:sanctum');
+Route::get('disable-products', 'ProductController@disableProducts');
+Route::delete('delete-product-variation/{id}', 'ProductController@deleteProductVariation')->middleware('auth:sanctum');
+Route::put('clone-product-variation/{id}', 'ProductController@cloneVariation')->middleware('auth:sanctum');
 
 
 
@@ -76,9 +94,9 @@ Route::delete('partners/{partner}', 'PartnerController@destroy')->middleware('au
 
 #Contact Us
 Route::post('form-submit', 'ContactUsController@store');
-Route::get('contact-us', 'ContactUsController@index');
-Route::get('contact-us/{contactUs}', 'ContactUsController@show');
-Route::delete('contact-us/{contactUs}', 'ContactUsController@destroy')->middleware('auth:sanctum');
+Route::get('contacts', 'ContactUsController@index');
+Route::get('contacts/{contacts}', 'ContactUsController@show');
+Route::delete('contacts/{contacts}', 'ContactUsController@destroy')->middleware('auth:sanctum');
 
 #Management
 Route::get('managements', 'ManagementController@index');
@@ -117,7 +135,6 @@ Route::get('promo-codes/{id}', 'PromoCodeController@show');
 Route::delete('promo-codes/{id}', 'PromoCodeController@destroy')->middleware('auth:sanctum');
 
 #Project
-
 Route::get('projects', 'ProjectController@index');
 Route::get('project-product', 'ProjectController@projectProduct');
 Route::post('projects', 'ProjectController@store')->middleware('auth:sanctum');
@@ -172,19 +189,15 @@ Route::get('/paymentFailed', [PaymentController::class, 'failedResponse']);
 #Front Controllers
 
 /*Product Inner page*/
-
 Route::get('front-products/{route}', 'FrontProductController@frontProducts');
 Route::get('product-detail/{route}/{id?}', 'FrontProductController@productDetail');
 Route::get('home-product-category-filter/{route}', 'FrontProductController@homeProductCategoryFilter');
 Route::get('product-filter-data', 'FrontProductController@filterProductData');
 Route::get('related-products/{route}', 'FrontProductController@relatedProducts');
 Route::get('random-products', 'FrontProductController@randomProducts');
-
-
 /*End Product Inner Page*/
 
 /*Resource Front Page*/
-
 Route::get('home-resource', 'FrontResourceController@index');
 
 #Videos
@@ -210,8 +223,6 @@ Route::get('plan-detail/{id}', 'FrontResourceController@planDetail');
 Route::get('finishes-filter-list/{type}', 'FrontResourceController@finishesFilterList');
 Route::post('finishes-filter-data', 'FrontResourceController@finishesFilterData');
 Route::get('finishes-filter-detail/{id}', 'FrontResourceController@finishesFilterDetail');
-
-
 /* End Resource Front Page*/
 
 
@@ -224,23 +235,15 @@ Route::post('category-list-filteration', 'CategoryFiltersController@CategoryList
 #Product Detail
 Route::get('front-category/{route}', 'FrontProductController@category');
 Route::get('header-category', 'FrontProductController@headerCategory');
-
-Route::get('top-selling-products/{id}', 'FrontProductController@topSellingProducts');
-Route::get('top-selling-product', 'FrontProductController@topSellingProduct');
-
-    #Product Detail
-        Route::get('front-category/{route}', 'FrontProductController@category');
-        Route::get('header-category', 'FrontProductController@headerCategory');
-        Route::get('top-selling-products', 'FrontProductController@topSellingProduct');
+Route::get('top-selling-products', 'FrontProductController@topSellingProduct');
 
 
 #Guest Cart
-
 Route::get('guest-cart/{id}', 'GuestCartController@index');
 Route::post('guest-cart', 'GuestCartController@store');
 Route::delete('guest-remove-cart/{id}', 'GuestCartController@removeCart');
 Route::delete('guest-clear-all-cart/{id}', 'GuestCartController@clearAllCart');
-Route::post('guest-cart-qty', 'GuestCartController@incrementQty');
+Route::post('guest-update-cart', 'GuestCartController@updateCart');
 Route::get('guest-cart-detail/{id}', 'GuestCartController@show');
 Route::get('guest-cart-total/{id}', 'GuestCartController@cartTotal');
 
@@ -261,21 +264,22 @@ Route::get('enquiries', 'EnquiryController@index');
 Route::get('enquiries/{id}', 'EnquiryController@show');
 Route::delete('enquiries/{id}', 'EnquiryController@destroy');
 
-
-
+#Subscriber
+Route::post('subscriber', 'SubscriberController@store');
+Route::get('subscriber', 'SubscriberController@index');
+Route::delete('subscriber/{id}', 'SubscriberController@destroy');
 
 
 
 #Forgot Password
 Route::post('forget-password', 'UserController@forgetPassword');
-Route::post('submit-reset-password', 'UserController@submitResetPassword');
-
-    #Forgot Password
-            Route::post('forget-password', 'UserController@forgetPassword');
-
 
 #Order Detail User
 Route::get('user-order-detail/{id}', 'UserOrderDetailController@userOrderDetail');
+
+
+
+Route::get('wishlist_all', 'WishlistController@list');
 
 
 Route::group(['prefix' => 'auth'], function ($router) {
@@ -289,11 +293,10 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::post('/update-profile', 'UserController@updateProfile')->middleware('auth:sanctum');
     Route::post('/change-password', 'UserController@changePassword')->middleware('auth:sanctum');
     Route::get('/track-order/{id}', 'UserController@trackOrder')->middleware('auth:sanctum');
-
-
-
+    Route::post('/cancel-order', 'UserOrderDetailController@cancelOrder')->middleware('auth:sanctum');
 
     #Wishlist
+
     Route::get('wishlists/{id}', 'WishlistController@index')->middleware('auth:sanctum');
     Route::get('wishlists/{id}', 'WishlistController@index')->middleware('auth:sanctum');
     Route::get('wishlist-detail/{id}', 'WishlistController@show')->middleware('auth:sanctum');
@@ -308,20 +311,18 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::post('cart', 'CartController@store')->middleware('auth:sanctum');
     Route::delete('remove-cart/{id}', 'CartController@removeCart')->middleware('auth:sanctum');
     Route::delete('clear-all-cart/{id}', 'CartController@clearAllCart')->middleware('auth:sanctum');
-    Route::post('cart-qty', 'CartController@incrementQty')->middleware('auth:sanctum');
+    Route::post('update-cart', 'CartController@updateCart')->middleware('auth:sanctum');
     Route::get('cart-detail/{id}', 'CartController@show')->middleware('auth:sanctum');
     Route::get('cart-total/{id}', 'CartController@cartTotal')->middleware('auth:sanctum');
     Route::get('promo-cart-total/{id}', 'CartController@promoCartDetail')->middleware('auth:sanctum');
     Route::post('get-guest-cart', 'CartController@getGuestCart')->middleware('auth:sanctum');
 
-
-
     #Dashboard CMS
-
     Route::get('dashboard-details', 'DashboardController@dashboardDetails');
     Route::get('all-users', 'DashboardController@allUsers');
     Route::get('all-orders', 'DashboardController@allOrder');
     Route::get('order-detail/{id}', 'DashboardController@orderDetail');
+    Route::post('order-filter', 'DashboardController@orderFilter');
     Route::post('change-order-status', 'DashboardController@changeOrderStatus');
     Route::get('product-report-list', 'DashboardController@productReportList');
     Route::get('product-report-detail/{id}', 'DashboardController@productReportDetail');
@@ -329,6 +330,8 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::post('transaction-filter', 'DashboardController@transactionFilter');
     Route::get('sales-list', 'DashboardController@salesList');
     Route::get('sales-count', 'DashboardController@salesCount');
+    Route::post('sales-list-filter', 'DashboardController@salesListFilter');
+
 
     #Todo
     Route::get('todos', 'TodoController@index')->middleware('auth:sanctum');

@@ -186,15 +186,12 @@ class FrontResourceController extends Controller
 
     /* Fabrics and Finishes*/
 
-
-
-
         public function finishesFilterList($type){
 
             if($type == "Leather"){
 
                 $material = Material::where('name','=', 'Leather')->with('materialValues.values')->first();
-                $finishesList = Finishes::with('value','childValue')->where('parent_id', 0)->get();
+                $finishesList = Finishes::with('value','childValue.value')->where('parent_id', 0)->get();
                 $finishes = FinishesValue::where('material_id', $material->id)->where('finishes_id',$finishesList)->pluck('finishes_id');
                 $finishesData = Finishes::where('name','Finishes')->with('childValue.value')->get();
                 $data = [
@@ -207,12 +204,8 @@ class FrontResourceController extends Controller
             }else{
 
                 $material = Material::where('name',$type)->with('materialValues.values')->first();
-
-                $finishesList = Finishes::with('value','childValue')->where('parent_id', 0)->get();
-//                $finishes = FinishesValue::where('material_id', $material->id)->where('finishes_id',$finishesList)->first();
-//                $finishesParent = Finishes::where('id', $finishes['finishes_id'])->with('parent')->first();
-//                $ID =  $finishesParent['parent']['id'];
-//                $finishesData = Finishes::where('id', $ID)->with('childValue.value')->get();
+                $finishesList = Finishes::with('value')->with('childValue.value')->where('parent_id', 0)->get();
+                $finishes = FinishesValue::where('material_id', $material->id)->where('finishes_id',$finishesList)->pluck('finishes_id');
                 $finishesData = Finishes::where('name','Finishes')->with('childValue.value')->get();
                 $data = [
                     'finishesList' => $finishesList,
@@ -220,8 +213,6 @@ class FrontResourceController extends Controller
 
                 ];
                 return response()->json($data);
-
-
 
             }
 
@@ -233,13 +224,35 @@ class FrontResourceController extends Controller
             $data = $request->all();
             $materialId = $data['material_id'];
             $finishesId = $data['finishes_id'];
-            $finishes = FinishesValue::where('material_id',$materialId)->where('finishes_id',$finishesId)->first();
-            $finishesParent = Finishes::where('id', $finishes['finishes_id'])->with('parent')->first();
-            $ID =  $finishesParent['parent']['id'];
-            $finishesData = Finishes::where('id', $ID)->with('childValue.value')->get();
-            $data = [
-                'finishesData' => $finishesData,
-            ];
+            $i = 0;
+            if(@$data['color_code'] != null){
+                $finishesData['child_value'] = FinishesValue::where('material_id',$materialId)->where('color_code',$data['color_code'])->get();
+                
+                $i = 0;
+                foreach($finishesData['child_value'] as $id){
+
+                    $finishesData['child_value'][$i]['finishes'] = Finishes::where('id', $id['finishes_id'])->first('name');
+                    $i++;
+
+                }
+                $data = [
+                    'finishesData' => $finishesData,
+                ];
+                  
+            }else{
+
+                $finishes = FinishesValue::where('material_id',$materialId)->where('finishes_id',$finishesId)->first();
+                $finishesParent = Finishes::where('id',  $finishesId)->with('parent')->first();
+                $ID =  $finishesParent['parent']['id'];
+                $finishesData = Finishes::where('id', $ID)->with(['childValue' => function($q) use ($finishesId){
+                        $q->where('id',$finishesId)->with('value');
+                }])->get();
+                $data = [
+                    'finishesData' => $finishesData,
+                ];
+
+            }
+                
             return response()->json($data);
 
         }
@@ -253,9 +266,6 @@ class FrontResourceController extends Controller
                 'detailData' => $value
             ];
             return response()->json($data);
-
-
-
         }
 
 

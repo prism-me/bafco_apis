@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\ProductPivotVariation;
+use App\Models\Variation;
+use App\Models\Product;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
+
 class CategoryFiltersController extends Controller
 {
 
@@ -13,69 +17,84 @@ class CategoryFiltersController extends Controller
     {
 
         $variations =  DB::select("CALL CategoryFilterList('" . $category->route . "')");
-        return response()->json($variations, 200);
+        // DB::enableQueryLog();
 
+        $categories = Category::where('parent_id', $category->parent_id)->withCount(['products' => function($q){
+            $q->where('status', 1);
+        }])->get();
+        // ->filter(function($category) { return $category['products']['status'] > 0; });
+
+        //   return DB::getQueryLog();
+
+        $brands = Product::distinct()->select('brand','category_id')->where('category_id',$category->id)->get();
+
+        return response()->json(['categories' => $categories, 'variations' => $variations , 'brands' => $brands], 200);
     }
 
     public function CategoryListFilteration(Request $request)
     {
-        $brand = $request->brand;
-        $route = $request->route;
-        $max = $request->max;
-        $min = $request->min;
+        $brand =  $request->brand;
+        $route =  $request->route;
+        $max =  $request->max ;
+        $min =   $request->min;
+        $color  = $request->color;
 
-        $category = Category::with(['parentCategory'])->where('route', $route)->first();
 
-        if ($brand !== null && $min !== null && $max !== null) {
+        $category = Category::where('route', $route)->first();
 
-            #Brands && Price
-            $products =  Category::with(['parentCategory'])->with(['products' => function ($query) use ($brand, $category, $min, $max) {
-                $query->whereIn('brand', $brand)
-                    ->with(['productvariations' =>  function ($range) use ($min, $max) {
-                        $range->where('lower_price', '>=', $min)->where('upper_price', '<=', $max);
-                    }]);
-            }])
-                ->whereHas('products.productvariations')
-                ->where('id', $category->id)
-                ->first();
 
-            $filteredNull = $products->products->whereNotNull('productvariations');
-            unset($products->products);
-            $products->products = $filteredNull;
+        $products = Product::with('productCategory.parentCategory')
+                            ->when(!empty($request->brand), function($q) use ($brand,$category) {
+                                $q->whereIn('brand', $brand);
 
-            return response()->json($products);
-        } elseif (isset($brand) && $brand !== null) {
+                            })
 
-            #Brands
-            $products = Category::with(['parentCategory'])->with(['products' => function ($query) use ($brand, $category) {
-                $query->whereIn('brand', $brand)
-                    ->where('category_id', $category->id)
-                    ->with(['productvariations']);
-            }])
-                ->where('id', $category->id)->first();
+                            ->when(($request->min == 0 || $request->min > 0 ) &&  !empty($request->max) , function ($q) use ($min,$max) {
 
-            return response()->json($products);
-        } elseif ($min && $max !== null) {
+                                    $q->with('productvariations', function($q)  use ($min, $max) {
 
-            //return 'hi';
-            #Price Range
-            $products = Category::with(['parentCategory'])
-                ->with(['products.productvariations' => function ($range) use ($min, $max) {
-                    $range->where('lower_price','>',$min)->where('lower_price','<',$max);
+                                        $q->whereBetween('upper_price', [$min, $max]);
+                                    });
+                                })
 
-                }])
-                ->whereHas('products.productvariations')
-                ->where('id', $category->id)
-                ->first();
+                            ->when(!empty($request->color)  , function ($q)  use($color){
+                                $productId = ProductPivotVariation::whereIn('variation_value_id', $color)->pluck('product_id')->unique();
+                                $q->whereIn('id', $productId);
 
-            $filteredNull = $products->products->whereNotNull('productvariations');
-            unset($products->products);
-            $products->products = $filteredNull;
+                            })
 
-            return response()->json($products);
-        } else {
+                            ->whereHas('productvariations')
+                            ->where('category_id',$category->id)
+                            ->where('status',1)
+                            ->when( count( $request->all()) === 0, function($q){
+                                return response()->json([]);
+                            })->get();
 
-            return response()->json('No Product Found', 404);
-        }
+                            if($products->count() > 0){
+
+                                if(!empty($products)){
+                                    $productFiltered =[];
+                                    $i=0;
+                                    foreach($products as $item){
+                                        if($item->productvariations){
+                                            $productFiltered[$i] = $item;
+                                            $i++;
+                                        }
+
+                                    }
+                                    unset($products);
+                                    $products = $productFiltered;
+                                    return response()->json($products);
+                                }else{
+
+                                    return response()->json([]);
+                                }
+                            }else{
+
+                                return response()->json([]);
+
+                            }
     }
+
+
 }

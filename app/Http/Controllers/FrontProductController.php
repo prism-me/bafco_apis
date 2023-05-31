@@ -17,12 +17,16 @@ class FrontProductController extends Controller
         public function homeProductCategoryFilter($route)
     {
         if($route == 'all' ){
-            $product = Product::with('variations.variation_items.variation_values')->get()->take(4);
+            $product = Product::with('variations.variation_items.variation_values')->where('status',1)->get()->take(4);
             $data = $product;
         }
         else{
             //$productFilter = Category::with('products')->where('route',$route)->get()->take(4);
-            $productFilter = Category::with('products.variations.variation_items.variation_values')->where('route',$route)->get()->take(4);
+            $productFilter = Category::with('parentCategory')->with(['products' => function($q) {
+                    $q->where('status',1)
+                    ->with('productvariations.productVariationName.productVariationValues');
+                    }])
+                    ->where('route',$route)->get()->take(4);
             $data =  $productFilter;
         }
         return response()->json($data);
@@ -33,7 +37,11 @@ class FrontProductController extends Controller
     #Product Inner Category Listing
         public function frontProducts($route)
         {
-            $products = Category::with('parentCategory','products.productvariations.productVariationName.productVariationValues')->where('route',$route)->first(['id','route','name','parent_id']);
+            $products = Category::with('parentCategory')->with(['products' => function($q) {
+                    $q->where('status',1)
+                    ->with('productvariations.productVariationName.productVariationValues');
+                    }])
+                    ->where('route',$route)->first(['id','route','name','parent_id','banner_image','seo']);
             return response()->json($products);
         }
 
@@ -73,15 +81,16 @@ class FrontProductController extends Controller
 
             }
 
-            $dropDownValue  = ProductPivotVariation::where('product_id',$productDetails['id'])->get(['product_variation_id','product_id','variation_id','variation_value_id']);
-
+            $dropDownValue  = ProductPivotVariation::where('product_id',$productDetails['id'])->orderBy('product_variation_id','ASC')->get(['product_variation_id','product_id','variation_id','variation_value_id']);
+         
             $j = 0;
             foreach ($dropDownValue as $value){
-
                 $dropDown[$j] = VariationValues::where('id', $value['variation_value_id'])->with('variant')->first(['id','variation_id','name','route','type' , 'type_value']);
                 $dropDown[$j]['product_variation_id'] = $value['product_variation_id'];
                 $j++;
             }
+            
+           
 
             if($id == null){
 
@@ -113,13 +122,13 @@ class FrontProductController extends Controller
 
         public function category($route){
 
-            $category = Category::where('route' , $route)->with('subcategoryProducts')->get(['id','name','route','featured_image','description']);
+            $category = Category::where('route' , $route)->with('subcategoryProducts')->get(['id','name','route','featured_image','banner_image','description','seo']);
             return response()->json($category);
         }
 
         public function relatedProducts($route){
             $category = Category::where('route',$route)->first();
-            $relatedProducts = Product::with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')->where('category_id',$category->id)->paginate(4);
+            $relatedProducts = Product::with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')->where('category_id',$category->id)->where('status',1)->paginate(4);
             return response($relatedProducts,200);
 
         }
@@ -127,7 +136,9 @@ class FrontProductController extends Controller
         public function randomProducts()
         {
 
-            $randomProducts = Product::with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')->inRandomOrder()
+            $randomProducts = Product::with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')
+                ->where('status',1)
+                ->inRandomOrder()
                 ->limit(4)
                 ->paginate(4);
             return response($randomProducts,200);
@@ -152,7 +163,10 @@ class FrontProductController extends Controller
     public function topSellingProduct()
     {
 
-        $products = Product::where('top_selling', 1)->with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')->take(8)->get();
+        $products = Product::where('top_selling', 1)->with('productCategory.parentCategory','productvariations.productVariationName.productVariationValues')
+            ->where('status',1)
+            ->take(8)
+            ->get();
         return response($products,200);
 
     }

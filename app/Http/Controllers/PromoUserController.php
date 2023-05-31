@@ -16,7 +16,6 @@ class PromoUserController extends Controller
     {
         try {
 
-            \DB::beginTransaction();
 
             $data = $request->all();
             $user  = $request->user_id;
@@ -46,17 +45,10 @@ class PromoUserController extends Controller
 
 
                         if(!($promoUser = PromoUser::where('user_id',$user)->where('promo_code_id',$code)->exists())){
-
-
-                            //$user = PromoUser::create($data);
-                            $cartCalculation  =  CartCalculation::where('user_id', $request->user_id)->first();
-                            $coupon['coupon'] = $Code['name'];
-                            $coupon['discounted_price'] = $Code['value'];
-                            $coupon['total'] = $cartCalculation['sub_total'] - $Code['value'];
-                            $cartCalculation->update($coupon);
-
-                    \DB::commit();
-                        return json_encode(['status' =>200 ,'data' => $cartCalculation  , 'message'=>'Promo Code Applied Successfully' ]);
+                            $value['id'] = $Code['id'];
+                            $value['name'] = $Code['name'];
+                            $value['value'] = $Code['value'];
+                            return json_encode(['status' =>200 ,'value' => $value  , 'message'=>'Promo Code Applied Successfully' ]);
 
                         }else{
 
@@ -78,7 +70,7 @@ class PromoUserController extends Controller
             }
         }    catch (\Exception $e) {
 
-            \DB::rollBack();
+          
             return response(['Product is not added.', 'stack' => $e->getMessage() , 'line' => $e->getLine()], 500);
         }
 
